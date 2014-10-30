@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+# Clion files
+workspace.xml
+tasks.xml
