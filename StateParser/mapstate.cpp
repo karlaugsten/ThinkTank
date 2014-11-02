@@ -9,8 +9,8 @@ MapState::MapState(const rapidjson::Value &dom)
     // TODO: Implement this
     const rapidjson::Value& size = dom["size"];
     assert(size.IsArray());
-    width = size[0].GetInt();
-    height = size[1].GetInt();
+    width = size[0].GetDouble();
+    height = size[1].GetDouble();
     const rapidjson::Value& terrainArray = dom["terrain"];
 
     assert(terrainArray.IsArray());

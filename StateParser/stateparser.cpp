@@ -16,9 +16,10 @@ void StateParser::Run() {
     zmq::message_t msg;
 
     while(stateChannel->recv(&msg)){
-        std::cout << "Recieved message: " << std::endl << msg.data() << std::endl;
+
         // TODO: This static_cast needs to be optimized!!
         std::string tmp = std::string(static_cast<char*>(msg.data()), msg.size());
+        std::cout << "Recieved message: " << std::endl << tmp << std::endl;
         state = GameState::ParseState((*allocator), tmp);
 
         allocator->Clear();

@@ -7,7 +7,7 @@ Player::Player(const rapidjson::Value &dom)
 
     const rapidjson::Value& sc = dom["score"];
     assert(sc.IsInt());
-    score = sc.GetInt();
+    score = sc.GetDouble();
 
     const rapidjson::Value& nm = dom["name"];
     assert(nm.IsString());
