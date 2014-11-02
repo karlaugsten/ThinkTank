@@ -18,14 +18,14 @@ private:
 public:
 
     GameState(rapidjson::Document &dom); // Constructor that parses the game state response message
-
+    ~GameState();
     MapState* GetMapState() { return mapState; }
     Player* GetOpponent() { return opponent; }
     Player* GetPlayer() { return us; }
     long GetTimeRemaining() { return timeRemaining; }
     long GetTimestamp() { return timestamp; }
 
-    static GameState* ParseState(std::string state);
+    static GameState* ParseState(rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> &allocator, std::string &state);
 
 };
 

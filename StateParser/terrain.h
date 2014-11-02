@@ -13,6 +13,7 @@ private:
 public:
 
     Terrain(const rapidjson::Value &dom);
+    ~Terrain();
 
     TerrainType Type;
 

@@ -13,7 +13,7 @@ public:
     Tank* TankFast;
 
     Player(const rapidjson::Value &dom); // Constructor that parses the map state message
-
+    ~Player();
 };
 
 #endif

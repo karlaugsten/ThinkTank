@@ -53,5 +53,18 @@ Tank::Tank(const rapidjson::Value &dom)
     alive = d_alive.GetBool();
 
 
+    const rapidjson::Value& d_projectiles = dom["projectiles"];
+    assert(d_projectiles.IsArray());
+    for(int i = 0; i < d_projectiles.Size(); i++){
+        Projectile* projectile = new Projectile(d_projectiles[i]);
+        projectiles.push_back(projectile);
+    }
+
     // TODO: Finish implementing this
+}
+
+Tank::~Tank(){
+    for(int i = 0; i < projectiles.size(); i++){
+        delete projectiles[i];
+    }
 }

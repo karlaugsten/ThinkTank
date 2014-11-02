@@ -33,12 +33,18 @@ GameState::GameState(rapidjson::Document &dom)
     }
 }
 
-GameState* GameState::ParseState(std::string json){
-    rapidjson::Document dom;
-    std::cout << "Now parsing:"  << std::endl << json << std::endl;
+GameState::~GameState(){
+    delete mapState;
+    delete us;
+    delete opponent;
+}
+
+GameState* GameState::ParseState(rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> &allocator, std::string &json){
+    rapidjson::Document dom(&allocator);
     dom.Parse(json.c_str());
     if(dom.HasParseError()){
         return NULL;
     }
     return new GameState(dom);
+
 }

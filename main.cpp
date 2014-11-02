@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include "StateParser/gamestate.h"
+#include "StateParser/stateparser.h"
+#include "zmq.hpp"
 
 using namespace std;
 
@@ -46,7 +48,7 @@ int main() {
             "\"speed\" : 5,\n"
             "\"projectiles\" : [\n"
             "{\n"
-            "\"id\" : 123,\n"
+            "\"id\" : \"123\",\n"
             "\"position\" : [5, 12],\n"
             "\"direction\" : 1.23,\n"
             "\"speed\" : 30,\n"
@@ -100,9 +102,10 @@ int main() {
             "\"projectiles\" : []\n"
             "} ] } ]\n" // end of players array
             "}";
+    zmq::context_t ctx (1);
+    zmq::socket_t s (ctx, 0);
+    s.connect ("tcp://192.168.0.115:5555");
+    StateParser* parser = new StateParser(&s);
 
-    GameState* game = GameState::ParseState(map);
-    if(game == NULL) cout << "wtf" << endl;
-    else cout << "parsed game!" << endl;
     return 0;
 }

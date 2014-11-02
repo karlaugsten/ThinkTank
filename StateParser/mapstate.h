@@ -1,9 +1,9 @@
-#include "terrain.h"
-#include <vector>
 #ifndef MAPSTATE_H
 #define MAPSTATE_H
 
 #include "rapidjson/document.h"
+#include "terrain.h"
+#include <vector>
 
 class MapState
 {
@@ -15,6 +15,7 @@ private:
 public:
 
     MapState(const rapidjson::Value &dom); // Constructor that parses the map state message
+    ~MapState();
 
     int GetWidth() { return width; }
     int GetHeight() { return height; }

@@ -1,7 +1,9 @@
 #ifndef TANKSTATE_H
 #define TANKSTATE_H
 
+#include <vector>
 #include "rapidjson/document.h"
+#include "projectilestate.h"
 
 enum TankType { FAST, SLOW};
 
@@ -22,7 +24,10 @@ public:
 
     TankType Type;
 
+    std::vector<Projectile*> projectiles;
+
     Tank(const rapidjson::Value &dom); // Constructor that parses the map state message
+    ~Tank();
 
 };
 

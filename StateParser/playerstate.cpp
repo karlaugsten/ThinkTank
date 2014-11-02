@@ -13,8 +13,6 @@ Player::Player(const rapidjson::Value &dom)
     assert(nm.IsString());
     name = nm.GetString();
 
-    std::cout << "Found player: " << name << std::endl;
-
     const rapidjson::Value& tanks = dom["tanks"];
     assert(tanks.IsArray());
     Tank* firstTank = new Tank(tanks[0]);
@@ -37,4 +35,9 @@ Player::Player(const rapidjson::Value &dom)
     }
 
     // TODO: Finish implementing this
+}
+
+Player::~Player(){
+    delete TankFast;
+    delete TankSlow;
 }

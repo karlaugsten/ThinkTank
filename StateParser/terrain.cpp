@@ -20,3 +20,7 @@ Terrain::Terrain(const rapidjson::Value &dom)
     }
     // TODO: Finish implementing this
 }
+
+Terrain::~Terrain(){
+
+}
