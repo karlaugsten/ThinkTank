@@ -30,3 +30,5 @@
 # Clion files
 workspace.xml
 tasks.xml
+# build directory
+build

@@ -122,6 +122,7 @@ int main(int argc, char* argv[]) {
             "\"team_name\" : \"Think Tank\",\n"
             "\"password\" : \"" + password + "\"\n"
             "}";
+    cout << "Match Connect msg: " << match_connect << endl;
     zmq::socket_t messager (ctx, ZMQ_REQ);
     std::string command_channel_connection = "tcp://" + server_ip + ":5557";
     messager.connect(command_channel_connection.c_str());
