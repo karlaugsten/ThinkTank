@@ -9,8 +9,8 @@
 class GameState
 {
 private:
-    long timeRemaining;
-    long timestamp;
+    double timeRemaining;
+    double timestamp;
     MapState* mapState;
     Player* opponent;
     Player* us;
@@ -26,7 +26,7 @@ public:
     long GetTimestamp() { return timestamp; }
 
     static GameState* ParseState(rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> &allocator, std::string &state);
-
+    static GameState* ParseState(std::string &state);
 };
 
 #endif

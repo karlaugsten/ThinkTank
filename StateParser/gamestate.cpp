@@ -8,9 +8,9 @@
 GameState::GameState(rapidjson::Document &dom)
 {
     rapidjson::Value::MemberIterator tr = dom.FindMember("timeRemaining");
-    timeRemaining = tr->value.GetInt64();
+    timeRemaining = tr->value.GetDouble();
     tr = dom.FindMember("timestamp");
-    timestamp = tr->value.GetInt64();
+    timestamp = tr->value.GetDouble();
     mapState = new MapState(dom["map"]);
 
     // Parse players array
@@ -19,11 +19,11 @@ GameState::GameState(rapidjson::Document &dom)
 
     Player* firstPlayer = new Player(players[0]);
     Player* secondPlayer = new Player(players[1]);
-    if(strcmp(firstPlayer->name.c_str(), "ThinkTank")){
+    if(strcmp(firstPlayer->name.c_str(), "Think Tank")){
 
         us = firstPlayer;
         opponent = secondPlayer;
-    } else if(strcmp(secondPlayer->name.c_str(), "ThinkTank")){
+    } else if(strcmp(secondPlayer->name.c_str(), "Think Tank")){
         us = secondPlayer;
         opponent = firstPlayer;
     }
@@ -41,6 +41,16 @@ GameState::~GameState(){
 
 GameState* GameState::ParseState(rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> &allocator, std::string &json){
     rapidjson::Document dom(&allocator);
+    dom.Parse(json.c_str());
+    if(dom.HasParseError()){
+        return NULL;
+    }
+    return new GameState(dom);
+
+}
+
+GameState* GameState::ParseState(std::string &json){
+    rapidjson::Document dom;
     dom.Parse(json.c_str());
     if(dom.HasParseError()){
         return NULL;

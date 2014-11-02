@@ -12,10 +12,11 @@ int main(int argc, char* argv[]) {
         cout << "Program must be run with arguments: ./ThinkTank server_ip match_token password" << endl;
         return -1;
     }
+
     std::string map = "{\n"
             "\"comm_type\": \"GAMESTATE\",\n"
-            "\"timeRemaining\" : 300000,\n"
-            "\"timestamp\" : 145433123,\n"
+            "\"timeRemaining\" : 300000.00,\n"
+            "\"timestamp\" : 145433123.00,\n"
             "\"map\" : {\n"
             "\"size\" : [1280, 720],\n"
             "\"terrain\" : [\n"
@@ -38,7 +39,7 @@ int main(int argc, char* argv[]) {
             "\"players\" : [\n"
             "{\n"
             "\"score\" : 1,\n"
-            "\"name\" : \"ThinkTank\",\n"
+            "\"name\" : \"Think Tank\",\n"
             "\"tanks\" : [\n"
             "{\n"
             "\"id\" : \"eb49f487-92dc-4f66-ac83-91ae04a4cc16\",\n"
@@ -53,7 +54,7 @@ int main(int argc, char* argv[]) {
             "\"speed\" : 5,\n"
             "\"projectiles\" : [\n"
             "{\n"
-            "\"id\" : \"123\",\n"
+            "\"id\" : \"blahblah\",\n"
             "\"position\" : [5, 12],\n"
             "\"direction\" : 1.23,\n"
             "\"speed\" : 30,\n"
@@ -107,6 +108,7 @@ int main(int argc, char* argv[]) {
             "\"projectiles\" : []\n"
             "} ] } ]\n" // end of players array
             "}";
+
     std::string server_ip = argv[1];
     std::string match_token = argv[2];
     std::string password = argv[3];
@@ -147,6 +149,7 @@ int main(int argc, char* argv[]) {
     std::string state_channel_connection = "tcp://" + server_ip + ":5556";
     sub.connect (state_channel_connection.c_str());
     sub.setsockopt(ZMQ_SUBSCRIBE, match_token.c_str(), strlen(match_token.c_str()));
+
     StateParser* parser = new StateParser(&sub);
     parser->Run();
     return 0;
