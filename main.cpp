@@ -2,11 +2,16 @@
 #include <string>
 #include "StateParser/gamestate.h"
 #include "StateParser/stateparser.h"
-#include "zmq.hpp"
+#include <zmq.hpp>
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
+    if(argc != 4) {
+
+        cout << "Program must be run with arguments: ./ThinkTank server_ip match_token password" << endl;
+        return -1;
+    }
     std::string map = "{\n"
             "\"comm_type\": \"GAMESTATE\",\n"
             "\"timeRemaining\" : 300000,\n"
@@ -102,10 +107,46 @@ int main() {
             "\"projectiles\" : []\n"
             "} ] } ]\n" // end of players array
             "}";
-    zmq::context_t ctx (1);
-    zmq::socket_t s (ctx, 0);
-    s.connect ("tcp://192.168.0.115:5555");
-    StateParser* parser = new StateParser(&s);
+    std::string server_ip = argv[1];
+    std::string match_token = argv[2];
+    std::string password = argv[3];
+    cout << "Server IP is: " << server_ip << endl;
+    cout << "Match Token is: " << match_token << endl;
 
+    zmq::context_t ctx (1);
+
+    // Setup message channel TODO: This is for testing, actually encapsulate this
+    std::string match_connect = "{\n"
+            "\"comm_type\" : \"MatchConnect\",\n"
+            "\"match_token\" : \"" + match_token + "\",\n"
+            "\"team_name\" : \"Think Tank\",\n"
+            "\"password\" : \"" + password + "\"\n"
+            "}";
+    zmq::socket_t messager (ctx, ZMQ_REQ);
+    std::string command_channel_connection = "tcp://" + server_ip + ":5557";
+    messager.connect(command_channel_connection.c_str());
+    zmq::message_t connect_msg(match_connect.size());
+    memcpy(connect_msg.data(), match_connect.data(), match_connect.size());
+    if(messager.send(connect_msg)){
+
+        cout << "Sent match connect message!" << endl;
+        zmq::message_t resp;
+        messager.recv(&resp);
+        std::string data(static_cast<char*>(resp.data()), resp.size());
+        cout << "recieved response: " << data << endl;
+    } else {
+        cout << "Failed to connect to game..." << endl;
+        return -1;
+    }
+
+    // Setup state channel TODO: This is for testing, actually encapsulate this
+
+    zmq::socket_t sub (ctx, ZMQ_SUB);
+
+    std::string state_channel_connection = "tcp://" + server_ip + ":5556";
+    sub.connect (state_channel_connection.c_str());
+    sub.setsockopt(ZMQ_SUBSCRIBE, match_token.c_str(), strlen(match_token.c_str()));
+    StateParser* parser = new StateParser(&sub);
+    parser->Run();
     return 0;
 }

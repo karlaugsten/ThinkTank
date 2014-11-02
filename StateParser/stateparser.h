@@ -1,7 +1,7 @@
 #ifndef STATEPARSER_H
 #define STATEPARSER_H
 
-#include "../zmq.hpp"
+#include <zmq.hpp>
 #include "gamestate.h"
 
 class StateParser

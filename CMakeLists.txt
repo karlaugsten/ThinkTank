@@ -3,5 +3,10 @@ project(ThinkTank)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+FIND_LIBRARY(ZMQ_LIB zmq)
+
+include_directories("/usr/local/include")
+
 set(SOURCE_FILES main.cpp StateParser/gamestate.cpp StateParser/mapstate.cpp StateParser/terrain.cpp StateParser/playerstate.cpp StateParser/projectilestate.cpp StateParser/tankstate.cpp StateParser/stateparser.cpp)
 add_executable(ThinkTank ${SOURCE_FILES})
+TARGET_LINK_LIBRARIES(ThinkTank ${ZMQ_LIB})
