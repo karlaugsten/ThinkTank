@@ -18,9 +18,12 @@ Terrain::Terrain(const rapidjson::Value &dom)
         // Should never get here!
         assert(false);
     }
+    position = new Position(dom["corner"]);
+    size = new Position(dom["size"]);
     // TODO: Finish implementing this
 }
 
 Terrain::~Terrain(){
-
+    delete position;
+    delete size;
 }

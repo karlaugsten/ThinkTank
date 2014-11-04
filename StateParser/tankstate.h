@@ -4,6 +4,7 @@
 #include <vector>
 #include "rapidjson/document.h"
 #include "projectilestate.h"
+#include "positionstate.h"
 
 enum TankType { FAST, SLOW};
 
@@ -16,6 +17,8 @@ public:
     double tracks;
     double turret;
     double speed;
+
+    Position* position;
 
     bool alive;
 
