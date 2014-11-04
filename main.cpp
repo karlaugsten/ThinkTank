@@ -157,7 +157,7 @@ int main(int argc, char* argv[]) {
     StateParser parser = StateParser(&sub);
     thread StateChannel(&StateParser::Run, parser);
     while(true){
-        cout << "hello" << endl;
+        //cout << "hello" << endl;
     }
     return 0;
 }
