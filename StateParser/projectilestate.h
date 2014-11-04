@@ -3,6 +3,7 @@
 
 #include <string>
 #include "rapidjson/document.h"
+#include "positionstate.h"
 
 class Projectile
 {
@@ -11,6 +12,9 @@ private:
     double direction;
     double speed;
     double damage;
+
+    Position* position;
+
     Projectile() { } // private default constructor
 public:
 

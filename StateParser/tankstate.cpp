@@ -61,10 +61,13 @@ Tank::Tank(const rapidjson::Value &dom)
     }
 
     // TODO: Finish implementing this
+    position = new Position(dom["position"]);
 }
 
 Tank::~Tank(){
     for(int i = 0; i < projectiles.size(); i++){
         delete projectiles[i];
     }
+
+    delete position;
 }

@@ -38,23 +38,3 @@ GameState::~GameState(){
     delete us;
     delete opponent;
 }
-
-GameState* GameState::ParseState(rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> &allocator, std::string &json){
-    rapidjson::Document dom(&allocator);
-    dom.Parse(json.c_str());
-    if(dom.HasParseError()){
-        return NULL;
-    }
-    return new GameState(dom);
-
-}
-
-GameState* GameState::ParseState(std::string &json){
-    rapidjson::Document dom;
-    dom.Parse(json.c_str());
-    if(dom.HasParseError()){
-        return NULL;
-    }
-    return new GameState(dom);
-
-}
