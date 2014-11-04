@@ -3,6 +3,7 @@
 #include "StateParser/gamestate.h"
 #include "StateParser/stateparser.h"
 #include <zmq.hpp>
+#include <thread>
 
 using namespace std;
 
@@ -150,7 +151,11 @@ int main(int argc, char* argv[]) {
     sub.connect (state_channel_connection.c_str());
     sub.setsockopt(ZMQ_SUBSCRIBE, match_token.c_str(), strlen(match_token.c_str()));
 
-    StateParser* parser = new StateParser(&sub);
-    parser->Run();
+    // Spawn new thread for state parsing.
+    StateParser parser = StateParser(&sub);
+    thread StateChannel(&StateParser::Run, parser);
+    while(true){
+        cout << "hello" << endl;
+    }
     return 0;
 }
