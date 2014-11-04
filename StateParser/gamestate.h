@@ -25,8 +25,6 @@ public:
     long GetTimeRemaining() { return timeRemaining; }
     long GetTimestamp() { return timestamp; }
 
-    static GameState* ParseState(rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator> &allocator, std::string &state);
-    static GameState* ParseState(std::string &state);
 };
 
 #endif
