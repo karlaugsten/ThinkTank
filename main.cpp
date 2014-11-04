@@ -2,6 +2,7 @@
 #include <string>
 #include "StateParser/gamestate.h"
 #include "StateParser/stateparser.h"
+#include "command.h"
 #include <zmq.hpp>
 #include <thread>
 
@@ -117,9 +118,12 @@ int main(int argc, char* argv[]) {
     cout << "Match Token is: " << match_token << endl;
 
     zmq::context_t ctx (1);
+    Command cmdChannel = Command(ctx,server_ip);
+    cmdChannel.MatchConnect("MatchConnect", match_token, "Think Tank", password);
+
 
     // Setup message channel TODO: This is for testing, actually encapsulate this
-    std::string match_connect = "{\n"
+    /*std::string match_connect = "{\n"
             "\"comm_type\" : \"MatchConnect\",\n"
             "\"match_token\" : \"" + match_token + "\",\n"
             "\"team_name\" : \"Think Tank\",\n"
@@ -141,7 +145,7 @@ int main(int argc, char* argv[]) {
     } else {
         cout << "Failed to connect to game..." << endl;
         return -1;
-    }
+    }*/
 
     // Setup state channel TODO: This is for testing, actually encapsulate this
 
@@ -155,7 +159,15 @@ int main(int argc, char* argv[]) {
     StateParser parser = StateParser(&sub);
     thread StateChannel(&StateParser::Run, parser);
     while(true){
-        cout << "hello" << endl;
+        if(parser.state->GetPlayer() != NULL){
+            if(parser.state->GetPlayer()->TankFast != NULL){
+
+                cmdChannel.Fire(parser.state->GetPlayer()->TankFast->id, "FIRE", "");
+            }
+            if(parser.state->GetPlayer()->TankSlow != NULL){
+                parser.state->GetPlayer()->TankFast->id;
+            }
+        }
     }
     return 0;
 }
