@@ -12,10 +12,9 @@ private:
     zmq::socket_t* stateChannel;
     rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>* allocator;
     GameState* state;
-    std::mutex* stateLock;
 
 public:
-    StateParser(){ stateLock = new std::mutex(); }
+    StateParser(){ }
     GameState* GetState();
     void SetState(GameState* state);
 
