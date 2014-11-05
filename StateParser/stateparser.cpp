@@ -17,7 +17,7 @@ StateParser::~StateParser() {
 void StateParser::Run() {
 
 
-    while(ReceiveAndParse());
+    while(true)ReceiveAndParse();
 }
 
 bool StateParser::ReceiveAndParse() {
