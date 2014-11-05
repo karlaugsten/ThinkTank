@@ -14,11 +14,12 @@ private:
     MapState* mapState;
     Player* opponent;
     Player* us;
-    //GameState() { } // private default constructor
+    GameState() { } // private default constructor
 public:
 
     GameState(rapidjson::Document &dom); // Constructor that parses the game state response message
     ~GameState();
+    GameState* Clone();
     MapState* GetMapState() { return mapState; }
     Player* GetOpponent() { return opponent; }
     Player* GetPlayer() { return us; }

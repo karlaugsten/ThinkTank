@@ -47,3 +47,16 @@ Player::~Player(){
     delete TankFast;
     delete TankSlow;
 }
+
+Player* Player::Clone(){
+    Player* clone = new Player();
+    clone->name = this->name;
+    clone->score = this->score;
+    if(this->TankFast != NULL) {
+        clone->TankFast = this->TankFast->Clone();
+    }
+    if(this->TankSlow != NULL){
+        clone->TankSlow = this->TankSlow->Clone();
+    }
+    return clone;
+}

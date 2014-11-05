@@ -8,14 +8,13 @@ Tank::Tank(const rapidjson::Value &dom)
     const rapidjson::Value& strId = dom["id"];
     assert(strId.IsString());
     id = strId.GetString();
-    std::cout << "Received tank id: " << id << std::endl;
     const rapidjson::Value& type = dom["type"];
     assert(type.IsString());
-
-    if(strcmp(type.GetString(), "TankSlow"))
+    std::string strType = type.GetString();
+    if(strType == "TankSlow")
     {
         Type = TankType::SLOW;
-    } else if(strcmp(type.GetString(), "TankFast"))
+    } else if(strType == "TankFast")
     {
         Type = TankType::FAST;
     } else
@@ -70,4 +69,23 @@ Tank::~Tank(){
     }
 
     delete position;
+}
+
+Tank* Tank::Clone(){
+    Tank* clone = new Tank();
+    clone->name = this->name;
+    clone->Type = this->Type;
+    clone->alive = this->alive;
+    clone->collisionRadius = this->collisionRadius;
+    clone->health = this->health;
+    clone->hitRadius = this->hitRadius;
+    clone->id = this->id;
+    clone->position = this->position->Clone();
+    clone->speed = this->speed;
+    clone->tracks = this->tracks;
+    clone->turret = this->turret;
+    for(int i = 0; i < this->projectiles.size(); i++){
+        clone->projectiles.push_back(projectiles[i]->Clone());
+    }
+    return clone;
 }

@@ -10,6 +10,8 @@ enum TankType { FAST, SLOW};
 
 class Tank
 {
+private:
+    Tank(){}
 public:
     double health;
     double hitRadius;
@@ -31,6 +33,7 @@ public:
 
     Tank(const rapidjson::Value &dom); // Constructor that parses the map state message
     ~Tank();
+    Tank* Clone();
 
 };
 

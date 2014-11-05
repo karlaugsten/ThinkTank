@@ -16,6 +16,7 @@ public:
 
     MapState(const rapidjson::Value &dom); // Constructor that parses the map state message
     ~MapState();
+    MapState* Clone();
 
     int GetWidth() { return width; }
     int GetHeight() { return height; }

@@ -3,6 +3,7 @@
 
 #include <zmq.hpp>
 #include "gamestate.h"
+#include <mutex>
 
 class StateParser
 {
@@ -10,9 +11,13 @@ private:
     char buffer[20000];
     zmq::socket_t* stateChannel;
     rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>* allocator;
+    GameState* state;
+    std::mutex stateLock;
+
 public:
 
-    GameState* state;
+    GameState* GetState();
+    void SetState(GameState* state);
 
     StateParser(zmq::socket_t *s); // Constructor that parses the game state response message
     ~StateParser();

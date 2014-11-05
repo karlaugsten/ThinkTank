@@ -11,11 +11,12 @@ private:
 
     Position* position;
     Position* size;
-
+    Terrain(){}
 public:
 
     Terrain(const rapidjson::Value &dom);
     ~Terrain();
+    Terrain* Clone();
 
     TerrainType Type;
 

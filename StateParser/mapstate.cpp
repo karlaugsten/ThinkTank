@@ -26,3 +26,14 @@ MapState::~MapState(){
         delete terrain[i];
     }
 }
+
+MapState* MapState::Clone() {
+    MapState* clone = new MapState();
+    clone->width = this->width;
+    clone->height = this->height;
+    for(int i = 0; i < this->terrain.size(); i++){
+        clone->terrain.push_back(terrain[i]->Clone());
+    }
+    return clone;
+
+}

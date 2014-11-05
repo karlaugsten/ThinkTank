@@ -14,3 +14,10 @@ Position::Position(const rapidjson::Value &dom)
 
 Position::~Position(){
 }
+
+Position* Position::Clone(){
+    Position* clone = new Position();
+    clone->x = this->x;
+    clone->y = this->y;
+    return clone;
+}

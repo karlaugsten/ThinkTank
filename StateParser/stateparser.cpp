@@ -35,7 +35,7 @@ bool StateParser::ReceiveAndParse() {
         assert(d_comm_type.IsString());
         std::string comm_type = d_comm_type.GetString();
         if (comm_type == "GAMESTATE") {
-            state = new GameState(dom);
+            SetState(new GameState(dom));
         } else if (comm_type == "GAME_START") {
             // TODO: implement this somehow
             std::cout << "Recieved Game Start message: " << std::endl << json << std::endl;
@@ -50,4 +50,19 @@ bool StateParser::ReceiveAndParse() {
         return true;
     }
     return false;
+}
+
+// Returns a copy of the game state
+GameState* StateParser::GetState(){
+    GameState* ret;
+    stateLock.lock();
+    ret = state->Clone();
+    stateLock.unlock();
+    return ret;
+}
+
+void StateParser::SetState(GameState* newState){
+    stateLock.lock();
+    state = newState;
+    stateLock.unlock();
 }

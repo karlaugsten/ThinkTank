@@ -24,3 +24,13 @@ Projectile::~Projectile() {
     // Do nothing for now;
     delete position;
 }
+
+Projectile* Projectile::Clone(){
+    Projectile* clone = new Projectile();
+    clone->speed = this->speed;
+    clone->position = this->position->Clone();
+    clone->damage = this->damage;
+    clone->direction = this->direction;
+    clone->id = this->id;
+    return clone;
+}

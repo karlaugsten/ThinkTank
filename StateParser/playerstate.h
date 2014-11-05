@@ -6,6 +6,8 @@
 
 class Player
 {
+private:
+    Player(){}
 public:
     int score;
     std::string name;
@@ -14,6 +16,8 @@ public:
 
     Player(const rapidjson::Value &dom); // Constructor that parses the map state message
     ~Player();
+    Player* Clone();
+
 };
 
 #endif

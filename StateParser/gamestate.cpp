@@ -19,11 +19,11 @@ GameState::GameState(rapidjson::Document &dom)
 
     Player* firstPlayer = new Player(players[0]);
     Player* secondPlayer = new Player(players[1]);
-    if(strcmp(firstPlayer->name.c_str(), "Think Tank")){
+    if(firstPlayer->name == "Think Tank"){
 
         us = firstPlayer;
         opponent = secondPlayer;
-    } else if(strcmp(secondPlayer->name.c_str(), "Think Tank")){
+    } else if(secondPlayer->name == "Think Tank"){
         us = secondPlayer;
         opponent = firstPlayer;
     }
@@ -37,4 +37,19 @@ GameState::~GameState(){
     delete mapState;
     delete us;
     delete opponent;
+}
+
+GameState* GameState::Clone(){
+    GameState* clone = new GameState();
+    if(this->mapState != NULL)
+        clone->mapState = this->mapState->Clone();
+    clone->timeRemaining = this->timeRemaining;
+    clone->timestamp = this->timestamp;
+    if(this->opponent != NULL) {
+        clone->opponent = this->opponent->Clone();
+    }
+    if(this->us != NULL) {
+        clone->us = this->opponent->Clone();
+    }
+    return clone;
 }
