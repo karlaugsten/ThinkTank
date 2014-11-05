@@ -183,7 +183,7 @@ int main(int argc, char* argv[]) {
             }
         }else {
             cout << "player is null" << endl;
-	}
+	    }
     }
     return 0;
 }

@@ -65,11 +65,7 @@ private:
             "\"rads\" : \"%lf\"\n"
             "\"client_token\" : \"%s\"\n"
             "}";
-    std::string cmd_fire = "{\n"
-            "\"tank_id\" : \"%s\",\n"
-            "\"comm_type\" : \"FIRE\",\n"
-            "\"client_token\" : \"%s\",\n"
-            "}";
+    std::string cmd_fire = "{\"tank_id\":\"%s\",\"comm_type\":\"FIRE\",\"client_token\":\"%s\"}";
     std::string cmd_stop = "{\n"
             "\"tank_id\" : \"%s\",\n"
             "\"comm_type\" : \"STOP\",\n"
