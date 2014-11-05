@@ -8,13 +8,14 @@
 class StateParser
 {
 private:
+
     char buffer[20000];
     zmq::socket_t* stateChannel;
     rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>* allocator;
     GameState* state;
+    std::mutex* stateLock;
 
 public:
-    StateParser(){ }
     GameState* GetState();
     void SetState(GameState* state);
 

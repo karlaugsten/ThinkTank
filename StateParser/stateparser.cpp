@@ -1,13 +1,13 @@
 #include "stateparser.h"
 #include <iostream>
 
-std::mutex stateLock;
+
 
 StateParser::StateParser(zmq::socket_t* s){
     stateChannel = s;
 
     allocator = new rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>(buffer, sizeof(buffer));
-
+    stateLock = new std::mutex();
 }
 
 StateParser::~StateParser() {
@@ -56,14 +56,20 @@ void StateParser::ParseState(std::string stateMsg){
 // Returns a copy of the game state
 GameState* StateParser::GetState(){
     GameState* ret;
-    stateLock.lock();
+    std::cout << "Trying for lock to get state\n";
+    stateLock->lock();
+    std::cout << "Got lock for getstate\n";
     ret = state->Clone();
-    stateLock.unlock();
+    stateLock->unlock();
+    std::cout << "Unlocked getstate\n";
     return ret;
 }
 
 void StateParser::SetState(GameState* newState){
-    stateLock.lock();
+    std::cout << "Trying for lock for set state\n";
+    stateLock->lock();
+    std::cout << "setting state\n";
     state = newState;
-    stateLock.unlock();
+    stateLock->unlock();
+    std::cout << "set state\n";
 }
