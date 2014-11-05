@@ -163,10 +163,14 @@ int main(int argc, char* argv[]) {
 
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
+    /*
     thread StateChannel(&StateParser::Run, parser);
+    */
+
     if(parser.state == NULL) cout << "wtf" << endl;
     while(true){
-        while(parser.state == NULL);
+        parser.ReceiveAndParse();
+        
         cout << "Trying to fire!" << endl;
         if(parser.state->GetPlayer() != NULL){
             cout << "Got our player" << endl;

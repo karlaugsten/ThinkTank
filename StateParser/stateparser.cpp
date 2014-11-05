@@ -14,34 +14,40 @@ StateParser::~StateParser() {
 }
 
 void StateParser::Run() {
+
+
+    while(ReceiveAndParse());
+}
+
+bool StateParser::ReceiveAndParse() {
     zmq::message_t msg;
-
-    while(stateChannel->recv(&msg)){
-
+    if(stateChannel->recv(&msg)) {
         // TODO: This static_cast needs to be optimized!!
-        std::string json = std::string(static_cast<char*>(msg.data()), msg.size());
+        std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
 
         rapidjson::Document dom(allocator);
         dom.Parse(json.c_str());
-        if(dom.HasParseError()){
+        if (dom.HasParseError()) {
             std::cout << "ERROR: Parsing json. " << json << std::endl;
-            continue;
+            return false;
         }
-        const rapidjson::Value& d_comm_type = dom["comm_type"];
+        const rapidjson::Value &d_comm_type = dom["comm_type"];
         assert(d_comm_type.IsString());
         std::string comm_type = d_comm_type.GetString();
-        if(comm_type == "GAMESTATE") {
+        if (comm_type == "GAMESTATE") {
             state = new GameState(dom);
-        } else if(comm_type == "GAME_START") {
+        } else if (comm_type == "GAME_START") {
             // TODO: implement this somehow
             std::cout << "Recieved Game Start message: " << std::endl << json << std::endl;
-        } else if(comm_type == "GAME_END") {
+        } else if (comm_type == "GAME_END") {
             // TODO: implement this somehow
             std::cout << "Recieved Game End message: " << std::endl << json << std::endl;
-        } else if(comm_type == "MatchEnd") {
+        } else if (comm_type == "MatchEnd") {
             // TODO: implement this somehow
             std::cout << "Recieved Match End message: " << std::endl << json << std::endl;
         }
         allocator->Clear();
+        return true;
     }
+    return false;
 }
