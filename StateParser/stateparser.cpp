@@ -16,13 +16,8 @@ StateParser::~StateParser() {
 
 void StateParser::Run() {
 
-
-    while(true)ReceiveAndParse();
-}
-
-bool StateParser::ReceiveAndParse() {
     zmq::message_t msg;
-    if(stateChannel->recv(&msg)) {
+    while(stateChannel->recv(&msg)) {
         // TODO: This static_cast needs to be optimized!!
         std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
 
@@ -30,7 +25,7 @@ bool StateParser::ReceiveAndParse() {
         dom.Parse(json.c_str());
         if (dom.HasParseError()) {
             std::cout << "ERROR: Parsing json. " << json << std::endl;
-            return false;
+
         }
         const rapidjson::Value &d_comm_type = dom["comm_type"];
         assert(d_comm_type.IsString());
@@ -48,10 +43,10 @@ bool StateParser::ReceiveAndParse() {
             std::cout << "Recieved Match End message: " << std::endl << json << std::endl;
         }
         allocator->Clear();
-        return true;
     }
-    return false;
 }
+
+
 
 // Returns a copy of the game state
 GameState* StateParser::GetState(){
