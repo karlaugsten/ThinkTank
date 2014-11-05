@@ -3,11 +3,14 @@
 
 
 
+std::mutex StateParser::stateLock;
+// initialize to null
+GameState* StateParser::state = NULL;
+
 StateParser::StateParser(zmq::socket_t* s){
     stateChannel = s;
     state = NULL;
     allocator = new rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>(buffer, sizeof(buffer));
-    stateLock = new std::mutex();
 }
 
 StateParser::~StateParser() {
@@ -38,7 +41,7 @@ void StateParser::ParseState(std::string stateMsg){
     std::string comm_type = d_comm_type.GetString();
     if (comm_type == "GAMESTATE") {
         GameState* tmp = new GameState(dom);
-        SetState(tmp);
+        StateParser::SetState(tmp);
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
         std::cout << "Recieved Game Start message: " << std::endl << stateMsg << std::endl;
@@ -57,16 +60,16 @@ void StateParser::ParseState(std::string stateMsg){
 // Returns a copy of the game state
 GameState* StateParser::GetState(){
     GameState* ret;
-    stateLock->lock();
-    if(state == NULL) ret = NULL;
+    stateLock.lock();
+    if(StateParser::state == NULL) ret = NULL;
     else ret = state->Clone();
-    stateLock->unlock();
+    stateLock.unlock();
     return ret;
 }
 
 void StateParser::SetState(GameState* newState){
-    stateLock->lock();
-    delete state;
-    state = newState;
-    stateLock->unlock();
+    stateLock.lock();
+    delete StateParser::state;
+    StateParser::state = newState;
+    stateLock.unlock();
 }
