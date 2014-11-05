@@ -5,7 +5,7 @@
 
 std::mutex StateParser::stateLock;
 // initialize to null
-GameState* StateParser::state = NULL;
+//GameState* StateParser::state = NULL;
 
 StateParser::StateParser(zmq::socket_t* s){
     stateChannel = s;
@@ -16,17 +16,18 @@ StateParser::StateParser(zmq::socket_t* s){
 StateParser::~StateParser() {
     // Do nothing for now;
     delete allocator;
+    delete state;
 }
 
 void StateParser::Run() {
 
     zmq::message_t msg;
-    while(stateChannel->recv(&msg)) {
-        // TODO: This static_cast needs to be optimized!!
-        std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
-        std::cout << "Received: " << json << std::endl;
-        ParseState(json);
-    }
+    stateChannel->recv(&msg);
+    // TODO: This static_cast needs to be optimized!!
+    std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
+    std::cout << "Received: " << json << std::endl;
+    ParseState(json);
+
 }
 
 void StateParser::ParseState(std::string stateMsg){
@@ -41,7 +42,8 @@ void StateParser::ParseState(std::string stateMsg){
     std::string comm_type = d_comm_type.GetString();
     if (comm_type == "GAMESTATE") {
         GameState* tmp = new GameState(dom);
-        StateParser::SetState(tmp);
+        //StateParser::SetState(tmp);
+        state = tmp;
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
         std::cout << "Recieved Game Start message: " << std::endl << stateMsg << std::endl;
@@ -55,7 +57,7 @@ void StateParser::ParseState(std::string stateMsg){
     allocator->Clear();
 }
 
-
+/*
 
 // Returns a copy of the game state
 GameState* StateParser::GetState(){
@@ -74,3 +76,4 @@ void StateParser::SetState(GameState* newState){
     StateParser::state = newState;
     stateLock.unlock();
 }
+*/

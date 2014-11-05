@@ -165,7 +165,7 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-    thread StateChannel(&StateParser::Run, parser);
+    //thread StateChannel(&StateParser::Run, parser);
     //parser.ParseState(map);
     /*rapidjson::Document dom;
     dom.Parse(map.c_str());
@@ -174,7 +174,8 @@ int main(int argc, char* argv[]) {
 
     // Algorithm does stuff here!
     while(true){
-        GameState* state = StateParser::GetState();
+        parser.Run();
+        GameState* state = parser.state;
         if(state == NULL) continue;
 
         cout << "Trying to fire!" << endl;

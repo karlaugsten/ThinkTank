@@ -61,7 +61,6 @@ void Command::Fire(std::string tank_id)
 {
     int n;
     n=std::sprintf(buffer, cmd_fire.c_str(), tank_id.c_str(), client_token.c_str());
-    printf(buffer);
     std::string resp = SendMessage(n);
 }
 

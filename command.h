@@ -8,7 +8,7 @@ class Command
 {
 private:
     zmq::socket_t *messager;
-    char buffer[1000];
+    char buffer[10000];
     // For passing into every message.
     std::string client_token;
 
