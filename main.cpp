@@ -124,6 +124,8 @@ int main(int argc, char* argv[]) {
     std::string client_token = cmdChannel.MatchConnect(match_token, password);
     if(client_token == "") {
         cout << "Could not retrieve client token" << endl;
+    } else {
+        cout << "Client token is: " << client_token << endl;
     }
 
     // Setup message channel TODO: This is for testing, actually encapsulate this
@@ -162,16 +164,22 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
     thread StateChannel(&StateParser::Run, parser);
+    if(parser.state == NULL) cout << "wtf" << endl;
     while(true){
+        while(parser.state == NULL);
+        cout << "Trying to fire!" << endl;
         if(parser.state->GetPlayer() != NULL){
+            cout << "Got our player" << endl;
             if(parser.state->GetPlayer()->TankFast != NULL){
-
+                cout << "Firing fast tank!" << endl;
                 cmdChannel.Fire(parser.state->GetPlayer()->TankFast->id);
             }
             if(parser.state->GetPlayer()->TankSlow != NULL){
                 cmdChannel.Fire(parser.state->GetPlayer()->TankFast->id);
             }
-        }
+        }else {
+            cout << "player is null" << endl;
+	}
     }
     return 0;
 }
