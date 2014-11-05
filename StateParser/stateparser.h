@@ -13,16 +13,16 @@ private:
     rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>* allocator;
     GameState* state;
     std::mutex* stateLock;
-    StateParser(){ stateLock = new std::mutex(); }
-public:
 
+public:
+    StateParser(){ stateLock = new std::mutex(); }
     GameState* GetState();
     void SetState(GameState* state);
 
     StateParser(zmq::socket_t *s); // Constructor that parses the game state response message
     ~StateParser();
 
-
+    void ParseState(std::string stateMsg);
 
     void Run();
 };

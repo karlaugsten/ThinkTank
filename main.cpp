@@ -5,6 +5,7 @@
 #include "command.h"
 #include <zmq.hpp>
 #include <thread>
+#include <unistd.h>
 
 using namespace std;
 
@@ -164,8 +165,8 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-    thread StateChannel(&StateParser::Run, parser);
-
+    //thread StateChannel(&StateParser::Run, parser);
+    parser.ParseState(map);
     /*rapidjson::Document dom;
     dom.Parse(map.c_str());
     GameState* state = new GameState(dom);
@@ -173,6 +174,7 @@ int main(int argc, char* argv[]) {
 
     // Algorithm does stuff here!
     while(true){
+        usleep(100000);
         GameState* state = parser.GetState();
         if(state == NULL) continue;
 
