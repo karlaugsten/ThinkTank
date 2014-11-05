@@ -8,7 +8,7 @@ Tank::Tank(const rapidjson::Value &dom)
     const rapidjson::Value& strId = dom["id"];
     assert(strId.IsString());
     id = strId.GetString();
-
+    std::cout << "Received tank id: " << id << std::endl;
     const rapidjson::Value& type = dom["type"];
     assert(type.IsString());
 
