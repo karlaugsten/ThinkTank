@@ -5,12 +5,13 @@ StateParser::StateParser(zmq::socket_t* s){
     stateChannel = s;
 
     allocator = new rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>(buffer, sizeof(buffer));
-
+    stateLock = new std::mutex();
 }
 
 StateParser::~StateParser() {
     // Do nothing for now;
     delete allocator;
+    delete stateLock;
 }
 
 void StateParser::Run() {
@@ -55,14 +56,14 @@ bool StateParser::ReceiveAndParse() {
 // Returns a copy of the game state
 GameState* StateParser::GetState(){
     GameState* ret;
-    stateLock.lock();
+    stateLock->lock();
     ret = state->Clone();
-    stateLock.unlock();
+    stateLock->unlock();
     return ret;
 }
 
 void StateParser::SetState(GameState* newState){
-    stateLock.lock();
+    stateLock->lock();
     state = newState;
-    stateLock.unlock();
+    stateLock->unlock();
 }
