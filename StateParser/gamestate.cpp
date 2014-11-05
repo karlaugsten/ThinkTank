@@ -49,7 +49,7 @@ GameState* GameState::Clone(){
         clone->opponent = this->opponent->Clone();
     }
     if(this->us != NULL) {
-        clone->us = this->opponent->Clone();
+        clone->us = this->us->Clone();
     }
     return clone;
 }
