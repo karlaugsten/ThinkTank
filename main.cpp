@@ -121,8 +121,10 @@ int main(int argc, char* argv[]) {
 
     zmq::context_t ctx (1);
     Command cmdChannel = Command(ctx,server_ip);
-    cmdChannel.MatchConnect("MatchConnect", match_token, "Think Tank", password);
-
+    std::string client_token = cmdChannel.MatchConnect(match_token, password);
+    if(client_token == "") {
+        cout << "Could not retrieve client token" << endl;
+    }
 
     // Setup message channel TODO: This is for testing, actually encapsulate this
     /*std::string match_connect = "{\n"
@@ -164,10 +166,10 @@ int main(int argc, char* argv[]) {
         if(parser.state->GetPlayer() != NULL){
             if(parser.state->GetPlayer()->TankFast != NULL){
 
-                cmdChannel.Fire(parser.state->GetPlayer()->TankFast->id, "FIRE", "");
+                cmdChannel.Fire(parser.state->GetPlayer()->TankFast->id);
             }
             if(parser.state->GetPlayer()->TankSlow != NULL){
-                parser.state->GetPlayer()->TankFast->id;
+                cmdChannel.Fire(parser.state->GetPlayer()->TankFast->id);
             }
         }
     }

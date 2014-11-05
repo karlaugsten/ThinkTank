@@ -9,60 +9,83 @@ class Command
 private:
     zmq::socket_t *messager;
     char buffer[1000];
+    // For passing into every message.
+    std::string client_token;
+
     std::string cmd_error = "{\n"
             "\"comm_type\" : \"%s\",\n"
             "\"error\" : \"%s\",\n"
             "\"message\" : \"%s\",\n"
             "}";
     std::string cmd_connect = "{\n"
-            "\"comm_type\" : \"%s\",\n"
+            "\"comm_type\" : \"MatchConnect\",\n"
             "\"match_token\" : \"%s\",\n"
-            "\"team_name\" : \"%s\",\n"
+            "\"team_name\" : \"Think Tank\",\n"
             "\"password\" : \"%s\"\n"
             "}";
-    std::string cmd_movement = "{\n"
+    std::string cmd_movement_fwd = "{\n"
             "\"tank_id\" : \"%s\",\n"
-            "\"comm_type\" : \"%s\",\n"
-            "\"direction\" : \"%s\",\n"
-            "\"distance\" : \"%d\"\n"
+            "\"comm_type\" : \"MOVE\",\n"
+            "\"direction\" : \"FWD\",\n"
+            "\"distance\" : \"%lf\"\n"
             "\"client_token\" : \"%s\"\n"
             "}";
-    std::string cmd_tankRotation = "{\n"
+    std::string cmd_movement_rev = "{\n"
             "\"tank_id\" : \"%s\",\n"
-            "\"comm_type\" : \"%s\",\n"
-            "\"direction\" : \"%s\",\n"
-            "\"distance\" : \"%d\"\n"
+            "\"comm_type\" : \"MOVE\",\n"
+            "\"direction\" : \"REV\",\n"
+            "\"distance\" : \"%lf\"\n"
             "\"client_token\" : \"%s\"\n"
             "}";
-    std::string cmd_turretRotation = "{\n"
+    std::string cmd_tankRotation_ccw = "{\n"
             "\"tank_id\" : \"%s\",\n"
-            "\"comm_type\" : \"%s\",\n"
-            "\"direction\" : \"%s\",\n"
-            "\"rads\" : \"%d\"\n"
+            "\"comm_type\" : \"ROTATE\",\n"
+            "\"direction\" : \"CCW\",\n"
+            "\"distance\" : \"%lf\"\n"
+            "\"client_token\" : \"%s\"\n"
+            "}";
+    std::string cmd_tankRotation_cw = "{\n"
+            "\"tank_id\" : \"%s\",\n"
+            "\"comm_type\" : \"ROTATE\",\n"
+            "\"direction\" : \"CW\",\n"
+            "\"distance\" : \"%lf\"\n"
+            "\"client_token\" : \"%s\"\n"
+            "}";
+    std::string cmd_turretRotation_ccw = "{\n"
+            "\"tank_id\" : \"%s\",\n"
+            "\"comm_type\" : \"ROTATE_TURRET\",\n"
+            "\"direction\" : \"CCW\",\n"
+            "\"rads\" : \"%lf\"\n"
+            "\"client_token\" : \"%s\"\n"
+            "}";
+    std::string cmd_turretRotation_cw = "{\n"
+            "\"tank_id\" : \"%s\",\n"
+            "\"comm_type\" : \"ROTATE_TURRET\",\n"
+            "\"direction\" : \"cw\",\n"
+            "\"rads\" : \"%lf\"\n"
             "\"client_token\" : \"%s\"\n"
             "}";
     std::string cmd_fire = "{\n"
             "\"tank_id\" : \"%s\",\n"
-            "\"comm_type\" : \"%s\",\n"
+            "\"comm_type\" : \"FIRE\",\n"
             "\"client_token\" : \"%s\",\n"
             "}";
     std::string cmd_stop = "{\n"
             "\"tank_id\" : \"%s\",\n"
-            "\"comm_type\" : \"%s\",\n"
+            "\"comm_type\" : \"STOP\",\n"
             "\"control\" : \"%s\",\n"
             "\"client_token\" : \"%s\",\n"
             "}";
 
 public:
-     Command(zmq::context_t &ctx,std::string server_ip);
-     void ErrorResponse(std::string comm_type,std::string error,std::string message);
-     std::string MatchConnect(std::string comm_type, std::string match_token, std::string team_name, std::string password);
-     void Movement(std::string tank_id, std::string comm_type,std::string direction,double distance,std::string client_token);
-     void TankRotation(std::string tank_id, std::string comm_type,std::string direction,double rads,std::string client_token);
-     void TurretRotation(std::string tank_id, std::string comm_type,std::string direction,double rads,std::string client_token);
-     void Fire(std::string tank_id, std::string comm_type,std::string client_token);
-     void Stop(std::string tank_id, std::string comm_type,std::string control,std::string client_token);
-     std::string SendMessage(int n);
+    Command(zmq::context_t &ctx,std::string server_ip);
+    std::string MatchConnect(std::string match_token, std::string password);
+    void Movement(std::string tank_id, double distance);
+    void TankRotation(std::string tank_id, double rads);
+    void TurretRotation(std::string tank_id, double rads);
+    void Fire(std::string tank_id);
+    void Stop(std::string tank_id, std::string control);
+    std::string SendMessage(int n);
 };
 
 #endif
