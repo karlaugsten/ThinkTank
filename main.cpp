@@ -174,9 +174,8 @@ int main(int argc, char* argv[]) {
 
     // Algorithm does stuff here!
     while(true){
-        parser.Run();
-        GameState* state = parser.state;
-        if(state == NULL) continue;
+        GameState* state = NULL;
+        while((state = parser.Run()) == NULL){}
 
         cout << "Trying to fire!" << endl;
         if(state->GetPlayer() != NULL){

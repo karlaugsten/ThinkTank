@@ -19,7 +19,7 @@ StateParser::~StateParser() {
     delete state;
 }
 
-void StateParser::Run() {
+GameState* StateParser::Run() {
 
     zmq::message_t msg;
     stateChannel->recv(&msg);
@@ -30,12 +30,12 @@ void StateParser::Run() {
 
 }
 
-void StateParser::ParseState(std::string stateMsg){
+GameState* StateParser::ParseState(std::string stateMsg){
     rapidjson::Document dom(allocator);
     dom.Parse(stateMsg.c_str());
     if (dom.HasParseError()) {
         std::cout << "ERROR: Parsing json. " << stateMsg << std::endl;
-        return;
+        return NULL;
     }
     const rapidjson::Value &d_comm_type = dom["comm_type"];
     assert(d_comm_type.IsString());
@@ -44,6 +44,7 @@ void StateParser::ParseState(std::string stateMsg){
         GameState* tmp = new GameState(dom);
         //StateParser::SetState(tmp);
         state = tmp;
+        return state;
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
         std::cout << "Recieved Game Start message: " << std::endl << stateMsg << std::endl;
@@ -54,6 +55,7 @@ void StateParser::ParseState(std::string stateMsg){
         // TODO: implement this somehow
         std::cout << "Recieved Match End message: " << std::endl << stateMsg << std::endl;
     }
+    return NULL;
     allocator->Clear();
 }
 
