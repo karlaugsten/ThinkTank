@@ -69,7 +69,8 @@ GameState* StateParser::GetState(){
 
 void StateParser::SetState(GameState* newState){
     stateLock.lock();
-    delete StateParser::state;
+    if(StateParser::state != NULL)
+        delete StateParser::state;
     StateParser::state = newState;
     stateLock.unlock();
 }
