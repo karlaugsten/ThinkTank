@@ -169,8 +169,8 @@ int main(int argc, char* argv[]) {
 
     if(parser.state == NULL) cout << "wtf" << endl;
     while(true){
-        parser.ReceiveAndParse();
-        
+        if(!parser.ReceiveAndParse()) continue;
+
         cout << "Trying to fire!" << endl;
         if(parser.state->GetPlayer() != NULL){
             cout << "Got our player" << endl;
