@@ -149,10 +149,18 @@ int main(int argc, char* argv[]) {
                 cout << "Firing fast tank!" << endl;
                 FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
                 cmdChannel.SendCommand(command);
+                MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(moveCommand);
+                RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(rotateCommand);
             }
             if(state.GetPlayer().TankSlow.alive){
                 FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(command);
+                MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(moveCommand);
+                RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(rotateCommand);
             }
         }else {
             cout << "player is null" << endl;
