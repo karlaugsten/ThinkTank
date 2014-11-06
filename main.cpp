@@ -157,9 +157,9 @@ int main(int argc, char* argv[]) {
             if(state.GetPlayer().TankSlow.alive){
                 FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(command);
-                MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankFast.id);
+                MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(moveCommand);
-                RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankFast.id);
+                RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(rotateCommand);
             }
         }else {
