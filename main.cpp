@@ -6,6 +6,7 @@
 #include <zmq.hpp>
 #include <thread>
 #include <unistd.h>
+#include "commandchannel.h"
 
 using namespace std;
 
@@ -121,38 +122,6 @@ int main(int argc, char* argv[]) {
     cout << "Match Token is: " << match_token << endl;
 
     zmq::context_t ctx (1);
-    Command cmdChannel = Command(ctx,server_ip);
-    std::string client_token = cmdChannel.MatchConnect(match_token, password);
-    if(client_token == "") {
-        cout << "Could not retrieve client token" << endl;
-    } else {
-        cout << "Client token is: " << client_token << endl;
-    }
-
-    // Setup message channel TODO: This is for testing, actually encapsulate this
-    /*std::string match_connect = "{\n"
-            "\"comm_type\" : \"MatchConnect\",\n"
-            "\"match_token\" : \"" + match_token + "\",\n"
-            "\"team_name\" : \"Think Tank\",\n"
-            "\"password\" : \"" + password + "\"\n"
-            "}";
-    cout << "Match Connect msg: " << match_connect << endl;
-    zmq::socket_t messager (ctx, ZMQ_REQ);
-    std::string command_channel_connection = "tcp://" + server_ip + ":5557";
-    messager.connect(command_channel_connection.c_str());
-    zmq::message_t connect_msg(match_connect.size());
-    memcpy(connect_msg.data(), match_connect.data(), match_connect.size());
-    if(messager.send(connect_msg)){
-
-        cout << "Sent match connect message!" << endl;
-        zmq::message_t resp;
-        messager.recv(&resp);
-        std::string data(static_cast<char*>(resp.data()), resp.size());
-        cout << "recieved response: " << data << endl;
-    } else {
-        cout << "Failed to connect to game..." << endl;
-        return -1;
-    }*/
 
     // Setup state channel TODO: This is for testing, actually encapsulate this
 
@@ -165,12 +134,7 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-    //thread StateChannel(&StateParser::Run, parser);
-    //parser.ParseState(map);
-    /*rapidjson::Document dom;
-    dom.Parse(map.c_str());
-    GameState* state = new GameState(dom);
-    GameState* copy = state->Clone();*/
+    CommandChannel cmdChannel = CommandChannel(ctx, server_ip, match_token, password);
 
     // Algorithm does stuff here!
     while(true){
@@ -183,10 +147,10 @@ int main(int argc, char* argv[]) {
             cout << "Got our player" << endl;
             if(state->GetPlayer()->TankFast != NULL){
                 cout << "Firing fast tank!" << endl;
-                cmdChannel.Fire(state->GetPlayer()->TankFast->id);
+                //cmdChannel.Fire(state->GetPlayer()->TankFast->id);
             }
             if(state->GetPlayer()->TankSlow != NULL){
-                cmdChannel.Fire(state->GetPlayer()->TankSlow->id);
+                //cmdChannel.Fire(state->GetPlayer()->TankSlow->id);
             }
         }else {
             cout << "player is null" << endl;
