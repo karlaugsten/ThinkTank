@@ -134,14 +134,13 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-
+    parser.Start();
 
     // Algorithm does stuff here!
 
     while(true){
-        GameState state;
-        parser.Run(state);
-
+        // TODO: not thread safe
+        GameState state = parser.game;
         cout << "Trying to fire!" << endl;
         if(state.GetPlayer().alive){
             cout << "Got our player" << endl;

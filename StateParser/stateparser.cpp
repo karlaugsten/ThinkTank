@@ -1,6 +1,6 @@
 #include "stateparser.h"
 #include <iostream>
-
+#include <thread>
 
 
 std::mutex StateParser::stateLock;
@@ -9,29 +9,34 @@ std::mutex StateParser::stateLock;
 
 StateParser::StateParser(zmq::socket_t* s){
     stateChannel = s;
-    state = NULL;
     allocator = new rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>(buffer, sizeof(buffer));
 }
 
 StateParser::~StateParser() {
     // Do nothing for now;
     delete allocator;
-    delete state;
 }
 
+/**
+* Starts the state parsing thread
+*/
+void StateParser::Start() {
+    std::thread(&StateParser::Run, this);
+}
 
-void StateParser::Run(GameState& game) {
+void StateParser::Run() {
 
     zmq::message_t msg;
-    stateChannel->recv(&msg);
-    // TODO: This static_cast needs to be optimized!!
-    std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
-    std::cout << "Received: " << json << std::endl;
-    ParseState(json, game);
+    while (stateChannel->recv(&msg)) {
+        // TODO: This static_cast needs to be optimized!!
+        std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
+        std::cout << "Received: " << json << std::endl;
+        ParseState(json);
+    }
 
 }
 
-void StateParser::ParseState(std::string stateMsg, GameState& game){
+void StateParser::ParseState(std::string stateMsg){
     rapidjson::Document dom(allocator);
     dom.Parse(stateMsg.c_str());
     if (dom.HasParseError()) {

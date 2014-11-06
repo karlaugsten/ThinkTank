@@ -20,13 +20,15 @@ private:
 public:
     //static GameState* GetState();
     //static void SetState(GameState* state);
-    GameState* state;
+    GameState game;
     StateParser(zmq::socket_t *s); // Constructor that parses the game state response message
     ~StateParser();
 
-    void ParseState(std::string stateMsg, GameState& game);
+    void ParseState(std::string stateMsg);
 
-    void Run(GameState& game);
+    void Run();
+
+    void Start();
 };
 
 #endif
