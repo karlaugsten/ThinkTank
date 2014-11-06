@@ -45,7 +45,7 @@ class RotateCommand : public Command
 private:
     double rads;
     std::string tank_id;
-    std::string cmd_tankRotation_cw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE\",\"direction\":\"CW\",\"client_token\":\"%s\"}";
+    std::string cmd_tankRotation_cw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE\",\"direction\":\"CW\",\"rads\":%lf,\"client_token\":\"%s\"}";
 public:
     RotateCommand(double r, std::string t){
         rads = r;
