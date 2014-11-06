@@ -6,6 +6,7 @@
 #include <mutex>
 #include "rapidjson/allocators.h"
 #include "rapidjson/document.h"
+#include <thread>
 
 class StateParser
 {

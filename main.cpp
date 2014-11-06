@@ -6,7 +6,6 @@
 #include <zmq.hpp>
 #include <thread>
 #include <unistd.h>
-#include <Foundation/Foundation.h>
 #include "commandchannel.h"
 
 using namespace std;

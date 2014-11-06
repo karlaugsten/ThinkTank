@@ -1,6 +1,5 @@
 #include "stateparser.h"
 #include <iostream>
-#include <thread>
 
 
 std::mutex StateParser::stateLock;
