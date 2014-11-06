@@ -28,7 +28,7 @@ public:
 
     void Run();
 
-    void Start();
+    std::thread Start();
 };
 
 #endif

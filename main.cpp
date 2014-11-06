@@ -6,6 +6,7 @@
 #include <zmq.hpp>
 #include <thread>
 #include <unistd.h>
+#include <Foundation/Foundation.h>
 #include "commandchannel.h"
 
 using namespace std;
@@ -134,8 +135,8 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-    parser.Start();
-
+    std::thread parserThread = parser.Start();
+    parserThread.detach();
     // Algorithm does stuff here!
 
     while(true){

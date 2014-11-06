@@ -20,8 +20,8 @@ StateParser::~StateParser() {
 /**
 * Starts the state parsing thread
 */
-void StateParser::Start() {
-    std::thread(&StateParser::Run, this);
+std::thread StateParser::Start() {
+    return std::thread(&StateParser::Run, this);
 }
 
 void StateParser::Run() {
