@@ -16,24 +16,10 @@ MapState::MapState(const rapidjson::Value &dom)
     assert(terrainArray.IsArray());
 
     for(int i = 0; i < terrainArray.Size(); i++) {
-        Terrain* tmpTerrain = new Terrain(terrainArray[i]);
+        Terrain tmpTerrain = Terrain(terrainArray[i]);
         terrain.push_back(tmpTerrain);
     }
 }
 
 MapState::~MapState(){
-    for(int i = 0; i < terrain.size(); i++){
-        delete terrain[i];
-    }
-}
-
-MapState* MapState::Clone() {
-    MapState* clone = new MapState();
-    clone->width = this->width;
-    clone->height = this->height;
-    for(int i = 0; i < this->terrain.size(); i++){
-        clone->terrain.push_back(terrain[i]->Clone());
-    }
-    return clone;
-
 }

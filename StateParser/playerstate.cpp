@@ -4,7 +4,7 @@
 
 Player::Player(const rapidjson::Value &dom)
 {
-
+    alive = true;
     const rapidjson::Value& sc = dom["score"];
     assert(sc.IsInt());
     score = sc.GetDouble();
@@ -16,21 +16,24 @@ Player::Player(const rapidjson::Value &dom)
     const rapidjson::Value& tanks = dom["tanks"];
     assert(tanks.IsArray());
     // TODO: If tank is not there handle this better (i.e if its dead)
-    Tank *firstTank = NULL;
-    Tank *secondTank = NULL;
+    Tank firstTank;
+    Tank secondTank;
     if(tanks.Size() == 2) {
-        firstTank = new Tank(tanks[0]);
-        secondTank = new Tank(tanks[1]);
+        firstTank = Tank(tanks[0]);
+        secondTank = Tank(tanks[1]);
     } else if(tanks.Size() == 1){
-        firstTank = new Tank(tanks[0]);
-
+        firstTank = Tank(tanks[0]);
+        secondTank.alive = false;
+    }else{
+        firstTank.alive = false;
+        secondTank.alive = false;
     }
-    if(firstTank != NULL){
-        if (firstTank->Type == TankType::FAST) {
+    if(firstTank.alive){
+        if (firstTank.Type == TankType::FAST) {
 
             TankFast = firstTank;
             TankSlow = secondTank;
-        } else if (firstTank->Type == TankType::SLOW) {
+        } else if (firstTank.Type == TankType::SLOW) {
 
             TankFast = secondTank;
             TankSlow = firstTank;
@@ -44,19 +47,5 @@ Player::Player(const rapidjson::Value &dom)
 }
 
 Player::~Player(){
-    delete TankFast;
-    delete TankSlow;
 }
 
-Player* Player::Clone(){
-    Player* clone = new Player();
-    clone->name = this->name;
-    clone->score = this->score;
-    if(this->TankFast != NULL) {
-        clone->TankFast = this->TankFast->Clone();
-    }
-    if(this->TankSlow != NULL){
-        clone->TankSlow = this->TankSlow->Clone();
-    }
-    return clone;
-}

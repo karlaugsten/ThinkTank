@@ -42,16 +42,15 @@ std::string CommandChannel::SendMessage(){
     }
 }
 
-void CommandChannel::SendCommand(Command* command){
-    command->GetCommandMessage(client_token, buffer);
+void CommandChannel::SendCommand(Command& command){
+    command.GetCommandMessage(client_token, buffer);
     std::string resp = SendMessage();
     // TODO: check for error resp
-    delete command;
 }
 
 void CommandChannel::SendCommands(std::vector<Command*> commands){
     for(int i = 0; i < commands.size(); i++){
-        SendCommand(commands[i]);
+        SendCommand(*commands[i]);
     }
 }
 

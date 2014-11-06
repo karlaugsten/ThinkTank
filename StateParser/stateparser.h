@@ -24,9 +24,9 @@ public:
     StateParser(zmq::socket_t *s); // Constructor that parses the game state response message
     ~StateParser();
 
-    GameState* ParseState(std::string stateMsg);
+    void ParseState(std::string stateMsg, GameState& game);
 
-    GameState* Run();
+    void Run(GameState& game);
 };
 
 #endif

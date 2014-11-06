@@ -11,7 +11,7 @@ enum TankType { FAST, SLOW};
 class Tank
 {
 private:
-    Tank(){}
+
 public:
     double health;
     double hitRadius;
@@ -20,7 +20,7 @@ public:
     double turret;
     double speed;
 
-    Position* position;
+    Position position;
 
     bool alive;
 
@@ -29,11 +29,11 @@ public:
 
     TankType Type;
 
-    std::vector<Projectile*> projectiles;
+    std::vector<Projectile> projectiles;
 
+    Tank(){ alive = false; }
     Tank(const rapidjson::Value &dom); // Constructor that parses the map state message
     ~Tank();
-    Tank* Clone();
 
 };
 

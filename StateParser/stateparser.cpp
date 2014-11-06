@@ -19,32 +19,31 @@ StateParser::~StateParser() {
     delete state;
 }
 
-GameState* StateParser::Run() {
+
+void StateParser::Run(GameState& game) {
 
     zmq::message_t msg;
     stateChannel->recv(&msg);
     // TODO: This static_cast needs to be optimized!!
     std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
     std::cout << "Received: " << json << std::endl;
-    ParseState(json);
+    ParseState(json, game);
 
 }
 
-GameState* StateParser::ParseState(std::string stateMsg){
+void StateParser::ParseState(std::string stateMsg, GameState& game){
     rapidjson::Document dom(allocator);
     dom.Parse(stateMsg.c_str());
     if (dom.HasParseError()) {
         std::cout << "ERROR: Parsing json. " << stateMsg << std::endl;
-        return NULL;
+        return;
     }
     const rapidjson::Value &d_comm_type = dom["comm_type"];
     assert(d_comm_type.IsString());
     std::string comm_type = d_comm_type.GetString();
     if (comm_type == "GAMESTATE") {
-        GameState* tmp = new GameState(dom);
+        game = GameState(dom);
         //StateParser::SetState(tmp);
-        state = tmp;
-        return state;
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
         std::cout << "Recieved Game Start message: " << std::endl << stateMsg << std::endl;
@@ -55,7 +54,6 @@ GameState* StateParser::ParseState(std::string stateMsg){
         // TODO: implement this somehow
         std::cout << "Recieved Match End message: " << std::endl << stateMsg << std::endl;
     }
-    return NULL;
     allocator->Clear();
 }
 

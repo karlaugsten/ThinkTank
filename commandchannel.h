@@ -19,7 +19,7 @@ public:
     ~CommandChannel(){
         delete channel;
     }
-    void SendCommand(Command* command);
+    void SendCommand(Command& command);
     void SendCommands(std::vector<Command*> commands);
 };
 

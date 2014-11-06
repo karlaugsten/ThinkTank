@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
     cout << "Match Token is: " << match_token << endl;
 
     zmq::context_t ctx (1);
-
+    CommandChannel cmdChannel = CommandChannel(ctx, server_ip, match_token, password);
     // Setup state channel TODO: This is for testing, actually encapsulate this
 
     zmq::socket_t sub (ctx, ZMQ_SUB);
@@ -134,28 +134,29 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-    CommandChannel cmdChannel = CommandChannel(ctx, server_ip, match_token, password);
+
 
     // Algorithm does stuff here!
+
     while(true){
-        GameState* state = NULL;
-        while((state = parser.Run()) == NULL){}
+        GameState state;
+        parser.Run(state);
 
         cout << "Trying to fire!" << endl;
-        if(state->GetPlayer() != NULL){
-
+        if(state.GetPlayer().alive){
             cout << "Got our player" << endl;
-            if(state->GetPlayer()->TankFast != NULL){
+            if(state.GetPlayer().TankFast.alive){
                 cout << "Firing fast tank!" << endl;
-                //cmdChannel.Fire(state->GetPlayer()->TankFast->id);
+                FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(command);
             }
-            if(state->GetPlayer()->TankSlow != NULL){
-                //cmdChannel.Fire(state->GetPlayer()->TankSlow->id);
+            if(state.GetPlayer().TankSlow.alive){
+                FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
+                cmdChannel.SendCommand(command);
             }
         }else {
             cout << "player is null" << endl;
 	    }
-        delete state;
     }
     return 0;
 }

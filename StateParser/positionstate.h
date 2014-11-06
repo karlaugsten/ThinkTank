@@ -7,16 +7,15 @@
 class Position
 {
 private:
-    Position(){}
+
 public:
 
     double x;
     double y;
 
-
+    Position(){ x = 0.0; y = 0.0; }
     Position(const rapidjson::Value &dom); // Constructor that parses the game state response message
     ~Position();
-    Position* Clone();
 
 };
 

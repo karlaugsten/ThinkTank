@@ -9,14 +9,13 @@ enum TerrainType { IMPASSABLE, SOLID};
 class Terrain {
 private:
 
-    Position* position;
-    Position* size;
-    Terrain(){}
-public:
+    Position position;
+    Position size;
 
+public:
+    Terrain(){}
     Terrain(const rapidjson::Value &dom);
     ~Terrain();
-    Terrain* Clone();
 
     TerrainType Type;
 

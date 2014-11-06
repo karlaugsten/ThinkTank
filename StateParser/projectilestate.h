@@ -13,14 +13,13 @@ private:
     double speed;
     double damage;
 
-    Position* position;
+    Position position;
 
-    Projectile() { } // private default constructor
+
 public:
-
+    Projectile() { } // private default constructor
     Projectile(const rapidjson::Value &dom); // Constructor that parses the game state response message
     ~Projectile();
-    Projectile* Clone();
 };
 
 #endif
