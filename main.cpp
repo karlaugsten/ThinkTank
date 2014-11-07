@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
             if(state.GetPlayer().TankFast.alive){
 
                 // Find closest enemy tank, point turret towards him and fire.
-                if(state.GetOpponent().TankFast.alive && fabs(d_state.GetPlayer().TankFast.turret - state.GetPlayer().TankFast.turret) > 1E-3) {
+                if(state.GetOpponent().TankFast.alive && fabs(d_state.GetPlayer().TankFast.turret - state.GetPlayer().TankFast.turret) < 1E-3) {
                     Position enemy1 = state.GetOpponent().TankFast.position;
                     Position thisTank = state.GetPlayer().TankFast.position;
                     double angle = state.GetPlayer().TankFast.turret;
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
             }
             if(state.GetPlayer().TankSlow.alive){
                 // Find closest enemy tank, point turret towards him and fire.
-                if(state.GetOpponent().TankSlow.alive && fabs(d_state.GetPlayer().TankSlow.turret - state.GetPlayer().TankSlow.turret) > 1E-3) {
+                if(state.GetOpponent().TankSlow.alive && fabs(d_state.GetPlayer().TankSlow.turret - state.GetPlayer().TankSlow.turret) < 1E-3) {
                     Position enemy1 = state.GetOpponent().TankSlow.position;
                     Position thisTank = state.GetPlayer().TankSlow.position;
                     double angle = state.GetPlayer().TankSlow.turret;

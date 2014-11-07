@@ -93,6 +93,7 @@ public:
 
         if(rads < 0.0) {
             rads = -rads;
+            // TODO: This acos is slow...
             if(rads > 2*acos(-1)) {
                 rads -= 2*acos(-1);
             }
