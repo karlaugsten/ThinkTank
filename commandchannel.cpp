@@ -46,7 +46,7 @@ void CommandChannel::SendCommand(Command& command){
     command.GetCommandMessage(client_token, buffer);
     std::string resp = SendMessage();
     // TODO: check for error resp
-    if(resp.rfind("error")){
+    if(resp.rfind("error") != std::string::npos){
         std::cout << "Received error response:\n" << resp << "\nFrom command:\n" << buffer << "\n";
     }
 }

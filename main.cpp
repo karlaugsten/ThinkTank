@@ -170,6 +170,7 @@ int main(int argc, char* argv[]) {
                     Position thisTank = state.GetPlayer().TankSlow.position;
                     double angle = state.GetPlayer().TankSlow.turret;
                     angle = enemy1.GetAngle(thisTank) - angle;
+                    cout << "Now rotating " << angle << endl;
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
