@@ -15,6 +15,7 @@ private:
     std::string SendMessage();
 
 public:
+    CommandChannel(){}
     CommandChannel(zmq::context_t &ctx, std::string server_ip, std::string match_token, std::string password); // Constructor that parses the game state response message
     ~CommandChannel(){
         delete channel;
