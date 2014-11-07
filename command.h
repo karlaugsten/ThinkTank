@@ -92,14 +92,14 @@ public:
 
     std::string GetCommandMessage(std::string client_token, char* buffer){
 
-        if(rads < 0.0) {
-            rads = -rads;
+        if(rads > 0.0) {
             // TODO: This acos is slow...
             if(rads > 2*acos(-1)) {
                 rads -= 2*acos(-1);
             }
             std::sprintf(buffer, cmd_turretRotation_ccw.c_str(), tank_id.c_str(), rads, client_token.c_str());
         } else {
+            rads = -rads;
             if(rads > 2*acos(-1)) {
                 rads -= 2*acos(-1);
             }

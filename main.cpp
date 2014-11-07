@@ -144,7 +144,6 @@ int main(int argc, char* argv[]) {
     int count = 0;
     while(true){
         // TODO: not thread safe
-        parser.ParseState(map);
         GameState state = parser.game;
         if(count == 0) d_state = state;
         count++;
@@ -163,8 +162,9 @@ int main(int argc, char* argv[]) {
                     double tmp = thisTank.GetAngle(enemy1);
                     double tmp2 = enemy1.GetAngle(thisTank);
                     angle = tmp - angle;
-                    cout << "Rotating slow tank: " << angle << endl;
-                    d_state.GetPlayer().TankFast.turret += angle;
+                    cout << "Rotating fast tank: " << angle << endl;
+                    d_state.GetPlayer().TankFast.turret = fmod(d_state.GetPlayer().TankFast.turret + angle, 2.0*acos(-1));
+			
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
@@ -179,14 +179,14 @@ int main(int argc, char* argv[]) {
             if(state.GetPlayer().TankSlow.alive){
                 // Find closest enemy tank, point turret towards him and fire.
                 if(state.GetOpponent().TankSlow.alive && (fabs(d_state.GetPlayer().TankSlow.turret - state.GetPlayer().TankSlow.turret) < 1E-3
-                    || d_state.GetPlayer().TankFast.id != state.GetPlayer().TankFast.id)) {
+                    || d_state.GetPlayer().TankSlow.id != state.GetPlayer().TankSlow.id)) {
                     Position enemy1 = state.GetOpponent().TankSlow.position;
                     Position thisTank = state.GetPlayer().TankSlow.position;
                     d_state.GetPlayer().TankSlow = state.GetPlayer().TankSlow;
                     double angle = state.GetPlayer().TankSlow.turret;
-                    cout << "Rotating fast tank: " << angle << endl;
+                    cout << "Rotating slow tank: " << angle << endl;
                     angle = thisTank.GetAngle(enemy1) - angle;
-                    d_state.GetPlayer().TankFast.turret += angle;
+                    d_state.GetPlayer().TankSlow.turret = fmod(d_state.GetPlayer().TankSlow.turret + angle, 2.0*acos(-1));
 
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
                     cmdChannel.SendCommand(rotateTurret);
