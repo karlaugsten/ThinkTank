@@ -3,6 +3,7 @@
 
 #include <string>
 #include <zmq.hpp>
+#include <cmath>
 
 /**
 * Base class that all commands inherit from.

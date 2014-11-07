@@ -15,8 +15,8 @@ public:
 
     Position(){ x = 0.0; y = 0.0; }
     Position(double x, double y){
-        x = x;
-        y = y;
+        this->x = x;
+        this->y = y;
     }
     Position(const rapidjson::Value &dom); // Constructor that parses the game state response message
     ~Position();

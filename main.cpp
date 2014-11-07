@@ -123,7 +123,8 @@ int main(int argc, char* argv[]) {
     cout << "Match Token is: " << match_token << endl;
 
     zmq::context_t ctx (1);
-    CommandChannel cmdChannel = CommandChannel(ctx, server_ip, match_token, password);
+    //CommandChannel cmdChannel = CommandChannel(ctx, server_ip, match_token, password);
+    CommandChannel cmdChannel = CommandChannel();
     // Setup state channel TODO: This is for testing, actually encapsulate this
 
     zmq::socket_t sub (ctx, ZMQ_SUB);
@@ -135,14 +136,15 @@ int main(int argc, char* argv[]) {
     // Spawn new thread for state parsing.
     StateParser parser = StateParser(&sub);
 
-    std::thread parserThread = parser.Start();
-    parserThread.detach();
+    //std::thread parserThread = parser.Start();
+    //parserThread.detach();
 
     // Algorithm does stuff here!
     GameState d_state;
     int count = 0;
     while(true){
         // TODO: not thread safe
+        parser.ParseState(map);
         GameState state = parser.game;
         if(count == 0) d_state = state;
         count++;
@@ -158,19 +160,21 @@ int main(int argc, char* argv[]) {
                     Position enemy1 = state.GetOpponent().TankFast.position;
                     Position thisTank = state.GetPlayer().TankFast.position;
                     double angle = state.GetPlayer().TankFast.turret;
-                    angle = enemy1.GetAngle(thisTank) - angle;
+                    double tmp = thisTank.GetAngle(enemy1);
+                    double tmp2 = enemy1.GetAngle(thisTank);
+                    angle = tmp - angle;
                     cout << "Rotating slow tank: " << angle << endl;
                     d_state.GetPlayer().TankFast.turret += angle;
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
-                    cmdChannel.SendCommand(rotateTurret);
+                    //cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
-                    cmdChannel.SendCommand(command);
+                    //cmdChannel.SendCommand(command);
                 }
 
                 MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(moveCommand);
+                //cmdChannel.SendCommand(moveCommand);
                 RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(rotateCommand);
+                //cmdChannel.SendCommand(rotateCommand);
             }
             if(state.GetPlayer().TankSlow.alive){
                 // Find closest enemy tank, point turret towards him and fire.
@@ -181,19 +185,19 @@ int main(int argc, char* argv[]) {
                     d_state.GetPlayer().TankSlow = state.GetPlayer().TankSlow;
                     double angle = state.GetPlayer().TankSlow.turret;
                     cout << "Rotating fast tank: " << angle << endl;
-                    angle = enemy1.GetAngle(thisTank) - angle;
+                    angle = thisTank.GetAngle(enemy1) - angle;
                     d_state.GetPlayer().TankFast.turret += angle;
 
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
-                    cmdChannel.SendCommand(rotateTurret);
+                    //cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
-                    cmdChannel.SendCommand(command);
+                    //cmdChannel.SendCommand(command);
                 }
 
                 MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(moveCommand);
+                //cmdChannel.SendCommand(moveCommand);
                 RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(rotateCommand);
+                //cmdChannel.SendCommand(rotateCommand);
             }
         }else {
             cout << "player is null" << endl;
