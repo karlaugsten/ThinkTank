@@ -163,8 +163,12 @@ int main(int argc, char* argv[]) {
                     double tmp2 = enemy1.GetAngle(thisTank);
                     angle = tmp - angle;
                     cout << "Rotating fast tank: " << angle << endl;
-                    d_state.GetPlayer().TankFast.turret = fmod(d_state.GetPlayer().TankFast.turret + angle, 2.0*acos(-1));
-			
+                    d_state.GetPlayer().TankFast.turret = d_state.GetPlayer().TankFast.turret + angle;
+                    if(d_state.GetPlayer().TankFast.turret < 0.0){
+                        d_state.GetPlayer().TankFast.turret += 2.0*acos(-1);
+                    } else if(d_state.GetPlayer().TankFast.turret > 2.0*acos(-1)){
+                        d_state.GetPlayer().TankFast.turret -= 2.0*acos(-1);
+                    }
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
@@ -186,8 +190,12 @@ int main(int argc, char* argv[]) {
                     double angle = state.GetPlayer().TankSlow.turret;
                     cout << "Rotating slow tank: " << angle << endl;
                     angle = thisTank.GetAngle(enemy1) - angle;
-                    d_state.GetPlayer().TankSlow.turret = fmod(d_state.GetPlayer().TankSlow.turret + angle, 2.0*acos(-1));
-
+                    d_state.GetPlayer().TankSlow.turret = d_state.GetPlayer().TankSlow.turret + angle;
+                    if(d_state.GetPlayer().TankSlow.turret < 0.0){
+                        d_state.GetPlayer().TankSlow.turret += 2.0*acos(-1);
+                    } else if(d_state.GetPlayer().TankSlow.turret > 2.0*acos(-1)){
+                        d_state.GetPlayer().TankSlow.turret -= 2.0*acos(-1);
+                    }
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
