@@ -141,17 +141,17 @@ int main(int argc, char* argv[]) {
     while(true){
         // TODO: not thread safe
         GameState state = parser.game;
-        cout << "Trying to fire!" << endl;
+
         if(state.GetPlayer().alive){
-            cout << "Got our player" << endl;
+
             if(state.GetPlayer().TankFast.alive){
-                cout << "Firing fast tank!" << endl;
+
                 // Find closest enemy tank, point turret towards him and fire.
                 if(state.GetOpponent().TankFast.alive) {
                     Position enemy1 = state.GetOpponent().TankFast.position;
                     Position thisTank = state.GetPlayer().TankFast.position;
                     double angle = state.GetPlayer().TankFast.turret;
-                    angle = angle - enemy1.GetAngle(thisTank);
+                    angle = enemy1.GetAngle(thisTank) - angle;
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
@@ -164,8 +164,18 @@ int main(int argc, char* argv[]) {
                 cmdChannel.SendCommand(rotateCommand);
             }
             if(state.GetPlayer().TankSlow.alive){
-                FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(command);
+                // Find closest enemy tank, point turret towards him and fire.
+                if(state.GetOpponent().TankSlow.alive) {
+                    Position enemy1 = state.GetOpponent().TankSlow.position;
+                    Position thisTank = state.GetPlayer().TankSlow.position;
+                    double angle = state.GetPlayer().TankSlow.turret;
+                    angle = enemy1.GetAngle(thisTank) - angle;
+                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
+                    cmdChannel.SendCommand(rotateTurret);
+                    FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
+                    cmdChannel.SendCommand(command);
+                }
+
                 MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(moveCommand);
                 RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankSlow.id);

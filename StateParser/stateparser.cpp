@@ -29,7 +29,7 @@ void StateParser::Run() {
     while (stateChannel->recv(&msg)) {
         // TODO: This static_cast needs to be optimized!!
         std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
-        std::cout << "Received: " << json << std::endl;
+        //std::cout << "Received: " << json << std::endl;
         ParseState(json);
     }
 

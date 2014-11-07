@@ -20,9 +20,9 @@ public:
     GameState(rapidjson::Document &dom); // Constructor that parses the game state response message
     ~GameState();
     GameState Clone();
-    MapState GetMapState() { return mapState; }
-    Player GetOpponent() { return opponent; }
-    Player GetPlayer() { return us; }
+    MapState& GetMapState() { return mapState; }
+    Player& GetOpponent() { return opponent; }
+    Player& GetPlayer() { return us; }
     long GetTimeRemaining() { return timeRemaining; }
     long GetTimestamp() { return timestamp; }
 
