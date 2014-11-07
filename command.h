@@ -81,6 +81,7 @@ class RotateTurretCommand : public Command
 private:
     double rads;
     std::string tank_id;
+    std::string cmd_turretRotation_cw = "{\"tank_id\":\"%s\",\"comm_type\" : \"ROTATE_TURRET\",\"direction\":\"CW\",\"rads\":\"%lf\",\"client_token\":\"%s\"}";
     std::string cmd_turretRotation_ccw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE_TURRET\",\"direction\":\"CCW\",\"rads\":\"%lf\",\"client_token\":\"%s\"}";
 public:
     RotateTurretCommand(double r, std::string t){
@@ -89,7 +90,12 @@ public:
     }
 
     std::string GetCommandMessage(std::string client_token, char* buffer){
-        std::sprintf(buffer, cmd_turretRotation_ccw.c_str(), tank_id.c_str(), rads, client_token.c_str());
+        if(rads < 0.0) {
+            rads = -rads;
+            std::sprintf(buffer, cmd_turretRotation_cccw.c_str(), tank_id.c_str(), rads, client_token.c_str());
+        } else {
+            std::sprintf(buffer, cmd_turretRotation_cw.c_str(), tank_id.c_str(), rads, client_token.c_str());
+        }
         std::string ret = buffer;
         return ret;
     }
