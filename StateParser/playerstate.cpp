@@ -21,25 +21,30 @@ Player::Player(const rapidjson::Value &dom)
     if(tanks.Size() == 2) {
         firstTank = Tank(tanks[0]);
         secondTank = Tank(tanks[1]);
+        if(firstTank.Type == TankType::FAST){
+            TankFast = firstTank;
+            TankSlow = secondTank;
+        } else {
+            TankFast = secondTank;
+            TankSlow = firstTank;
+        }
     } else if(tanks.Size() == 1){
         firstTank = Tank(tanks[0]);
         secondTank.alive = false;
+        if(firstTank.Type == TankType::FAST){
+            TankFast = firstTank;
+            TankSlow = secondTank;
+        } else {
+            TankFast = secondTank;
+            TankSlow = firstTank;
+        }
     }else{
         firstTank.alive = false;
         secondTank.alive = false;
-    }
-    if (firstTank.Type == TankType::FAST) {
-
-        TankFast = firstTank;
-        TankSlow = secondTank;
-    } else if (firstTank.Type == TankType::SLOW) {
-
-        TankFast = secondTank;
         TankSlow = firstTank;
-    } else {
-        // Could not find fast and slow tanks!
-        assert(false);
+        TankFast = secondTank;
     }
+
 
     // TODO: Finish implementing this
 }
