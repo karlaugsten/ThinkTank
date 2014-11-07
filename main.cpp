@@ -146,8 +146,18 @@ int main(int argc, char* argv[]) {
             cout << "Got our player" << endl;
             if(state.GetPlayer().TankFast.alive){
                 cout << "Firing fast tank!" << endl;
-                FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(command);
+                // Find closest enemy tank, point turret towards him and fire.
+                if(state.GetOpponent().TankFast.alive) {
+                    Position enemy1 = state.GetOpponent().TankFast.position;
+                    Position thisTank = state.GetPlayer().TankFast.position;
+                    double angle = state.GetPlayer().TankFast.turret;
+                    angle = angle - enemy1.GetAngle(thisTank);
+                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
+                    cmdChannel.SendCommand(rotateTurret);
+                    FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
+                    cmdChannel.SendCommand(command);
+                }
+
                 MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankFast.id);
                 cmdChannel.SendCommand(moveCommand);
                 RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankFast.id);
