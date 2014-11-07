@@ -7,6 +7,7 @@
 #include <thread>
 #include <unistd.h>
 #include "commandchannel.h"
+#include <cmath>
 
 using namespace std;
 
@@ -136,8 +137,9 @@ int main(int argc, char* argv[]) {
 
     std::thread parserThread = parser.Start();
     parserThread.detach();
-    // Algorithm does stuff here!
 
+    // Algorithm does stuff here!
+    GameState d_state;
     while(true){
         // TODO: not thread safe
         GameState state = parser.game;
@@ -147,11 +149,12 @@ int main(int argc, char* argv[]) {
             if(state.GetPlayer().TankFast.alive){
 
                 // Find closest enemy tank, point turret towards him and fire.
-                if(state.GetOpponent().TankFast.alive) {
+                if(state.GetOpponent().TankFast.alive && fabs(d_state.GetPlayer().TankFast.turret - state.GetPlayer().TankFast.turret) > 1E-3) {
                     Position enemy1 = state.GetOpponent().TankFast.position;
                     Position thisTank = state.GetPlayer().TankFast.position;
                     double angle = state.GetPlayer().TankFast.turret;
                     angle = enemy1.GetAngle(thisTank) - angle;
+                    d_state.GetPlayer().TankFast.turret += angle;
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
@@ -165,12 +168,12 @@ int main(int argc, char* argv[]) {
             }
             if(state.GetPlayer().TankSlow.alive){
                 // Find closest enemy tank, point turret towards him and fire.
-                if(state.GetOpponent().TankSlow.alive) {
+                if(state.GetOpponent().TankSlow.alive && fabs(d_state.GetPlayer().TankSlow.turret - state.GetPlayer().TankSlow.turret) > 1E-3) {
                     Position enemy1 = state.GetOpponent().TankSlow.position;
                     Position thisTank = state.GetPlayer().TankSlow.position;
                     double angle = state.GetPlayer().TankSlow.turret;
                     angle = enemy1.GetAngle(thisTank) - angle;
-                    cout << "Now rotating " << angle << endl;
+                    d_state.GetPlayer().TankFast.turret += angle;
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
                     cmdChannel.SendCommand(rotateTurret);
                     FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
