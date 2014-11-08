@@ -157,8 +157,13 @@ int main(int argc, char* argv[]) {
                     Position enemy1 = state.GetOpponent().TankFast.position;
                     Position thisTank = state.GetPlayer().TankFast.position;
                     double angle = state.GetPlayer().TankFast.turret;
-                    double tmp = thisTank.GetAngle(enemy1);
-                    angle = tmp - angle - acos(-1);
+                    double tmp = thisTank.GetAngle(enemy1) - angle - acos(-1);
+                    if(tmp > acos(-1)){
+                        tmp -= 2*acos(-1);
+                    }if(tmp < acos(-1)){
+                        tmp += 2*acos(-1);
+                    }
+                    angle = tmp;
 
                     RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
                     cmdChannel.SendCommand(rotateTurret);
