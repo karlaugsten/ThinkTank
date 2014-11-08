@@ -8,10 +8,50 @@
 #include <unistd.h>
 #include "commandchannel.h"
 #include <cmath>
+#include <AppKit/AppKit.h>
 
 using namespace std;
 
+void moveCommand_CircleDodge(CommandChannel cmdChannel,string tankID){
+    // TODO: Check for unbreakable terrain and unmovable terrain
+    MoveCommand moveCommand = MoveCommand(1.0,tankID);
+    cmdChannel.SendCommand(moveCommand);
+    RotateCommand rotateCommand = RotateCommand(0.1,tankID);
+    cmdChannel.SendCommand(rotateCommand);
+}
 
+double Distance(double x0, double y0, double x1, double y1)
+{
+    return sqrt((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0));
+}
+
+Position getClosestTarget(GameState state,Position thisTank){
+    double distanceBetweenTanksFast=-1;
+    double distanceBetweenTanksSlow=-1;
+
+    //Check if each tank is alive and calculate its relative distance
+    if(state.GetOpponent().TankFast.alive) {
+        Position enemy1 = state.GetOpponent().TankFast.position;
+        distanceBetweenTanksFast=Distance(thisTank.x,thisTank.y,enemy1.x,enemy1.y);
+    }
+    if(state.GetOpponent().TankSlow.alive) {
+        Position enemy2 = state.GetOpponent().TankSlow.position;
+        distanceBetweenTanksSlow=Distance(thisTank.x,thisTank.y,enemy2.x,enemy2.y);
+    }
+
+    // TODO: CHECK FOR UNBREAKABLE BARRIER BETWEEN
+    if(distanceBetweenTanksFast==-1){
+        return state.GetOpponent().TankSlow.position;
+    }else if(distanceBetweenTanksSlow==-1){
+        return state.GetOpponent().TankFast.position;
+    }else{
+        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
+            return state.GetOpponent().TankSlow.position;
+        }else{
+            return state.GetOpponent().TankFast.position;
+        }
+    }
+}
 
 int main(int argc, char* argv[]) {
     if(argc != 4) {
@@ -149,57 +189,42 @@ int main(int argc, char* argv[]) {
         count++;
 
         if(state.GetPlayer().alive){
-
             if(state.GetPlayer().TankFast.alive){
-
-                // Find closest enemy tank, point turret towards him and fire.
-                if(state.GetOpponent().TankFast.alive) {
-                    Position enemy1 = state.GetOpponent().TankFast.position;
-                    Position thisTank = state.GetPlayer().TankFast.position;
-                    double angle = state.GetPlayer().TankFast.turret;
-                    double tmp = thisTank.GetAngle(enemy1) - angle - acos(-1);
-                    if(tmp > acos(-1)){
-                        tmp -= 2*acos(-1);
-                    }if(tmp < acos(-1)){
-                        tmp += 2*acos(-1);
-                    }
-                    angle = tmp;
-
-                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
-                    cmdChannel.SendCommand(rotateTurret);
-                    FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
-                    cmdChannel.SendCommand(command);
+                // TODO: Find closest enemy tank, point turret towards him and fire.
+                Position thisTank = state.GetPlayer().TankFast.position;
+                double angle = state.GetPlayer().TankFast.turret;
+                double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle - acos(-1);
+                if (tmp > acos(-1)) {
+                    tmp -= 2 * acos(-1);
                 }
+                if (tmp < acos(-1)) {
+                    tmp += 2 * acos(-1);
+                }
+                angle = tmp;
 
-                MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(moveCommand);
-                RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(rotateCommand);
+                // TODO: Check for unbreakable terrain
+                RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(rotateTurret);
+                FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
+                cmdChannel.SendCommand(command);
+                moveCommand_CircleDodge(cmdChannel, state.GetPlayer().TankFast.id);
             }
             if(state.GetPlayer().TankSlow.alive){
-                // Find closest enemy tank, point turret towards him and fire.
-                if(state.GetOpponent().TankSlow.alive ) {
-                    Position enemy1 = state.GetOpponent().TankSlow.position;
-                    Position thisTank = state.GetPlayer().TankSlow.position;
-                    double angle = state.GetPlayer().TankSlow.turret;
-                    double tmp = thisTank.GetAngle(enemy1) - angle - acos(-1);
-                    if(tmp > acos(-1)){
-                        tmp -= 2*acos(-1);
-                    }if(tmp < acos(-1)){
-                        tmp += 2*acos(-1);
-                    }
-                    angle = tmp;
-
-                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
-                    cmdChannel.SendCommand(rotateTurret);
-                    FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
-                    cmdChannel.SendCommand(command);
+                Position thisTank = state.GetPlayer().TankSlow.position;
+                double angle = state.GetPlayer().TankSlow.turret;
+                double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle - acos(-1);
+                if(tmp > acos(-1)){
+                    tmp -= 2*acos(-1);
+                }if(tmp < acos(-1)){
+                    tmp += 2*acos(-1);
                 }
+                angle = tmp;
 
-                MoveCommand moveCommand = MoveCommand(1.0, state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(moveCommand);
-                RotateCommand rotateCommand = RotateCommand(0.1, state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(rotateCommand);
+                RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
+                cmdChannel.SendCommand(rotateTurret);
+                FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
+                cmdChannel.SendCommand(command);
+                moveCommand_CircleDodge(cmdChannel,state.GetPlayer().TankSlow.id);
             }
         }else {
             cout << "player is null" << endl;
