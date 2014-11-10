@@ -8,7 +8,7 @@
 * A Strategy that models the playing field with a "goodness"
 * equation, and moves the tanks always to areas of increasing goodness.
 */
-class DifferntialMovementStrategy : public Strategy
+class DifferentialMovementStrategy : public Strategy
 {
 protected:
 
