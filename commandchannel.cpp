@@ -11,7 +11,10 @@ CommandChannel::CommandChannel(zmq::context_t &ctx, std::string server_ip, std::
     match_connect.GetCommandMessage("", buffer);
 
     std::string resp = SendMessage();
-
+    if(resp.rfind("error") != std::string::npos){
+        std::cout << "Received error response:\n" << resp << "\nFrom command:\n" << buffer << "\n";
+        exit(-1);
+    }
     rapidjson::Document dom;
     dom.Parse(resp.c_str());
     if(dom.HasParseError()){
