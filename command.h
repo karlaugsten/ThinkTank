@@ -46,6 +46,8 @@ class RotateCommand : public Command
 private:
     double rads;
     std::string tank_id;
+    std::string cmd_tankRotation_ccw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE\",\"direction\":\"CCW\",\"rads\":%lf,\"client_token\":\"%s\"}";
+
     std::string cmd_tankRotation_cw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE\",\"direction\":\"CW\",\"rads\":%lf,\"client_token\":\"%s\"}";
 public:
     RotateCommand(double r, std::string t){
@@ -54,7 +56,19 @@ public:
     }
 
     std::string GetCommandMessage(std::string client_token, char* buffer){
-        std::sprintf(buffer, cmd_tankRotation_cw.c_str(), tank_id.c_str(), rads, client_token.c_str());
+        if(rads > 0.0) {
+            // TODO: This acos is slow...
+            if(rads > 2*acos(-1)) {
+                rads -= 2*acos(-1);
+            }
+            std::sprintf(buffer, cmd_tankRotation_ccw.c_str(), tank_id.c_str(), rads, client_token.c_str());
+        } else {
+            rads = -rads;
+            if(rads > 2*acos(-1)) {
+                rads -= 2*acos(-1);
+            }
+            std::sprintf(buffer, cmd_tankRotation_cw.c_str(), tank_id.c_str(), rads, client_token.c_str());
+        }
         std::string ret = buffer;
         return ret;
     }

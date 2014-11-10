@@ -9,6 +9,7 @@
 #include "commandchannel.h"
 #include <cmath>
 #include "Strategies/movement_strategy.h"
+#include "Strategies/differential_movement_strategy.h"
 #include "Strategies/strategy.h"
 #include "Strategies/firing_strategy.h"
 
@@ -141,7 +142,7 @@ int main(int argc, char* argv[]) {
     std::thread parserThread = parser.Start();
     parserThread.detach();
     GameState state;
-    Strategy* movementStrategy = new MovementStrategy();
+    Strategy* movementStrategy = new DifferentialMovementStrategy();
     Strategy* firingStrategy = new FiringStrategy();
     // Algorithm does stuff here!
     try {
