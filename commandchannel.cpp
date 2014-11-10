@@ -54,9 +54,13 @@ void CommandChannel::SendCommand(Command& command){
     }
 }
 
-void CommandChannel::SendCommands(std::vector<Command*> commands){
-    for(int i = 0; i < commands.size(); i++){
-        SendCommand(*commands[i]);
+void CommandChannel::SendCommands(std::queue<Command*> commands){
+    while(!commands.empty()){
+        Command* c = commands.front();
+        commands.pop();
+        SendCommand(*c);
+        // delete reference command!
+        delete c;
     }
 }
 

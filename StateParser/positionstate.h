@@ -23,6 +23,7 @@ public:
 
     double GetAngle(const Position& other);
     double GetAngle();
+    double Distance(const Position& other);
 
     friend Position operator-(const Position &p1, const Position &p2);
 };

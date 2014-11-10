@@ -8,49 +8,12 @@
 #include <unistd.h>
 #include "commandchannel.h"
 #include <cmath>
+#include "Strategies/movement_strategy.h"
+#include "Strategies/strategy.h"
+#include "Strategies/firing_strategy.h"
 
 using namespace std;
 
-void moveCommand_CircleDodge(CommandChannel& cmdChannel,string tankID){
-    // TODO: Check for unbreakable terrain and unmovable terrain
-    MoveCommand moveCommand = MoveCommand(1.0,tankID);
-    cmdChannel.SendCommand(moveCommand);
-    RotateCommand rotateCommand = RotateCommand(0.1,tankID);
-    cmdChannel.SendCommand(rotateCommand);
-}
-
-double Distance(double x0, double y0, double x1, double y1)
-{
-    return sqrt((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0));
-}
-
-Position getClosestTarget(GameState& state, Position& thisTank){
-    double distanceBetweenTanksFast=-1;
-    double distanceBetweenTanksSlow=-1;
-
-    //Check if each tank is alive and calculate its relative distance
-    if(state.opponent.TankFast.alive) {
-        Position enemy1 = state.opponent.TankFast.position;
-        distanceBetweenTanksFast=Distance(thisTank.x,thisTank.y,enemy1.x,enemy1.y);
-    }
-    if(state.opponent.TankSlow.alive) {
-        Position enemy2 = state.opponent.TankSlow.position;
-        distanceBetweenTanksSlow=Distance(thisTank.x,thisTank.y,enemy2.x,enemy2.y);
-    }
-
-    // TODO: CHECK FOR UNBREAKABLE BARRIER BETWEEN
-    if(distanceBetweenTanksFast==-1){
-        return state.opponent.TankSlow.position;
-    }else if(distanceBetweenTanksSlow==-1){
-        return state.opponent.TankFast.position;
-    }else{
-        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-            return state.opponent.TankSlow.position;
-        }else{
-            return state.opponent.TankFast.position;
-        }
-    }
-}
 
 int main(int argc, char* argv[]) {
     if(argc != 4) {
@@ -178,50 +141,16 @@ int main(int argc, char* argv[]) {
     std::thread parserThread = parser.Start();
     parserThread.detach();
     GameState state;
+    Strategy* movementStrategy = new MovementStrategy();
+    Strategy* firingStrategy = new FiringStrategy();
     // Algorithm does stuff here!
     try {
         while (true) {
             // TODO: not thread safe
             state = parser.game;
 
-            if (state.player.alive) {
-                if (state.player.TankFast.alive) {
-                    // TODO: Find closest enemy tank, point turret towards him and fire.
-                    Position thisTank = state.player.TankFast.position;
-                    double angle = state.player.TankFast.turret;
-                    double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
-                    if (tmp > acos(-1)) {
-                        tmp -= 2 * acos(-1);
-                    }
-                    if (tmp < -acos(-1)) {
-                        tmp += 2 * acos(-1);
-                    }
-                    angle = tmp;
-                    // TODO: Check for unbreakable terrain
-                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.player.TankFast.id);
-                    cmdChannel.SendCommand(rotateTurret);
-                    FireCommand command = FireCommand(state.player.TankFast.id);
-                    cmdChannel.SendCommand(command);
-                    moveCommand_CircleDodge(cmdChannel, state.player.TankFast.id);
-                }
-                if (state.player.TankSlow.alive) {
-                    Position thisTank = state.player.TankSlow.position;
-                    double angle = state.player.TankSlow.turret;
-                    double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
-                    if (tmp > acos(-1)) {
-                        tmp -= 2 * acos(-1);
-                    }
-                    if (tmp < -acos(-1)) {
-                        tmp += 2 * acos(-1);
-                    }
-                    angle = tmp;
-                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.player.TankSlow.id);
-                    cmdChannel.SendCommand(rotateTurret);
-                    FireCommand command = FireCommand(state.player.TankSlow.id);
-                    cmdChannel.SendCommand(command);
-                    moveCommand_CircleDodge(cmdChannel, state.player.TankSlow.id);
-                }
-            }
+            cmdChannel.SendCommands(firingStrategy->DetermineActions(state));
+            cmdChannel.SendCommands(movementStrategy->DetermineActions(state));
         }
     } catch(const std::exception e){
         cout << "ERROR: Recieved exception: " << e.what() << endl;

@@ -35,3 +35,11 @@ double Position::GetAngle(const Position& other){
 double Position::GetAngle(){
     return std::atan2(y,x);
 }
+
+
+/**
+* Returns the distance to the other point
+*/
+double Position::Distance(const Position& other){
+    return hypot(this->x-other.x, this->y-other.y);
+}

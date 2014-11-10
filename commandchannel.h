@@ -2,7 +2,7 @@
 #define COMMANDCHANNEL_H
 
 #include <zmq.hpp>
-#include <vector>
+#include <queue>
 #include "command.h"
 
 class CommandChannel
@@ -21,7 +21,7 @@ public:
         delete channel;
     }
     void SendCommand(Command& command);
-    void SendCommands(std::vector<Command*> commands);
+    void SendCommands(std::queue<Command*> commands);
 };
 
 #endif
