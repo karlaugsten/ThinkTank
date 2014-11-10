@@ -33,5 +33,5 @@ double Position::GetAngle(const Position& other){
 * Returns the angle of the vector this position makes with the 1, 0 vector.
 */
 double Position::GetAngle(){
-    return std::atan(y/x);
+    return std::atan2(y,x);
 }
