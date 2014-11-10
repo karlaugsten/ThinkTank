@@ -192,7 +192,7 @@ int main(int argc, char* argv[]) {
                 if (tmp > acos(-1)) {
                     tmp -= 2 * acos(-1);
                 }
-                if (tmp < acos(-1)) {
+                if (tmp < -acos(-1)) {
                     tmp += 2 * acos(-1);
                 }
                 angle = tmp;
@@ -210,7 +210,7 @@ int main(int argc, char* argv[]) {
                 double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle - acos(-1);
                 if(tmp > acos(-1)){
                     tmp -= 2*acos(-1);
-                }if(tmp < acos(-1)){
+                }if(tmp < -acos(-1)){
                     tmp += 2*acos(-1);
                 }
                 angle = tmp;
