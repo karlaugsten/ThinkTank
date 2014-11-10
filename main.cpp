@@ -11,7 +11,7 @@
 
 using namespace std;
 
-void moveCommand_CircleDodge(CommandChannel cmdChannel,string tankID){
+void moveCommand_CircleDodge(CommandChannel& cmdChannel,string tankID){
     // TODO: Check for unbreakable terrain and unmovable terrain
     MoveCommand moveCommand = MoveCommand(1.0,tankID);
     cmdChannel.SendCommand(moveCommand);
