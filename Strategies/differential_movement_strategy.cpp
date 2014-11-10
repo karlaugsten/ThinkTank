@@ -17,7 +17,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
             goodness -= 1.0/((y - (t.position.y + t.size.y))*(y - (t.position.y + t.size.y)));
         }
 
-        if(y > t.position.x && y < t.position.x + t.size.x){
+        if(y > t.position.y && y < t.position.y + t.size.y){
             goodness -= 1.0/((x - t.position.x)*(x - t.position.x));
             goodness -= 1.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x)));
         }
