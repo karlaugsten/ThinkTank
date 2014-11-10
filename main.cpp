@@ -24,7 +24,7 @@ double Distance(double x0, double y0, double x1, double y1)
     return sqrt((x1 - x0)*(x1 - x0) + (y1 - y0)*(y1 - y0));
 }
 
-Position getClosestTarget(GameState state,Position thisTank){
+Position getClosestTarget(GameState& state, Position& thisTank){
     double distanceBetweenTanksFast=-1;
     double distanceBetweenTanksSlow=-1;
 
@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
                     tmp += 2 * acos(-1);
                 }
                 angle = tmp;
-
+                cout << "Fast Tank: " << thisTank.GetAngle(getClosestTarget(state, thisTank)) << " with angle: " << angle << endl;
                 // TODO: Check for unbreakable terrain
                 RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
                 cmdChannel.SendCommand(rotateTurret);
@@ -214,16 +214,14 @@ int main(int argc, char* argv[]) {
                     tmp += 2*acos(-1);
                 }
                 angle = tmp;
-
+                cout <<  "Slow tank " << thisTank.GetAngle(getClosestTarget(state, thisTank)) << " with angle: " << angle << endl;
                 RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(rotateTurret);
                 FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
                 cmdChannel.SendCommand(command);
                 moveCommand_CircleDodge(cmdChannel,state.GetPlayer().TankSlow.id);
             }
-        }else {
-            cout << "player is null" << endl;
-	    }
+        }
     }
     return 0;
 }
