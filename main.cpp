@@ -8,7 +8,6 @@
 #include <unistd.h>
 #include "commandchannel.h"
 #include <cmath>
-#include <AppKit/AppKit.h>
 
 using namespace std;
 
