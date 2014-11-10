@@ -8,6 +8,20 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
     goodness -= 1.0/(y*y);
     goodness -= 1.0/((x - state.map.width)*(x - state.map.width));
     goodness -= 1.0/((y - state.map.height)*(y - state.map.height));
+
+    for(int i = 0; i < state.map.terrain.size(); i++){
+        Terrain t = state.map.terrain[i];
+        if(x > t.position.x && x < t.position.x + t.size.x){
+            goodness -= 1.0/((y - t.position.y)*(y - t.position.y));
+            goodness -= 1.0/((y - (t.position.y + t.size.y)*(y - (t.position.y + t.size.y)));
+        }
+
+        if(y > t.position.x && y < t.position.x + t.size.x){
+            goodness -= 1.0/((x - t.position.x)*(x - t.position.x));
+            goodness -= 1.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x)));
+        }
+    }
+
     if(state.opponent.alive) {
         if(state.opponent.TankSlow.alive) {
             goodness -= (1.0 / (state.opponent.TankSlow.position.Distance(Position(x, y))));
