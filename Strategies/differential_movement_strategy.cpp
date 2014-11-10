@@ -13,7 +13,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
         Terrain t = state.map.terrain[i];
         if(x > t.position.x && x < t.position.x + t.size.x){
             goodness -= 1.0/((y - t.position.y)*(y - t.position.y));
-            goodness -= 1.0/((y - (t.position.y + t.size.y)*(y - (t.position.y + t.size.y)));
+            goodness -= 1.0/((y - (t.position.y + t.size.y))*(y - (t.position.y + t.size.y)));
         }
 
         if(y > t.position.x && y < t.position.x + t.size.x){
