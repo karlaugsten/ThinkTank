@@ -29,25 +29,25 @@ Position getClosestTarget(GameState& state, Position& thisTank){
     double distanceBetweenTanksSlow=-1;
 
     //Check if each tank is alive and calculate its relative distance
-    if(state.GetOpponent().TankFast.alive) {
-        Position enemy1 = state.GetOpponent().TankFast.position;
+    if(state.opponent.TankFast.alive) {
+        Position enemy1 = state.opponent.TankFast.position;
         distanceBetweenTanksFast=Distance(thisTank.x,thisTank.y,enemy1.x,enemy1.y);
     }
-    if(state.GetOpponent().TankSlow.alive) {
-        Position enemy2 = state.GetOpponent().TankSlow.position;
+    if(state.opponent.TankSlow.alive) {
+        Position enemy2 = state.opponent.TankSlow.position;
         distanceBetweenTanksSlow=Distance(thisTank.x,thisTank.y,enemy2.x,enemy2.y);
     }
 
     // TODO: CHECK FOR UNBREAKABLE BARRIER BETWEEN
     if(distanceBetweenTanksFast==-1){
-        return state.GetOpponent().TankSlow.position;
+        return state.opponent.TankSlow.position;
     }else if(distanceBetweenTanksSlow==-1){
-        return state.GetOpponent().TankFast.position;
+        return state.opponent.TankFast.position;
     }else{
         if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-            return state.GetOpponent().TankSlow.position;
+            return state.opponent.TankSlow.position;
         }else{
-            return state.GetOpponent().TankFast.position;
+            return state.opponent.TankFast.position;
         }
     }
 }
@@ -177,49 +177,54 @@ int main(int argc, char* argv[]) {
 
     std::thread parserThread = parser.Start();
     parserThread.detach();
-
+    GameState state;
     // Algorithm does stuff here!
-    while(true){
-        // TODO: not thread safe
-        GameState state = parser.game;
+    try {
+        while (true) {
+            // TODO: not thread safe
+            state = parser.game;
 
-        if(state.GetPlayer().alive){
-            if(state.GetPlayer().TankFast.alive){
-                // TODO: Find closest enemy tank, point turret towards him and fire.
-                Position thisTank = state.GetPlayer().TankFast.position;
-                double angle = state.GetPlayer().TankFast.turret;
-                double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
-                if (tmp > acos(-1)) {
-                    tmp -= 2 * acos(-1);
+            if (state.player.alive) {
+                if (state.player.TankFast.alive) {
+                    // TODO: Find closest enemy tank, point turret towards him and fire.
+                    Position thisTank = state.player.TankFast.position;
+                    double angle = state.player.TankFast.turret;
+                    double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
+                    if (tmp > acos(-1)) {
+                        tmp -= 2 * acos(-1);
+                    }
+                    if (tmp < -acos(-1)) {
+                        tmp += 2 * acos(-1);
+                    }
+                    angle = tmp;
+                    // TODO: Check for unbreakable terrain
+                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.player.TankFast.id);
+                    cmdChannel.SendCommand(rotateTurret);
+                    FireCommand command = FireCommand(state.player.TankFast.id);
+                    cmdChannel.SendCommand(command);
+                    moveCommand_CircleDodge(cmdChannel, state.player.TankFast.id);
                 }
-                if (tmp < -acos(-1)) {
-                    tmp += 2 * acos(-1);
+                if (state.player.TankSlow.alive) {
+                    Position thisTank = state.player.TankSlow.position;
+                    double angle = state.player.TankSlow.turret;
+                    double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
+                    if (tmp > acos(-1)) {
+                        tmp -= 2 * acos(-1);
+                    }
+                    if (tmp < -acos(-1)) {
+                        tmp += 2 * acos(-1);
+                    }
+                    angle = tmp;
+                    RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.player.TankSlow.id);
+                    cmdChannel.SendCommand(rotateTurret);
+                    FireCommand command = FireCommand(state.player.TankSlow.id);
+                    cmdChannel.SendCommand(command);
+                    moveCommand_CircleDodge(cmdChannel, state.player.TankSlow.id);
                 }
-                angle = tmp;
-                // TODO: Check for unbreakable terrain
-                RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(rotateTurret);
-                FireCommand command = FireCommand(state.GetPlayer().TankFast.id);
-                cmdChannel.SendCommand(command);
-                moveCommand_CircleDodge(cmdChannel, state.GetPlayer().TankFast.id);
-            }
-            if(state.GetPlayer().TankSlow.alive){
-                Position thisTank = state.GetPlayer().TankSlow.position;
-                double angle = state.GetPlayer().TankSlow.turret;
-                double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
-                if(tmp > acos(-1)){
-                    tmp -= 2*acos(-1);
-                }if(tmp < -acos(-1)){
-                    tmp += 2*acos(-1);
-                }
-                angle = tmp;
-                RotateTurretCommand rotateTurret = RotateTurretCommand(angle, state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(rotateTurret);
-                FireCommand command = FireCommand(state.GetPlayer().TankSlow.id);
-                cmdChannel.SendCommand(command);
-                moveCommand_CircleDodge(cmdChannel,state.GetPlayer().TankSlow.id);
             }
         }
+    } catch(const std::exception e){
+        cout << "ERROR: Recieved exception: " << e.what() << endl;
     }
     return 0;
 }

@@ -11,7 +11,7 @@ GameState::GameState(rapidjson::Document &dom)
     timeRemaining = tr.GetDouble();
     tr = dom["timestamp"];
     timestamp = tr.GetDouble();
-    mapState = MapState(dom["map"]);
+    map = MapState(dom["map"]);
 
     // Parse players array
     const rapidjson::Value& players = dom["players"];
@@ -27,10 +27,10 @@ GameState::GameState(rapidjson::Document &dom)
 
     if(firstPlayer.name == "Think Tank"){
 
-        us = firstPlayer;
+        player = firstPlayer;
         opponent = secondPlayer;
     } else if(secondPlayer.name == "Think Tank"){
-        us = secondPlayer;
+        player = secondPlayer;
         opponent = firstPlayer;
     }
     else {
