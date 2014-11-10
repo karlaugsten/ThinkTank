@@ -3,6 +3,9 @@
 
 #include "strategy.h"
 #include "../StateParser/gamestate.h"
+#include <cmath>
+#include <string>
+
 /**
 * A class to represent movement strategies.
 */
@@ -11,7 +14,7 @@ class FiringStrategy : public Strategy
 protected:
 
 private:
-    Position getClosestTarget(GameState& state, Position& thisTank);
+    Position getClosestTarget(GameState& state, Position& thisTank, std::string overloadClosest="");
 public:
     FiringStrategy(){
     }
