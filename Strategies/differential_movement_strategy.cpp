@@ -9,6 +9,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
     goodness -= 1.0/((x - state.map.width)*(x - state.map.width));
     goodness -= 1.0/((y - state.map.height)*(y - state.map.height));
 
+    // subtract 1/d^2 for distance to terrain objects.
     for(int i = 0; i < state.map.terrain.size(); i++){
         Terrain t = state.map.terrain[i];
         if(x > t.position.x && x < t.position.x + t.size.x){
@@ -20,6 +21,27 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
             goodness -= 1.0/((x - t.position.x)*(x - t.position.x));
             goodness -= 1.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x)));
         }
+        // TODO: for every corner of the terrain object, subtract 1/(distancetocorner)^2
+    }
+
+    // subtract -Aexp(-(a*(x-b) + c*(y-d))^2/B) function if tank is in front of projectile
+    for(int i = 0; i < state.projectiles.size(); i++){
+        // determine if position is in front of projectile
+        Projectile p = state.projectiles[i];
+        double theta1 = p.direction - acos(-1)/2.0;
+        Position A = Position(p.position.x - cos(theta1), p.position.y + sin(theta1));
+        Position B = Position(p.position.x + cos(theta1), p.position.y - sin(theta1));
+        // Determine cross product for direction
+        double test = (B.x - A.x)*(y-A.y) - (B.y - A.y)*(x - A.x);
+        // if test is positive point x,y is in front of projectile
+        if(test > 0.0){
+            double a = -cos(theta1);
+            double c = sin(theta1);
+            double b = p.position.x;
+            double d = p.position.y;
+            // TODO: make this function degrade the farther x,y is from projectile.
+            goodness -= 5.0*exp(-(a*(x-b) + c*(y-d))*(a*(x-b) + c*(y-d)));
+        }
     }
 
     if(state.opponent.alive) {
@@ -30,8 +52,8 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
             goodness -= (1.0 / (state.opponent.TankFast.position.Distance(Position(x, y))));
         }
     }
-    // TODO: Add in calculation for terrain object walls
     // TODO: Add in calculation for projectiles
+
     return goodness;
 
 }
@@ -74,7 +96,6 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
             tmp += 2 * acos(-1);
         }
         angle = tmp;
-        // TODO: Check for unbreakable terrain
         moves.push(new RotateCommand(angle, state.player.TankSlow.id));
         moves.push(new MoveCommand(1.0, state.player.TankSlow.id));
     }
@@ -107,7 +128,6 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
             tmp += 2 * acos(-1);
         }
         angle = tmp;
-        // TODO: Check for unbreakable terrain
         moves.push(new RotateCommand(angle, state.player.TankFast.id));
         moves.push(new MoveCommand(1.0, state.player.TankFast.id));
     }
