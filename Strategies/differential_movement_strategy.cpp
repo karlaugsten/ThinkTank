@@ -6,8 +6,8 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
     // Add subtract 1/r^2 for the outer walls
     goodness -= 1.0/(x*x);
     goodness -= 1.0/(y*y);
-    goodnes -= 1.0/((x - state.map.width)*(x - state.map.width));
-    goodnes -= 1.0/((y - state.map.height)*(y - state.map.height));
+    goodness -= 1.0/((x - state.map.width)*(x - state.map.width));
+    goodness -= 1.0/((y - state.map.height)*(y - state.map.height));
 
     // TODO: Add in calculation for terrain object walls
     // TODO: Add in calculation for projectiles
@@ -43,7 +43,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
             }
         }
         // best position is now in mx, my;
-        Position bestPos = Position(curPos.x + dx, curPos.y + dy);
+        Position bestPos = Position(curPos.x + mx, curPos.y + my);
         double angle = state.player.TankSlow.tracks;
         double tmp = curPos.GetAngle(bestPos) - angle;
         if (tmp > acos(-1)) {
