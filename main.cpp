@@ -179,13 +179,9 @@ int main(int argc, char* argv[]) {
     parserThread.detach();
 
     // Algorithm does stuff here!
-    GameState d_state;
-    int count = 0;
     while(true){
         // TODO: not thread safe
         GameState state = parser.game;
-        if(count == 0) d_state = state;
-        count++;
 
         if(state.GetPlayer().alive){
             if(state.GetPlayer().TankFast.alive){
