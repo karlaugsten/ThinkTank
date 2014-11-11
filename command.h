@@ -27,15 +27,24 @@ class MoveCommand : public Command
 private:
     double distance;
     std::string tank_id;
+    bool backwards = false;
+    std::string cmd_movement_rev = "{\"tank_id\":\"%s\",\"comm_type\":\"MOVE\",\"direction\":\"REV\",\"distance\":\"%lf\",\"client_token\":\"%s\"}";
     std::string cmd_movement_fwd = "{\"tank_id\":\"%s\",\"comm_type\":\"MOVE\",\"direction\":\"FWD\",\"distance\":\"%lf\",\"client_token\":\"%s\"}";
 public:
-    MoveCommand(double d, std::string t){
+    MoveCommand(double d, std::string t, bool bwd = false){
         distance = d;
         tank_id = t;
+        backwards = bwd;
     }
 
+    ~MoveCommand(){}
+
     std::string GetCommandMessage(std::string client_token, char* buffer){
-        std::sprintf(buffer, cmd_movement_fwd.c_str(), tank_id.c_str(), distance, client_token.c_str());
+        if(!backwards) {
+            std::sprintf(buffer, cmd_movement_fwd.c_str(), tank_id.c_str(), distance, client_token.c_str());
+        } else {
+            std::sprintf(buffer, cmd_movement_rev.c_str(), tank_id.c_str(), distance, client_token.c_str());
+        }
         std::string ret = buffer;
         return ret;
     }
@@ -60,6 +69,8 @@ public:
         rads = r;
         tank_id = t;
     }
+
+    ~RotateCommand(){}
 
     std::string GetCommandMessage(std::string client_token, char* buffer){
         if(rads > 0.0) {
@@ -90,6 +101,8 @@ public:
         tank_id = t;
     }
 
+    ~FireCommand(){}
+
     std::string GetCommandMessage(std::string client_token, char* buffer){
         std::sprintf(buffer, cmd_fire.c_str(), tank_id.c_str(), client_token.c_str());
         std::string ret = buffer;
@@ -114,6 +127,8 @@ public:
         tank_id = t;
         rads = r;
     }
+
+    ~RotateTurretCommand(){}
 
     std::string GetCommandMessage(std::string client_token, char* buffer){
 
@@ -152,6 +167,8 @@ public:
         password = p;
     }
 
+    ~ConnectCommand(){}
+
     std::string GetCommandMessage(std::string client_token, char* buffer){
         std::sprintf(buffer, cmd_connect.c_str(), match_token.c_str(), password.c_str());
         std::string ret = buffer;
@@ -168,6 +185,8 @@ public:
     StopFireCommand(std::string tid){
         id = tid;
     }
+
+    ~StopFireCommand(){}
 
     std::string GetCommandMessage(std::string client_token, char* buffer){
         std::sprintf(buffer, cmd_stop.c_str(), id.c_str(), client_token.c_str());

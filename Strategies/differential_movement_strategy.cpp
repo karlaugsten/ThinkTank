@@ -98,13 +98,20 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double angle = state.player.TankSlow.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
 
-        moves.push(new RotateCommand(angle, state.player.TankSlow.id));
+
         // check if tracks are pointing in proper direction
         angle = state.player.TankSlow.tracks;
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, state.player.TankFast, dir);
 
-        moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
+        // it might be better to go backwards instead of forwards!
+        if(fabs(angle) > acos(-1)/2.0){
+            moves.push(new RotateCommand(angle - acos(-1), state.player.TankSlow.id));
+            moves.push(new MoveCommand(10.0, state.player.TankSlow.id, true));
+        } else {
+            moves.push(new RotateCommand(angle, state.player.TankSlow.id));
+            moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
+        }
 
     }
     if(state.player.TankFast.alive) {
@@ -130,14 +137,22 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double angle = state.player.TankFast.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
 
-        moves.push(new RotateCommand(angle, state.player.TankFast.id));
+
 
         //std::cout << CalculateGoodness(state, state.player.TankFast.position) << std::endl;
 
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, state.player.TankSlow, dir);
 
-        moves.push(new MoveCommand(10.0, state.player.TankFast.id));
+        // it might be better to go backwards instead of forwards!
+        if(fabs(angle) > acos(-1)/2.0){
+            moves.push(new RotateCommand(angle - acos(-1), state.player.TankFast.id));
+            moves.push(new MoveCommand(10.0, state.player.TankFast.id, true));
+        } else {
+            moves.push(new RotateCommand(angle, state.player.TankFast.id));
+            moves.push(new MoveCommand(10.0, state.player.TankFast.id));
+        }
+
 
     }
 
