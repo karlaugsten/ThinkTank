@@ -19,6 +19,9 @@ MapState::MapState(const rapidjson::Value &dom)
         Terrain tmpTerrain = Terrain(terrainArray[i]);
         terrain.push_back(tmpTerrain);
     }
+    for(int i = 0; i < terrain.size(); i++){
+        std::cout << terrain[i].size.x << " " << terrain[i].position.x << std::endl;
+    }
 }
 
 MapState::~MapState(){

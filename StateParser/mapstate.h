@@ -19,10 +19,6 @@ public:
     double height;
     std::vector<Terrain> terrain;
 
-    int GetWidth() { return width; }
-    int GetHeight() { return height; }
-    std::vector<Terrain> GetTerrain() { return terrain; }
-
 };
 
 #endif

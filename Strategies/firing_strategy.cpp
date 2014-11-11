@@ -60,7 +60,7 @@ bool isTargetInSight(vector<Terrain> vecTerrain,Position tankPosition,double ang
     int orientation(Position &p, Position &q, Position &r)
     {
         int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-        if (val == 0) return 0;
+        if (fabs(val) < 1E-7) return 0;
         return (val > 0)? 1: 2;
     }
 
@@ -72,15 +72,15 @@ bool isTargetInSight(vector<Terrain> vecTerrain,Position tankPosition,double ang
         int o4 = orientation(p2, q2, q1);
         if (o1 != o2 && o3 != o4)
             return true;
-        if (o1 == 0 && onSegment(p1, p2, q1)) return true;
-        if (o2 == 0 && onSegment(p1, q2, q1)) return true;
-        if (o3 == 0 && onSegment(p2, p1, q2)) return true;
-        if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+        if (fabs(o1) < 1E-7 && onSegment(p1, p2, q1)) return true;
+        if (fabs(o2) < 1E-7 && onSegment(p1, q2, q1)) return true;
+        if (fabs(o3) < 1E-7 && onSegment(p2, p1, q2)) return true;
+        if (fabs(o4) < 1E-7 && onSegment(p2, q1, q2)) return true;
 
         return false;
     }
 
-bool inSight(vector<Terrain> vecTerrain,Position &tankPosition,Position &enemyPosition) {
+bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
     for(int i=0;i<vecTerrain.size();i++) {
         Terrain terrain = vecTerrain[i];
         if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solids
@@ -111,12 +111,12 @@ Position FiringStrategy::getClosestTarget(GameState& state, Position& thisTank){
     if(state.opponent.TankFast.alive) {//Check if each tank is alive and calculate its relative distance
         Position enemy1 = state.opponent.TankFast.position;
         distanceBetweenTanksFast=thisTank.Distance(enemy1);
-        if(!inSight(state.map.GetTerrain(),thisTank,enemy1)) distanceBetweenTanksFast=-1;
+        if(!inSight(state.map.terrain, thisTank, enemy1)) distanceBetweenTanksFast=-1;
     }
     if(state.opponent.TankSlow.alive) {
         Position enemy2 = state.opponent.TankSlow.position;
         distanceBetweenTanksSlow=thisTank.Distance(enemy2);
-        if(!inSight(state.map.GetTerrain(),thisTank,enemy2)) distanceBetweenTanksFast=-1;
+        if(!inSight(state.map.terrain, thisTank, enemy2)) distanceBetweenTanksFast=-1;
     }
     if(distanceBetweenTanksSlow==-1 && distanceBetweenTanksFast==-1){
         return posNull;
