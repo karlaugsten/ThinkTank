@@ -4,6 +4,7 @@
 
 double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &otherTank, double x, double y){
     double goodness = 0.0;
+    Position current = Position(x,y);
     // Add subtract 1/r^2 for the outer walls
     if(y < 0 || y > state.map.height || x < 0 || x > state.map.width) return -1E30;
     goodness -= (20.0/(x*x));
@@ -25,6 +26,11 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
         }
         if(y > t.position.y && y < t.position.y + t.size.y && x > t.position.x && x < t.position.x + t.size.x) return -1E30;
         // TODO: for every corner of the terrain object, subtract 1/(distancetocorner)^2
+        goodness -= 1.0/(current.Distance(t.position)*current.Distance(t.position));
+        goodness -= 1.0/(current.Distance(Position(t.position.x, t.position.y + t.size.y))* current.Distance(Position(t.position.x, t.position.y + t.size.y)));
+        goodness -= 1.0/(current.Distance(Position(t.position.x + t.size.x, t.position.y))* current.Distance(Position(t.position.x + t.size.x, t.position.y)));
+        goodness -= 1.0/(current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y))* current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)));
+
     }
 
     // subtract -Aexp(-(a*(x-b) + c*(y-d))^2/B) function if tank is in front of projectile
