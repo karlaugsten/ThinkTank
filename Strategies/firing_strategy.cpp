@@ -1,6 +1,7 @@
 #include "firing_strategy.h"
 #include <cmath>
 #include <string>
+#include <iostream>
 
 using namespace std;
 
@@ -80,27 +81,26 @@ bool isTargetInSight(vector<Terrain> vecTerrain,Position tankPosition,double ang
     }
 
 bool inSight(vector<Terrain> vecTerrain,Position &tankPosition,Position &enemyPosition) {
-    bool isTargetable = true;
     for(int i=0;i<vecTerrain.size();i++) {
-        if (isTargetable == false) break;
         Terrain terrain = vecTerrain[i];
+        if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solids
         Position upperLeft = Position(terrain.position.x, terrain.position.y+terrain.size.y);
         Position upperRight = Position(terrain.position.x+terrain.size.x, terrain.position.y+terrain.size.y);
         Position lowerRight = Position(terrain.position.x+terrain.size.x, terrain.position.y);
         Position lowerLeft = terrain.position;
-        if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solid
+
         if(doIntersect(tankPosition,enemyPosition,upperLeft,upperRight)){
-            isTargetable=false;
+            return false;
         }else if(doIntersect(tankPosition,enemyPosition,upperRight,lowerRight)){
-            isTargetable=false;
+            return false;
         }else if(doIntersect(tankPosition,enemyPosition,lowerRight,lowerLeft)){
-            isTargetable=false;
+            return false;
         }else if(doIntersect(tankPosition,enemyPosition,lowerLeft,upperLeft)){
-            isTargetable=false;
+            return false;
         }
     }
 
-    return isTargetable;
+    return true;
 }
 
 Position FiringStrategy::getClosestTarget(GameState& state, Position& thisTank){
@@ -156,6 +156,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         Position thisTank = state.player.TankSlow.position;
         Position closestEnemy =getClosestTarget(state, thisTank);
         double angle = state.player.TankSlow.turret;
+        cout << closestEnemy.x << " " << closestEnemy.y << endl;
         if(closestEnemy.x != -1) {
             angle = thisTank.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
