@@ -52,12 +52,15 @@ void StateParser::ParseState(std::string stateMsg){
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
         std::cout << "Recieved Game Start message: " << std::endl << stateMsg << std::endl;
+        game.paused = false;
     } else if (comm_type == "GAME_END") {
         // TODO: implement this somehow
         std::cout << "Recieved Game End message: " << std::endl << stateMsg << std::endl;
+        game.paused = true;
     } else if (comm_type == "MatchEnd") {
         // TODO: implement this somehow
         std::cout << "Recieved Match End message: " << std::endl << stateMsg << std::endl;
+        game.over = true;
     }
     allocator->Clear();
 }

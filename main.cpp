@@ -146,10 +146,12 @@ int main(int argc, char* argv[]) {
     Strategy* firingStrategy = new FiringStrategy();
     // Algorithm does stuff here!
     try {
-        while (true) {
+        while (!state.over) {
             // TODO: not thread safe
             state = parser.game;
-
+            while(state.paused){
+                state = parser.game;
+            }
             cmdChannel.SendCommands(firingStrategy->DetermineActions(state));
             cmdChannel.SendCommands(movementStrategy->DetermineActions(state));
         }

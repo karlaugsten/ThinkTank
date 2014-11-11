@@ -9,14 +9,17 @@
 class GameState
 {
 private:
-    double timeRemaining;
-    double timestamp;
+
 
 
 public:
+    double timeRemaining;
+    double timestamp;
     MapState map;
     Player opponent;
     Player player;
+    bool paused = true;
+    bool over = false;
     // for easy access keep a list of all projectiles here
     std::vector<Projectile> projectiles;
 
