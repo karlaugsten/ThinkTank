@@ -13,13 +13,13 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
     for(int i = 0; i < state.map.terrain.size(); i++){
         Terrain t = state.map.terrain[i];
         if(x > t.position.x && x < t.position.x + t.size.x){
-            goodness -= 1.0/((y - t.position.y)*(y - t.position.y));
-            goodness -= 1.0/((y - (t.position.y + t.size.y))*(y - (t.position.y + t.size.y)));
+            goodness -= (1.0/((y - t.position.y)*(y - t.position.y)));
+            goodness -= (1.0/((y - (t.position.y + t.size.y))*(y - (t.position.y + t.size.y))));
         }
 
         if(y > t.position.y && y < t.position.y + t.size.y){
-            goodness -= 1.0/((x - t.position.x)*(x - t.position.x));
-            goodness -= 1.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x)));
+            goodness -= (1.0/((x - t.position.x)*(x - t.position.x)));
+            goodness -= (1.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x))));
         }
         // TODO: for every corner of the terrain object, subtract 1/(distancetocorner)^2
     }
@@ -91,7 +91,13 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         angle = curPos.GetAngle(bestPos) - angle;
 
         moves.push(new RotateCommand(angle, state.player.TankSlow.id));
-        moves.push(new MoveCommand(1.0, state.player.TankSlow.id));
+        // check if tracks are pointing in proper direction
+        angle = state.player.TankSlow.tracks;
+        Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
+        double goodness = CalculateGoodness(state, dir);
+        if(goodness > currentgoodness) {
+            moves.push(new MoveCommand(0.1, state.player.TankSlow.id));
+        }
     }
     if(state.player.TankFast.alive) {
         // for now do a linear search for where the goodness is increasing with radius 1.
@@ -117,7 +123,12 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         angle = curPos.GetAngle(bestPos) - angle;
 
         moves.push(new RotateCommand(angle, state.player.TankFast.id));
-        moves.push(new MoveCommand(1.0, state.player.TankFast.id));
+
+        Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
+        double goodness = CalculateGoodness(state, dir);
+        if(goodness > currentgoodness) {
+            moves.push(new MoveCommand(0.1, state.player.TankFast.id));
+        }
     }
 
     return moves;
