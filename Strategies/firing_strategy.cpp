@@ -107,23 +107,28 @@ Position FiringStrategy::getClosestTarget(GameState& state, Position& thisTank){
     double distanceBetweenTanksFast=-1;
     double distanceBetweenTanksSlow=-1;
     Position posNull = Position(-1,-1);
-
+    bool FastInSight = true;
+    bool SlowInSight = true;
     if(state.opponent.TankFast.alive) {//Check if each tank is alive and calculate its relative distance
         Position enemy1 = state.opponent.TankFast.position;
         distanceBetweenTanksFast=thisTank.Distance(enemy1);
-        if(!inSight(state.map.terrain, thisTank, enemy1)) distanceBetweenTanksFast=-1;
+        if(!inSight(state.map.terrain, thisTank, enemy1)) FastInSight = false;
+    } else {
+        FastInSight = false;
     }
     if(state.opponent.TankSlow.alive) {
         Position enemy2 = state.opponent.TankSlow.position;
         distanceBetweenTanksSlow=thisTank.Distance(enemy2);
-        if(!inSight(state.map.terrain, thisTank, enemy2)) distanceBetweenTanksFast=-1;
+        if(!inSight(state.map.terrain, thisTank, enemy2)) SlowInSight = false;
+    } else {
+        SlowInSight = false;
     }
-    if(distanceBetweenTanksSlow==-1 && distanceBetweenTanksFast==-1){
+    if(!SlowInSight && !FastInSight){
         return posNull;
     }
-    if(distanceBetweenTanksFast==-1){ //Check if there is only one tank as an option
+    if(!FastInSight){ //Check if there is only one tank as an option
         return state.opponent.TankSlow.position;
-    }else if(distanceBetweenTanksSlow==-1){
+    }else if(!SlowInSight){
         return state.opponent.TankFast.position;
     }else{
         if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
