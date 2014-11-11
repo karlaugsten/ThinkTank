@@ -98,7 +98,9 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, dir);
         if(goodness > currentgoodness) {
-            moves.push(new MoveCommand(r, state.player.TankSlow.id));
+            moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
+        } else {
+            moves.push(new MoveCommand(0.0, state.player.TankSlow.id));
         }
     }
     if(state.player.TankFast.alive) {
@@ -129,7 +131,9 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, dir);
         if(goodness > currentgoodness) {
-            moves.push(new MoveCommand(r, state.player.TankFast.id));
+            moves.push(new MoveCommand(10.0, state.player.TankFast.id));
+        } else {
+            moves.push(new MoveCommand(0.0, state.player.TankFast.id));
         }
     }
 
