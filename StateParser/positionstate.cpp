@@ -20,6 +20,14 @@ Position operator-(const Position &p1, const Position &p2){
     return Position(p1.x - p2.x, p1.y - p2.y);
 }
 
+bool Position::operator==(const Position &other) const {
+    return (this->x == other.x && this->y == other.y);
+}
+
+bool Position::operator!=(const Position &other) const {
+    return !(this->x == other.x && this->y == other.y);
+}
+
 /**
 * Gets the angle of this position, relative to another position.
 */
@@ -36,6 +44,12 @@ double Position::GetAngle(){
     return std::atan2(y,x);
 }
 
+/**
+* Returns the normal^2 or this vector
+*/
+double Position::Norm2(){
+    return (x*x + y*y);
+}
 
 /**
 * Returns the distance to the other point

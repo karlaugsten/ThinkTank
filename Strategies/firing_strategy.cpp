@@ -6,6 +6,47 @@
 using namespace std;
 
 /*
+* returns true if a ray intersects a circle
+* direction is in radians from the (1,0) vector.
+* start is the start of the ray.
+* outIntersection will have the closest intersection point.
+ */
+bool intersectLineCircle(Position &circle, double radius, Position &start, double direction, Position &outIntersection){
+
+    Position rayDir = Position(cos(direction), sin(direction));
+    Position originNew = circle - start;
+
+    double b = originNew.x*rayDir.x + rayDir.x*originNew.y;
+    double c = radius*radius - (originNew.Norm2());
+    double a = rayDir.Norm2();
+
+    double diva = 1.0/a;
+
+    // Negative doesnt have square root
+    if( (b*b - 4.0*a*c) <= 0.0 ) return false;
+
+    double b4ac = sqrt( (b*b - 4.0*a*c) );
+
+    double intersect1 = (b-b4ac)*diva;
+    double intersect2 = (b + b4ac)*diva;
+
+    double intersect = min(intersect1, intersect2);
+
+    outIntersection.x = rayDir.x*intersect + start.x;
+    outIntersection.y = rayDir.y*intersect + start.y;
+
+    return true;
+}
+
+/*
+* returns true if tank is aiming at target tank
+ */
+bool aiming(Tank &tank, Tank &target){
+    Position intersect;
+    return intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
+}
+
+/*
 bool isIntercepted(Position tankPosition,double angle,Position a, Position b){
     // ref:http://rootllama.wordpress.com/2014/06/20/ray-line-segment-intersection-test-in-2d/
     // direction vector: http://math.stackexchange.com/questions/180874/convert-angle-radians-to-a-heading-vector
@@ -49,36 +90,36 @@ bool isTargetInSight(vector<Terrain> vecTerrain,Position tankPosition,double ang
     return isTargetable;
 } */
 
-    // http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-    bool onSegment(Position &p, Position &q, Position &r)
-    {
-        if (q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) && q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y))
-            return true;
-        return false;
-    }
+// http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
+bool onSegment(Position &p, Position &q, Position &r)
+{
+    if (q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) && q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y))
+        return true;
+    return false;
+}
 
-    int orientation(Position &p, Position &q, Position &r)
-    {
-        int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-        if (fabs(val) < 1E-7) return 0;
-        return (val > 0)? 1: 2;
-    }
+int orientation(Position &p, Position &q, Position &r)
+{
+    int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (fabs(val) < 1E-7) return 0;
+    return (val > 0)? 1: 2;
+}
 
-    bool doIntersect(Position &p1, Position &q1, Position &p2, Position &q2)
-    {
-        int o1 = orientation(p1, q1, p2);
-        int o2 = orientation(p1, q1, q2);
-        int o3 = orientation(p2, q2, p1);
-        int o4 = orientation(p2, q2, q1);
-        if (o1 != o2 && o3 != o4)
-            return true;
-        if (fabs(o1) < 1E-7 && onSegment(p1, p2, q1)) return true;
-        if (fabs(o2) < 1E-7 && onSegment(p1, q2, q1)) return true;
-        if (fabs(o3) < 1E-7 && onSegment(p2, p1, q2)) return true;
-        if (fabs(o4) < 1E-7 && onSegment(p2, q1, q2)) return true;
+bool doIntersect(Position &p1, Position &q1, Position &p2, Position &q2)
+{
+    int o1 = orientation(p1, q1, p2);
+    int o2 = orientation(p1, q1, q2);
+    int o3 = orientation(p2, q2, p1);
+    int o4 = orientation(p2, q2, q1);
+    if (o1 != o2 && o3 != o4)
+        return true;
+    if (fabs(o1) < 1E-7 && onSegment(p1, p2, q1)) return true;
+    if (fabs(o2) < 1E-7 && onSegment(p1, q2, q1)) return true;
+    if (fabs(o3) < 1E-7 && onSegment(p2, p1, q2)) return true;
+    if (fabs(o4) < 1E-7 && onSegment(p2, q1, q2)) return true;
 
-        return false;
-    }
+    return false;
+}
 
 bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
     for(int i=0;i<vecTerrain.size();i++) {
@@ -104,8 +145,8 @@ bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enem
 }
 
 bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Position& target){
-    double distanceBetweenTanksFast;
-    double distanceBetweenTanksSlow;
+    double distanceBetweenTanksFast = 100000;
+    double distanceBetweenTanksSlow = 100000;
     bool FastIsAlive = true;
     bool SlowIsAlive = true;
     bool FastInSight = true;
@@ -174,17 +215,32 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
-        Tank thisTank = state.player.TankFast;
+        Position thisTank = state.player.TankFast.position;
         Position closestEnemy;
-        bool canShoot = getClosestTarget(state, thisTank.position, closestEnemy);
-        double angle = thisTank.turret;
-        angle = thisTank.position.GetAngle(closestEnemy) - angle;
+        bool canShoot = getClosestTarget(state, thisTank, closestEnemy);
+
+
+        double angle = state.player.TankFast.turret;
+        angle = thisTank.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
-        if(canShoot && fabs(angle) < 0.05) {
-            moves.push(new FireCommand(thisTank.id));
+        if(canShoot
+                && closestEnemy == state.opponent.TankSlow.position
+                && aiming(state.player.TankFast, state.opponent.TankSlow)
+                ){
+
+            moves.push(new FireCommand(state.player.TankFast.id));
+
+        } else if (canShoot
+                && closestEnemy == state.opponent.TankFast.position
+                && aiming(state.player.TankFast, state.opponent.TankFast)
+                ) {
+
+            moves.push(new FireCommand(state.player.TankFast.id));
+
         } else {
-            moves.push(new StopFireCommand(thisTank.id));
+            moves.push(new StopFireCommand(state.player.TankFast.id));
         }
+
     }
     if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
@@ -194,8 +250,20 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         double angle = state.player.TankSlow.turret;
         angle = thisTank.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
-        if(canShoot && fabs(angle) < 0.05) {
+        if(canShoot
+                && closestEnemy == state.opponent.TankSlow.position
+                && aiming(state.player.TankSlow, state.opponent.TankSlow)
+                ){
+
             moves.push(new FireCommand(state.player.TankSlow.id));
+
+        } else if (canShoot
+                && closestEnemy == state.opponent.TankFast.position
+                && aiming(state.player.TankSlow, state.opponent.TankFast)
+                ) {
+
+            moves.push(new FireCommand(state.player.TankSlow.id));
+
         } else {
             moves.push(new StopFireCommand(state.player.TankSlow.id));
         }
