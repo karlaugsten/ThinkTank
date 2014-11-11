@@ -106,7 +106,6 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
 
         // check if tracks are pointing in proper direction
-        angle = state.player.TankSlow.tracks;
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, state.player.TankFast, dir);
 
