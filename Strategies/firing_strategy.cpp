@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Position FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, string overloadClosest=""){
+Position FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, string overloadClosest){
     double distanceBetweenTanksFast=-1;
     double distanceBetweenTanksSlow=-1;
 
