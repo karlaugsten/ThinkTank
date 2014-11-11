@@ -159,6 +159,23 @@ public:
     }
 };
 
+class StopFireCommand : public Command
+{
+private:
+    std::string id;
+    std::string cmd_stop = "{ \"tank_id\" : \"%s\",\"comm_type\" : \"STOP\",\"control\" : \"FIRE\",\"client_token\" : \"%s\"}";
+public:
+    StopFireCommand(std::string tid){
+        id = tid;
+    }
+
+    std::string GetCommandMessage(std::string client_token, char* buffer){
+        std::sprintf(buffer, cmd_stop.c_str(), id.c_str(), client_token.c_str());
+        std::string ret = buffer;
+        return ret;
+    }
+};
+
 /*
 class Command
 {

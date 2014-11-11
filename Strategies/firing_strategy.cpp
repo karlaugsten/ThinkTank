@@ -140,7 +140,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
     // TODO: Check for terrain we cant move through
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
-    if(state.player.TankSlow.alive) {
+    if(state.player.TankFast.alive) {
        // Do slow tank firing strategy
         Position thisTank = state.player.TankFast.position;
         Position closestEnemy =getClosestTarget(state, thisTank);
@@ -149,18 +149,21 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
             angle = thisTank.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
             moves.push(new FireCommand(state.player.TankFast.id));
+        } else {
+            moves.push(new StopFireCommand(state.player.TankFast.id));
         }
     }
-    if(state.player.TankFast.alive) {
+    if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
         Position thisTank = state.player.TankSlow.position;
         Position closestEnemy =getClosestTarget(state, thisTank);
         double angle = state.player.TankSlow.turret;
-        cout << closestEnemy.x << " " << closestEnemy.y << endl;
         if(closestEnemy.x != -1) {
             angle = thisTank.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
             moves.push(new FireCommand(state.player.TankSlow.id));
+        } else {
+            moves.push(new StopFireCommand(state.player.TankSlow.id));
         }
     }
 
