@@ -38,13 +38,13 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
         // determine if position is in front of projectile
         Projectile p = state.projectiles[i];
         double theta1 = p.direction - acos(-1)/2.0;
-        Position A = Position(p.position.x - cos(theta1), p.position.y + sin(theta1));
-        Position B = Position(p.position.x + cos(theta1), p.position.y - sin(theta1));
+        Position A = Position(p.position.x + cos(theta1), p.position.y + sin(theta1));
+        Position B = Position(p.position.x - cos(theta1), p.position.y - sin(theta1));
         // Determine cross product for direction
         double test = (B.x - A.x)*(y-A.y) - (B.y - A.y)*(x - A.x);
         // if test is positive point x,y is in front of projectile
-        if(test > 0.0){
-            double a = -cos(theta1);
+        if(test < 0.0){
+            double a = cos(theta1);
             double c = sin(theta1);
             double b = p.position.x;
             double d = p.position.y;
@@ -90,8 +90,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double maxgoodness = -1E30;
         double currentgoodness = CalculateGoodness(state, state.player.TankFast, curPos);
         for(int t = 0; t < 1000; t++){
-            double dx = r*cos(1000.0*2*acos(-1)/double(t));
-            double dy = r*sin(1000.0*2*acos(-1)/double(t));
+            double dx = r*cos(double(t)*2*acos(-1)/1000.0);
+            double dy = r*sin(double(t)*2*acos(-1)/1000.0);
             double goodness = CalculateGoodness(state, state.player.TankFast, curPos.x+dx, curPos.y+dy);
             if(goodness - currentgoodness > maxgoodness){
                 maxgoodness = goodness - currentgoodness;
@@ -129,8 +129,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double maxgoodness = -1E30;
         double currentgoodness = CalculateGoodness(state, state.player.TankSlow, curPos);
         for(int t = 0; t < 1000; t++){
-            double dx = r*cos(1000.0*2*acos(-1)/double(t));
-            double dy = r*sin(1000.0*2*acos(-1)/double(t));
+            double dx = r*cos(double(t)*2*acos(-1)/1000.0);
+            double dy = r*sin(double(t)*2*acos(-1)/1000.0);
             double goodness = CalculateGoodness(state, state.player.TankSlow, curPos.x+dx, curPos.y+dy);
             if(goodness - currentgoodness > maxgoodness){
                 maxgoodness = goodness - currentgoodness;
