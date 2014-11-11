@@ -79,8 +79,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double maxgoodness = -1E30;
         double currentgoodness = CalculateGoodness(state, curPos);
         for(int t = 0; t < 1000; t++){
-            double dx = r*cos(2*acos(-1)/double(t));
-            double dy = r*sin(2*acos(-1)/double(t));
+            double dx = r*cos(1000.0*2*acos(-1)/double(t));
+            double dy = r*sin(1000.0*2*acos(-1)/double(t));
             double goodness = CalculateGoodness(state, curPos.x+dx, curPos.y+dy);
             if(goodness - currentgoodness > maxgoodness){
                 maxgoodness = goodness - currentgoodness;
@@ -111,8 +111,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double maxgoodness = -1E30;
         double currentgoodness = CalculateGoodness(state, curPos);
         for(int t = 0; t < 1000; t++){
-            double dx = r*cos(2*acos(-1)/double(t));
-            double dy = r*sin(2*acos(-1)/double(t));
+            double dx = r*cos(1000.0*2*acos(-1)/double(t));
+            double dy = r*sin(1000.0*2*acos(-1)/double(t));
             double goodness = CalculateGoodness(state, curPos.x+dx, curPos.y+dy);
             if(goodness - currentgoodness > maxgoodness){
                 maxgoodness = goodness - currentgoodness;
