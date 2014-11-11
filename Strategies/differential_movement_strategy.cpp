@@ -2,7 +2,7 @@
 #include "../StateParser/gamestate.h"
 #include <iostream>
 
-double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double x, double y){
+double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &otherTank, double x, double y){
     double goodness = 0.0;
     // Add subtract 1/r^2 for the outer walls
     if(y < 0 || y > state.map.height || x < 0 || x > state.map.width) return -1E30;
@@ -43,8 +43,13 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
             double b = p.position.x;
             double d = p.position.y;
             // TODO: make this function degrade the farther x,y is from projectile.
-            goodness -= 5.0*exp(-(a*(x-b) + c*(y-d))*(a*(x-b) + c*(y-d)));
+            goodness -= 8.0*exp(-(a*(x-b) + c*(y-d))*(a*(x-b) + c*(y-d))/20.0);
         }
+    }
+
+    // Try to stay away from other tank!
+    if(otherTank.alive){
+        goodness -= 3.0*exp(-(otherTank.position.Distance(Position(x,y))*otherTank.position.Distance(Position(x,y)))/150.0);
     }
 
     if(state.opponent.alive) {
@@ -61,8 +66,8 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
 
 }
 
-double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Position &position){
-    return CalculateGoodness(state, position.x, position.y);
+double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &otherTank, Position &position){
+    return CalculateGoodness(state, otherTank, position.x, position.y);
 }
 
 std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &state) {
@@ -77,11 +82,11 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double mx = 1E30;
         double my = 1E30;
         double maxgoodness = -1E30;
-        double currentgoodness = CalculateGoodness(state, curPos);
+        double currentgoodness = CalculateGoodness(state, state.player.TankFast, curPos);
         for(int t = 0; t < 1000; t++){
             double dx = r*cos(1000.0*2*acos(-1)/double(t));
             double dy = r*sin(1000.0*2*acos(-1)/double(t));
-            double goodness = CalculateGoodness(state, curPos.x+dx, curPos.y+dy);
+            double goodness = CalculateGoodness(state, state.player.TankFast, curPos.x+dx, curPos.y+dy);
             if(goodness - currentgoodness > maxgoodness){
                 maxgoodness = goodness - currentgoodness;
                 mx = dx;
@@ -97,7 +102,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         // check if tracks are pointing in proper direction
         angle = state.player.TankSlow.tracks;
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
-        double goodness = CalculateGoodness(state, dir);
+        double goodness = CalculateGoodness(state, state.player.TankFast, dir);
 
         moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
 
@@ -109,11 +114,11 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         double mx = 1E30;
         double my = 1E30;
         double maxgoodness = -1E30;
-        double currentgoodness = CalculateGoodness(state, curPos);
+        double currentgoodness = CalculateGoodness(state, state.player.TankSlow, curPos);
         for(int t = 0; t < 1000; t++){
             double dx = r*cos(1000.0*2*acos(-1)/double(t));
             double dy = r*sin(1000.0*2*acos(-1)/double(t));
-            double goodness = CalculateGoodness(state, curPos.x+dx, curPos.y+dy);
+            double goodness = CalculateGoodness(state, state.player.TankSlow, curPos.x+dx, curPos.y+dy);
             if(goodness - currentgoodness > maxgoodness){
                 maxgoodness = goodness - currentgoodness;
                 mx = dx;
@@ -127,10 +132,10 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
         moves.push(new RotateCommand(angle, state.player.TankFast.id));
 
-        std::cout << CalculateGoodness(state, state.player.TankFast.position) << std::endl;
+        //std::cout << CalculateGoodness(state, state.player.TankFast.position) << std::endl;
 
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
-        double goodness = CalculateGoodness(state, dir);
+        double goodness = CalculateGoodness(state, state.player.TankSlow, dir);
 
         moves.push(new MoveCommand(10.0, state.player.TankFast.id));
 

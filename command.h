@@ -163,7 +163,7 @@ class StopFireCommand : public Command
 {
 private:
     std::string id;
-    std::string cmd_stop = "{ \"tank_id\" : \"%s\",\"comm_type\" : \"STOP\",\"control\" : \"FIRE\",\"client_token\" : \"%s\"}";
+    std::string cmd_stop = "{\"tank_id\":\"%s\",\"comm_type\":\"STOP\",\"control\":\"FIRE\",\"client_token\":\"%s\"}";
 public:
     StopFireCommand(std::string tid){
         id = tid;
