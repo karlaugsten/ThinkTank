@@ -2,6 +2,7 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <Foundation/Foundation.h>
 
 using namespace std;
 
@@ -103,70 +104,92 @@ bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enem
     return true;
 }
 
-Position FiringStrategy::getClosestTarget(GameState& state, Position& thisTank){
-    double distanceBetweenTanksFast=-1;
-    double distanceBetweenTanksSlow=-1;
-    Position posNull = Position(-1,-1);
+bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Position& target){
+    double distanceBetweenTanksFast;
+    double distanceBetweenTanksSlow;
+    bool FastIsAlive = true;
+    bool SlowIsAlive = true;
     bool FastInSight = true;
     bool SlowInSight = true;
-    if(state.opponent.TankFast.alive) {//Check if each tank is alive and calculate its relative distance
+
+    if(state.opponent.TankFast.alive) {//Check if fast tank is alive and calculate its relative distance
         Position enemy1 = state.opponent.TankFast.position;
         distanceBetweenTanksFast=thisTank.Distance(enemy1);
-        if(!inSight(state.map.terrain, thisTank, enemy1)) FastInSight = false;
+        if(!inSight(state.map.terrain, thisTank, enemy1)) FastInSight = false;// Alive but hiding
     } else {
-        FastInSight = false;
+        FastIsAlive = false; //dead
     }
-    if(state.opponent.TankSlow.alive) {
+    if(state.opponent.TankSlow.alive) {//Check if fast tank is alive and calculate its relative distance
         Position enemy2 = state.opponent.TankSlow.position;
         distanceBetweenTanksSlow=thisTank.Distance(enemy2);
-        if(!inSight(state.map.terrain, thisTank, enemy2)) SlowInSight = false;
+        if(!inSight(state.map.terrain, thisTank, enemy2)) SlowInSight = false;// Alive but hiding
     } else {
-        SlowInSight = false;
+        SlowIsAlive = false; //dead
     }
-    if(!SlowInSight && !FastInSight){
-        return posNull;
-    }
-    if(!FastInSight){ //Check if there is only one tank as an option
-        return state.opponent.TankSlow.position;
-    }else if(!SlowInSight){
-        return state.opponent.TankFast.position;
-    }else{
-        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-            return state.opponent.TankSlow.position;
+
+    if(!SlowInSight && !FastInSight){ // Both are alive and not in sight
+        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){ // Aim at the nearest but hold your fire
+            target.x = state.opponent.TankSlow.position.x;
+            target.y = state.opponent.TankSlow.position.y;
         }else{
-            return state.opponent.TankFast.position;
+            target.x = state.opponent.TankFast.position.x;
+            target.y = state.opponent.TankFast.position.y;
         }
+        return false; // Hold your fire captain!!!
+    }
+
+    if(!FastInSight){ //Check if there is only fast tank alive but not in sight
+        target.x = state.opponent.TankFast.position.x;
+        target.y = state.opponent.TankFast.position.y;
+        return false;
+    }else if(!SlowInSight){ //Check if there is only fast tank alive but not in sight
+        target.x = state.opponent.TankSlow.position.x;
+        target.y = state.opponent.TankSlow.position.y;
+        return false;
+    }else if(!SlowIsAlive&&!FastIsAlive){// If both are dead, target is irrelevant, just don't shoot
+        return false;
+    }
+    else{// If both are alive and in sight
+        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
+            target.x = state.opponent.TankSlow.position.x;
+            target.y = state.opponent.TankSlow.position.y;
+        }else{
+            target.x = state.opponent.TankFast.position.x;
+            target.y = state.opponent.TankFast.position.y;
+        }
+        return true;
     }
 }
 
 
 std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
-    // For now simply move in a circle!
-    // TODO: Check for terrain we cant move through
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
-    if(state.player.TankFast.alive) {
-       // Do slow tank firing strategy
-        Position thisTank = state.player.TankFast.position;
-        Position closestEnemy =getClosestTarget(state, thisTank);
-        double angle = state.player.TankFast.turret;
-        if(closestEnemy.x != -1) {
-            angle = thisTank.GetAngle(closestEnemy) - angle;
+    if(state.player.TankFast.alive) {// Do slow tank firing strategy
+        Tank thisTank = state.player.TankFast;
+        Position closestEnemy;
+        bool canShoot = getClosestTarget(state, thisTank.position, closestEnemy);
+        double angle = thisTank.turret;
+        if(canShoot==true) {
+            angle = thisTank.position.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
-            moves.push(new FireCommand(state.player.TankFast.id));
+            if(angle-0.05>=thisTank.turret && thisTank.turret <=angle+0.05)//wait until correct angle until firing
+                moves.push(new FireCommand(thisTank.id));
         } else {
-            moves.push(new StopFireCommand(state.player.TankFast.id));
+            moves.push(new StopFireCommand(thisTank.id));
         }
     }
     if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
         Position thisTank = state.player.TankSlow.position;
-        Position closestEnemy =getClosestTarget(state, thisTank);
+        Position closestEnemy;
+        bool canShoot = getClosestTarget(state, thisTank, closestEnemy);
         double angle = state.player.TankSlow.turret;
-        if(closestEnemy.x != -1) {
+        if(canShoot==true) {
             angle = thisTank.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
-            moves.push(new FireCommand(state.player.TankSlow.id));
+            if(angle-0.05>=state.player.TankFast.turret && state.player.TankFast.turret <=angle+0.05)//wait until correct angle until firing
+                moves.push(new FireCommand(state.player.TankSlow.id));
         } else {
             moves.push(new StopFireCommand(state.player.TankSlow.id));
         }
