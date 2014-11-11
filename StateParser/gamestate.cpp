@@ -39,10 +39,14 @@ GameState::GameState(rapidjson::Document &dom)
     }
 
     // make additional array of projectiles for easy access to all projectiles.
-    projectiles.insert(projectiles.end(), player.TankFast.projectiles.begin(), player.TankFast.projectiles.end());
-    projectiles.insert(projectiles.end(), player.TankSlow.projectiles.begin(), player.TankSlow.projectiles.end());
-    projectiles.insert(projectiles.end(), opponent.TankFast.projectiles.begin(), opponent.TankFast.projectiles.end());
-    projectiles.insert(projectiles.end(), opponent.TankSlow.projectiles.begin(), opponent.TankSlow.projectiles.end());
+    if(player.alive) {
+        projectiles.insert(projectiles.end(), player.TankFast.projectiles.begin(), player.TankFast.projectiles.end());
+        projectiles.insert(projectiles.end(), player.TankSlow.projectiles.begin(), player.TankSlow.projectiles.end());
+    }
+    if(opponent.alive) {
+        projectiles.insert(projectiles.end(), opponent.TankFast.projectiles.begin(), opponent.TankFast.projectiles.end());
+        projectiles.insert(projectiles.end(), opponent.TankSlow.projectiles.begin(), opponent.TankSlow.projectiles.end());
+    }
 
 }
 

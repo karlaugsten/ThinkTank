@@ -48,6 +48,7 @@ void StateParser::ParseState(std::string stateMsg){
     std::string comm_type = d_comm_type.GetString();
     if (comm_type == "GAMESTATE") {
         game = GameState(dom);
+        game.paused = false;
         //StateParser::SetState(tmp);
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
