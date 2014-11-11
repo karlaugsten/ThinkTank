@@ -4,6 +4,7 @@
 double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double x, double y){
     double goodness = 0.0;
     // Add subtract 1/r^2 for the outer walls
+    if(y < 0 || y > state.map.height || x < 0 || x > state.map.width) return -1E30;
     goodness -= (20.0/(x*x));
     goodness -= (20.0/(y*y));
     goodness -= (20.0/((x - state.map.width)*(x - state.map.width)));
@@ -21,6 +22,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double 
             goodness -= (1.0/((x - t.position.x)*(x - t.position.x)));
             goodness -= (1.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x))));
         }
+        if(y > t.position.y && y < t.position.y + t.size.y && x > t.position.x && x < t.position.x + t.size.x) return -1E30;
         // TODO: for every corner of the terrain object, subtract 1/(distancetocorner)^2
     }
 
@@ -69,7 +71,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
     if(!state.player.alive) return moves;
     if(state.player.TankSlow.alive) {
         // for now do a linear search for where the goodness is increasing with radius 1.
-        double r = 0.1;
+        double r = 0.5;
         Position curPos = state.player.TankSlow.position;
         double mx = 1E30;
         double my = 1E30;
@@ -96,12 +98,12 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, dir);
         if(goodness > currentgoodness) {
-            moves.push(new MoveCommand(0.1, state.player.TankSlow.id));
+            moves.push(new MoveCommand(r, state.player.TankSlow.id));
         }
     }
     if(state.player.TankFast.alive) {
         // for now do a linear search for where the goodness is increasing with radius 1.
-        double r = 0.1;
+        double r = 0.5;
         Position curPos = state.player.TankFast.position;
         double mx = 1E30;
         double my = 1E30;
@@ -127,7 +129,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, dir);
         if(goodness > currentgoodness) {
-            moves.push(new MoveCommand(0.1, state.player.TankFast.id));
+            moves.push(new MoveCommand(r, state.player.TankFast.id));
         }
     }
 
