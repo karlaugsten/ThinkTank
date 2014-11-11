@@ -4,10 +4,10 @@
 double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double x, double y){
     double goodness = 0.0;
     // Add subtract 1/r^2 for the outer walls
-    goodness -= 1.0/(x*x);
-    goodness -= 1.0/(y*y);
-    goodness -= 1.0/((x - state.map.width)*(x - state.map.width));
-    goodness -= 1.0/((y - state.map.height)*(y - state.map.height));
+    goodness -= (20.0/(x*x));
+    goodness -= (20.0/(y*y));
+    goodness -= (20.0/((x - state.map.width)*(x - state.map.width)));
+    goodness -= (20.0/((y - state.map.height)*(y - state.map.height)));
 
     // subtract 1/d^2 for distance to terrain objects.
     for(int i = 0; i < state.map.terrain.size(); i++){
