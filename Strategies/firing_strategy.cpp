@@ -59,7 +59,7 @@ bool isTargetInSight(vector<Terrain> vecTerrain,Position tankPosition,double ang
         Position upperRight = Position(terrain.position.x+terrain.size.x, terrain.position.y+terrain.size.y);
         Position lowerRight = Position(terrain.position.x+terrain.size.x, terrain.position.y);
         Position lowerLeft = terrain.position;
-        if(terrain.Type==0) continue; // If the current terrain type is impassible, look for solid
+        if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solid
             if(angle>0 && angle<=1.571){
                 isTargetable =(isIntercepted(tankPosition,angle,lowerLeft,upperLeft) || isIntercepted(tankPosition,angle,upperLeft,upperRight));
             }else if(angle>1.571 && angle <= 3.142){
@@ -84,24 +84,13 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
        // Do slow tank firing strategy
         Position thisTank = state.player.TankFast.position;
         double angle = state.player.TankFast.turret;
-        double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
-        if (tmp > acos(-1)) {
-            tmp -= 2 * acos(-1);
-        }
-        if (tmp < -acos(-1)) {
-            tmp += 2 * acos(-1);
-        }
-        angle = tmp;
+        angle = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
+
         //if not in sight change target
         if(!isTargetInSight(state.map.GetTerrain(), thisTank, angle)){
-            double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank,"UnseeableTarget")) - angle;
-            if (tmp > acos(-1)) {
-                tmp -= 2 * acos(-1);
-            }
-            if (tmp < -acos(-1)) {
-                tmp += 2 * acos(-1);
-            }
-            angle = tmp;
+            angle = thisTank.GetAngle(getClosestTarget(state, thisTank,"UnseeableTarget")) - angle;
+
+
         }
         moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
         moves.push(new FireCommand(state.player.TankFast.id));
@@ -110,14 +99,8 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         // Do fast tank firing strategy
         Position thisTank = state.player.TankSlow.position;
         double angle = state.player.TankSlow.turret;
-        double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
-        if (tmp > acos(-1)) {
-            tmp -= 2 * acos(-1);
-        }
-        if (tmp < -acos(-1)) {
-            tmp += 2 * acos(-1);
-        }
-        angle = tmp;
+        angle = thisTank.GetAngle(getClosestTarget(state, thisTank)) - angle;
+
         if(!isTargetInSight(state.map.GetTerrain(), thisTank, angle)){
             double tmp = thisTank.GetAngle(getClosestTarget(state, thisTank,"UnseeableTarget")) - angle;
             if (tmp > acos(-1)) {

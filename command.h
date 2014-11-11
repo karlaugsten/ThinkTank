@@ -106,6 +106,11 @@ private:
     std::string cmd_turretRotation_ccw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE_TURRET\",\"direction\":\"CCW\",\"rads\":\"%lf\",\"client_token\":\"%s\"}";
 public:
     RotateTurretCommand(double r, std::string t){
+        if(r > acos(-1)){
+            r -= 2*acos(-1);
+        } else if(r < -acos(-1)){
+            r += 2*acos(-1);
+        }
         tank_id = t;
         rads = r;
     }
