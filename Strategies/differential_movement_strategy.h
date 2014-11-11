@@ -16,8 +16,8 @@ private:
     /*
     * Calculates the goodness at the given position
      */
-    double CalculateGoodness(GameState &state, Position& position);
-    double CalculateGoodness(GameState &state, double x, double y);
+    double CalculateGoodness(GameState &state, Tank &otherTank, Position& position);
+    double CalculateGoodness(GameState &state, Tank &otherTank, double x, double y);
 public:
     DifferentialMovementStrategy(){
     }
