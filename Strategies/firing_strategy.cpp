@@ -138,14 +138,23 @@ bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Posi
         return false; // Hold your fire captain!!!
     }
 
-    if(!FastInSight){ //Check if there is only fast tank alive but not in sight
+    if(!FastInSight&&!SlowIsAlive){ //Check if there is only fast tank alive but not in sight
         target.x = state.opponent.TankFast.position.x;
         target.y = state.opponent.TankFast.position.y;
         return false;
-    }else if(!SlowInSight){ //Check if there is only fast tank alive but not in sight
+    }else if(!SlowInSight&&!FastIsAlive){ //Check if there is only fast tank alive but not in sight
         target.x = state.opponent.TankSlow.position.x;
         target.y = state.opponent.TankSlow.position.y;
         return false;
+    }else if(!FastInSight&&SlowIsAlive){ //Only slow in sight
+        target.x = state.opponent.TankSlow.position.x;
+        target.y = state.opponent.TankSlow.position.y;
+        return true;
+    }else if(!SlowInSight&&FastIsAlive) { //Only fast in sight
+        target.x = state.opponent.TankFast.position.x;
+        target.y = state.opponent.TankFast.position.y;
+        return true;
+
     }else if(!SlowIsAlive&&!FastIsAlive){// If both are dead, target is irrelevant, just don't shoot
         return false;
     }
@@ -173,7 +182,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         if(canShoot==true) {
             angle = thisTank.position.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
-            if(angle-0.05>=thisTank.turret && thisTank.turret <=angle+0.05)//wait until correct angle until firing
+            if(angle-0.05<=thisTank.turret && thisTank.turret <=angle+0.05)//wait until correct angle until firing
                 moves.push(new FireCommand(thisTank.id));
         } else {
             moves.push(new StopFireCommand(thisTank.id));
@@ -188,7 +197,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         if(canShoot==true) {
             angle = thisTank.GetAngle(closestEnemy) - angle;
             moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
-            if(angle-0.05>=state.player.TankFast.turret && state.player.TankFast.turret <=angle+0.05)//wait until correct angle until firing
+            if(angle-0.05<=state.player.TankFast.turret && state.player.TankFast.turret <=angle+0.05)//wait until correct angle until firing
                 moves.push(new FireCommand(state.player.TankSlow.id));
         } else {
             moves.push(new StopFireCommand(state.player.TankSlow.id));
