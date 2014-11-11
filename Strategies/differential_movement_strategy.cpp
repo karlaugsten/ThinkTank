@@ -1,5 +1,6 @@
 #include "differential_movement_strategy.h"
 #include "../StateParser/gamestate.h"
+#include <iostream>
 
 double DifferentialMovementStrategy::CalculateGoodness(GameState &state, double x, double y){
     double goodness = 0.0;
@@ -97,11 +98,9 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         angle = state.player.TankSlow.tracks;
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, dir);
-        if(goodness > currentgoodness) {
-            moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
-        } else {
-            moves.push(new MoveCommand(0.0, state.player.TankSlow.id));
-        }
+
+        moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
+
     }
     if(state.player.TankFast.alive) {
         // for now do a linear search for where the goodness is increasing with radius 1.
@@ -128,13 +127,13 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
         moves.push(new RotateCommand(angle, state.player.TankFast.id));
 
+        std::cout << CalculateGoodness(state, state.player.TankFast.position) << std::endl;
+
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, dir);
-        if(goodness > currentgoodness) {
-            moves.push(new MoveCommand(10.0, state.player.TankFast.id));
-        } else {
-            moves.push(new MoveCommand(0.0, state.player.TankFast.id));
-        }
+
+        moves.push(new MoveCommand(10.0, state.player.TankFast.id));
+
     }
 
     return moves;
