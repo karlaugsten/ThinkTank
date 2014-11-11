@@ -14,7 +14,7 @@ class FiringStrategy : public Strategy
 protected:
 
 private:
-    Position getClosestTarget(GameState& state, Position& thisTank, std::string overloadClosest="");
+    Position getClosestTarget(GameState& state, Position& thisTank);
 public:
     FiringStrategy(){
     }
