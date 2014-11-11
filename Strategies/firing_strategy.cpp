@@ -178,11 +178,10 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         Position closestEnemy;
         bool canShoot = getClosestTarget(state, thisTank.position, closestEnemy);
         double angle = thisTank.turret;
-        if(canShoot==true) {
-            angle = thisTank.position.GetAngle(closestEnemy) - angle;
-            moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
-            if(angle-0.05<=thisTank.turret && thisTank.turret <=angle+0.05)//wait until correct angle until firing
-                moves.push(new FireCommand(thisTank.id));
+        angle = thisTank.position.GetAngle(closestEnemy) - angle;
+        moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
+        if(canShoot && fabs(angle) < 0.05) {
+            moves.push(new FireCommand(thisTank.id));
         } else {
             moves.push(new StopFireCommand(thisTank.id));
         }
@@ -193,11 +192,10 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         Position closestEnemy;
         bool canShoot = getClosestTarget(state, thisTank, closestEnemy);
         double angle = state.player.TankSlow.turret;
-        if(canShoot==true) {
-            angle = thisTank.GetAngle(closestEnemy) - angle;
-            moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
-            if(angle-0.05<=state.player.TankFast.turret && state.player.TankFast.turret <=angle+0.05)//wait until correct angle until firing
-                moves.push(new FireCommand(state.player.TankSlow.id));
+        angle = thisTank.GetAngle(closestEnemy) - angle;
+        moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
+        if(canShoot && fabs(angle) < 0.05) {
+            moves.push(new FireCommand(state.player.TankSlow.id));
         } else {
             moves.push(new StopFireCommand(state.player.TankSlow.id));
         }
