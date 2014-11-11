@@ -88,14 +88,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         // best position is now in mx, my;
         Position bestPos = Position(curPos.x + mx, curPos.y + my);
         double angle = state.player.TankSlow.tracks;
-        double tmp = curPos.GetAngle(bestPos) - angle;
-        if (tmp > acos(-1)) {
-            tmp -= 2 * acos(-1);
-        }
-        if (tmp < -acos(-1)) {
-            tmp += 2 * acos(-1);
-        }
-        angle = tmp;
+        angle = curPos.GetAngle(bestPos) - angle;
+
         moves.push(new RotateCommand(angle, state.player.TankSlow.id));
         moves.push(new MoveCommand(1.0, state.player.TankSlow.id));
     }
@@ -120,14 +114,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         // best position is now in mx, my;
         Position bestPos = Position(curPos.x + mx, curPos.y + my);
         double angle = state.player.TankFast.tracks;
-        double tmp = curPos.GetAngle(bestPos) - angle;
-        if (tmp > acos(-1)) {
-            tmp -= 2 * acos(-1);
-        }
-        if (tmp < -acos(-1)) {
-            tmp += 2 * acos(-1);
-        }
-        angle = tmp;
+        angle = curPos.GetAngle(bestPos) - angle;
+
         moves.push(new RotateCommand(angle, state.player.TankFast.id));
         moves.push(new MoveCommand(1.0, state.player.TankFast.id));
     }
