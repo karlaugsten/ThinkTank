@@ -16,19 +16,20 @@ bool intersectLineCircle(Position &circle, double radius, Position &start, doubl
     Position rayDir = Position(cos(direction), sin(direction));
     Position originNew = circle - start;
 
-    double b = originNew.x*rayDir.x + rayDir.y*originNew.y;
-    double c = radius*radius - (originNew.Norm2());
+    double b = 2.0*((originNew.x*rayDir.x) + (rayDir.y*originNew.y));
+    double c = (originNew.Norm2()) - radius*radius;
     double a = rayDir.Norm2();
 
-    double diva = 1.0/a;
+    double delta = b * b - (4.0 * a * c);
 
     // Negative doesnt have square root
-    if( (b*b - 4.0*a*c) <= 0.0 ) return false;
+    if( delta <= 0.0 ) return false;
+    // if delta is 0.0 it is tangent to circle
+    // TODO: handle when delta is zero
 
-    double b4ac = sqrt( (b*b - 4.0*a*c) );
 
-    double intersect1 = (b-b4ac)*diva;
-    double intersect2 = (b + b4ac)*diva;
+    double intersect1 = (-b-sqrt(delta))/(2.0*a);
+    double intersect2 = (-b + sqrt(delta))/(2.0*a);
 
     double intersect = min(intersect1, intersect2);
 
