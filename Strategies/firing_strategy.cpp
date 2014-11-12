@@ -16,7 +16,7 @@ bool intersectLineCircle(Position &circle, double radius, Position &start, doubl
     Position rayDir = Position(cos(direction), sin(direction));
     Position originNew = circle - start;
 
-    double b = originNew.x*rayDir.x + rayDir.x*originNew.y;
+    double b = originNew.x*rayDir.x + rayDir.y*originNew.y;
     double c = radius*radius - (originNew.Norm2());
     double a = rayDir.Norm2();
 
