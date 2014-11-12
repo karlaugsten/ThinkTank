@@ -226,6 +226,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         if(canShoot
                 && closestEnemy == state.opponent.TankSlow.position
                 && aiming(state.player.TankFast, state.opponent.TankSlow)
+                && !aiming(state.player.TankFast, state.player.TankSlow)
                 ){
 
             moves.push(new FireCommand(state.player.TankFast.id));
@@ -233,6 +234,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         } else if (canShoot
                 && closestEnemy == state.opponent.TankFast.position
                 && aiming(state.player.TankFast, state.opponent.TankFast)
+                && !aiming(state.player.TankFast, state.player.TankSlow)
                 ) {
 
             moves.push(new FireCommand(state.player.TankFast.id));
@@ -253,6 +255,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         if(canShoot
                 && closestEnemy == state.opponent.TankSlow.position
                 && aiming(state.player.TankSlow, state.opponent.TankSlow)
+                && !aiming(state.player.TankSlow, state.player.TankFast)
                 ){
 
             moves.push(new FireCommand(state.player.TankSlow.id));
@@ -260,6 +263,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
         } else if (canShoot
                 && closestEnemy == state.opponent.TankFast.position
                 && aiming(state.player.TankSlow, state.opponent.TankFast)
+                && !aiming(state.player.TankSlow, state.player.TankFast)
                 ) {
 
             moves.push(new FireCommand(state.player.TankSlow.id));
