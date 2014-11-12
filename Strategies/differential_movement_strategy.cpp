@@ -25,7 +25,6 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
             goodness -= (10.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x))));
         }
         if(y > t.position.y && y < t.position.y + t.size.y && x > t.position.x && x < t.position.x + t.size.x) return -1E30;
-        // TODO: for every corner of the terrain object, subtract 1/(distancetocorner)^2
         goodness -= (10.0/(current.Distance(t.position)*current.Distance(t.position)));
         goodness -= 10.0/(current.Distance(Position(t.position.x, t.position.y + t.size.y))* current.Distance(Position(t.position.x, t.position.y + t.size.y)));
         goodness -= 10.0/(current.Distance(Position(t.position.x + t.size.x, t.position.y))* current.Distance(Position(t.position.x + t.size.x, t.position.y)));
@@ -52,8 +51,6 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
             goodness -= 8.0*exp(-(a*(x-b) + c*(y-d))*(a*(x-b) + c*(y-d))/20.0);
         }
     }
-
-
 
     // Try to stay away from other tank!
     if(otherTank.alive){
@@ -104,7 +101,6 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
             }
         }
     }
-    // TODO: Add in calculation for projectiles
 
     return goodness;
 
@@ -147,9 +143,9 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, state.player.TankFast, dir);
 
-        moves.push(new RotateCommand(angle, state.player.TankSlow.id));
-        moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
-        /*
+        //moves.push(new RotateCommand(angle, state.player.TankSlow.id));
+        //moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
+
         // it might be better to go backwards instead of forwards!
         if(fabs(angle) > acos(-1)/2.0){
             moves.push(new RotateCommand(angle - acos(-1), state.player.TankSlow.id));
@@ -157,7 +153,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         } else {
             moves.push(new RotateCommand(angle, state.player.TankSlow.id));
             moves.push(new MoveCommand(10.0, state.player.TankSlow.id));
-        }*/
+        }
 
     }
     if(state.player.TankFast.alive) {
@@ -185,9 +181,9 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, state.player.TankSlow, dir);
-        moves.push(new RotateCommand(angle, state.player.TankFast.id));
-        moves.push(new MoveCommand(10.0, state.player.TankFast.id));
-        /*
+        //moves.push(new RotateCommand(angle, state.player.TankFast.id));
+        //moves.push(new MoveCommand(10.0, state.player.TankFast.id));
+
         // it might be better to go backwards instead of forwards!
         if(fabs(angle) > acos(-1)/2.0){
             moves.push(new RotateCommand(angle - acos(-1), state.player.TankFast.id));
@@ -195,7 +191,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         } else {
             moves.push(new RotateCommand(angle, state.player.TankFast.id));
             moves.push(new MoveCommand(10.0, state.player.TankFast.id));
-        }*/
+        }
 
 
     }
