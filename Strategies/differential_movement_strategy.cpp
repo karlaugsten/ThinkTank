@@ -53,6 +53,8 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
         }
     }
 
+
+
     // Try to stay away from other tank!
     if(otherTank.alive){
         goodness -= 3.0*exp(-(otherTank.position.Distance(Position(x,y))*otherTank.position.Distance(Position(x,y)))/150.0);
@@ -60,10 +62,46 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
 
     if(state.opponent.alive) {
         if(state.opponent.TankSlow.alive) {
+            // Try to stay away from opponent
             goodness -= (1.0 / (state.opponent.TankSlow.position.Distance(Position(x, y))));
+
+            // determine if position is in front of tank turrent
+
+            double theta1 = state.opponent.TankSlow.turret - acos(-1)/2.0;
+            Position A = Position(state.opponent.TankSlow.position.x + cos(theta1), state.opponent.TankSlow.position.y + sin(theta1));
+            Position B = Position(state.opponent.TankSlow.position.x - cos(theta1), state.opponent.TankSlow.position.y - sin(theta1));
+            // Determine cross product for direction
+            double test = (B.x - A.x)*(y-A.y) - (B.y - A.y)*(x - A.x);
+            // if test is positive point x,y is in front of projectile
+            if(test < 0.0){
+                double a = cos(theta1);
+                double c = sin(theta1);
+                double b = state.opponent.TankSlow.position.x;
+                double d = state.opponent.TankSlow.position.y;
+                // TODO: make this function degrade the farther x,y is from projectile.
+                goodness -= 3.0*exp(-(a*(x-b) + c*(y-d))*(a*(x-b) + c*(y-d))/15.0);
+            }
         }
         if(state.opponent.TankFast.alive){
+
             goodness -= (1.0 / (state.opponent.TankFast.position.Distance(Position(x, y))));
+
+            // determine if position is in front of tank turrent
+
+            double theta1 = state.opponent.TankFast.turret - acos(-1)/2.0;
+            Position A = Position(state.opponent.TankFast.position.x + cos(theta1), state.opponent.TankFast.position.y + sin(theta1));
+            Position B = Position(state.opponent.TankFast.position.x - cos(theta1), state.opponent.TankFast.position.y - sin(theta1));
+            // Determine cross product for direction
+            double test = (B.x - A.x)*(y-A.y) - (B.y - A.y)*(x - A.x);
+            // if test is positive point x,y is in front of projectile
+            if(test < 0.0){
+                double a = cos(theta1);
+                double c = sin(theta1);
+                double b = state.opponent.TankFast.position.x;
+                double d = state.opponent.TankFast.position.y;
+                // TODO: make this function degrade the farther x,y is from projectile.
+                goodness -= 3.0*exp(-(a*(x-b) + c*(y-d))*(a*(x-b) + c*(y-d))/15.0);
+            }
         }
     }
     // TODO: Add in calculation for projectiles
@@ -144,10 +182,6 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         Position bestPos = Position(curPos.x + mx, curPos.y + my);
         double angle = state.player.TankFast.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
-
-
-
-        //std::cout << CalculateGoodness(state, state.player.TankFast.position) << std::endl;
 
         Position dir = Position(state.player.TankFast.position.x + r*cos(angle), state.player.TankFast.position.y + r*sin(angle));
         double goodness = CalculateGoodness(state, state.player.TankSlow, dir);
