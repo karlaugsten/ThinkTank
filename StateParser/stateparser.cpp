@@ -32,6 +32,7 @@ void StateParser::Run() {
         std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
         //std::cout << "Received: " << json << std::endl;
         ParseState(json);
+        if(this->game.over) break;
     }
 
 }
