@@ -14,12 +14,15 @@ class Control
 {
 private:
 
-    StateParser parser;
-    CommandChannel cmdChannel;
+    StateParser* parser;
+    CommandChannel* cmdChannel;
 
 public:
-    Control(StateParser &parser, CommandChannel &cmdChannel); // Constructor that parses the game state response message
-    ~Control(){}
+    Control(StateParser *parser, CommandChannel *cmdChannel); // Constructor that parses the game state response message
+    ~Control(){
+        delete parser;
+        delete cmdChannel;
+    }
 
     void Run();
 

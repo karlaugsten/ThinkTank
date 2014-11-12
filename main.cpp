@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
     cout << "Match Token is: " << match_token << endl;
 
     zmq::context_t ctx (1);
-    CommandChannel cmdChannel = CommandChannel(ctx, server_ip, match_token, password);
+    CommandChannel* cmdChannel = new CommandChannel(ctx, server_ip, match_token, password);
 
     zmq::socket_t sub (ctx, ZMQ_SUB);
 
@@ -32,15 +32,19 @@ int main(int argc, char* argv[]) {
     sub.setsockopt(ZMQ_SUBSCRIBE, match_token.c_str(), strlen(match_token.c_str()));
 
     // Spawn new thread for state parsing.
-    StateParser parser = StateParser(&sub);
+    StateParser* parser = new StateParser(&sub);
 
-    Control control = Control(parser, cmdChannel);
 
-    std::thread parserThread = parser.Start();
-    std::thread controlThread = control.Start();
+    Control* control = new Control(parser, cmdChannel);
+
+    std::thread parserThread = parser->Start();
+    std::thread controlThread = control->Start();
     // Join and wait for threads to finish
     parserThread.join();
     controlThread.join();
+
+    delete control;
+    delete parser;
 
     return 0;
 }

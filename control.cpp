@@ -1,7 +1,7 @@
 #include "control.h"
 #include <iostream>
 
-Control::Control(StateParser &p, CommandChannel &ch){
+Control::Control(StateParser *p, CommandChannel *ch){
     parser = p;
     cmdChannel = ch;
 }
@@ -21,12 +21,12 @@ void Control::Run() {
     try {
         while (!state.over) {
             // TODO: not thread safe
-            state = parser.game;
+            state = parser->game;
             while(state.paused){
-                state = parser.game;
+                state = parser->game;
             }
-            cmdChannel.SendCommands(firingStrategy->DetermineActions(state));
-            cmdChannel.SendCommands(movementStrategy->DetermineActions(state));
+            cmdChannel->SendCommands(firingStrategy->DetermineActions(state));
+            cmdChannel->SendCommands(movementStrategy->DetermineActions(state));
         }
     } catch(const std::exception e){
         std::cout << "ERROR: Recieved exception: " << e.what() << std::endl;
