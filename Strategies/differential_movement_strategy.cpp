@@ -54,13 +54,20 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
 
     // Try to stay away from other tank!
     if(otherTank.alive){
-        goodness -= 3.0*exp(-(otherTank.position.Distance(Position(x,y))*otherTank.position.Distance(Position(x,y)))/150.0);
+        double dist = 50.0;
+        goodness -= 10.0*cos(acos(-1)*dist*otherTank.position.Distance(Position(x,y))) * exp(-(otherTank.position.Distance(Position(x,y))*otherTank.position.Distance(Position(x,y)))/dist);
     }
 
     if(state.opponent.alive) {
         if(state.opponent.TankSlow.alive) {
-            // Try to stay away from opponent
-            goodness -= (1.0 / (state.opponent.TankSlow.position.Distance(Position(x, y))));
+            // if tank is fast, we can get closer to enemy
+            double dist;
+            if(tank.Type == TankType::FAST){
+                dist = 25.0;
+            } else {
+                dist = 60.0;
+            }
+            goodness -= 10.0*cos(acos(-1)*dist*state.opponent.TankSlow.position.Distance(Position(x,y)))*exp(-(state.opponent.TankSlow.position.Distance(Position(x,y))*state.opponent.TankSlow.position.Distance(Position(x,y)))/dist);
 
             // determine if position is in front of tank turrent
 
@@ -81,7 +88,15 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
         }
         if(state.opponent.TankFast.alive){
 
-            goodness -= (1.0 / (state.opponent.TankFast.position.Distance(Position(x, y))));
+            // if tank is fast, we can get closer to enemy
+            double dist;
+            if(tank.Type == TankType::FAST){
+                dist = 25.0;
+            } else {
+                dist = 60.0;
+            }
+            goodness -= 10.0*cos(acos(-1)*dist*state.opponent.TankFast.position.Distance(Position(x,y)))*exp(-(state.opponent.TankFast.position.Distance(Position(x,y))*state.opponent.TankFast.position.Distance(Position(x,y)))/dist);
+
 
             // determine if position is in front of tank turrent
 
@@ -112,13 +127,13 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
     // it has actually moved some amount
 
     if(dPos.Norm2() > 0.1) {
-        Position cPos = Position(x,y) - tank.position;
+        Position cPos = tank.position - Position(x,y);
         double dAngle = dPos.GetAngle();
         double cAngle = cPos.GetAngle();
 
         if (fabs(dAngle - cAngle) < acos(-1)/2.0){
-            // add goodness
-            goodness += 0.3;
+            // add goodness to try and go the current direction over switching.
+            goodness += 0.1;
         }
     }
 
