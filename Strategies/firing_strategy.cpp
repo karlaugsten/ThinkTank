@@ -8,6 +8,9 @@ using namespace std;
 
 Position randPointInRange(Position a, Position b){
     Position c;
+    if(a == b){
+        return a;
+    }
     c.x = a.x + (b.x - a.x) * rand() / (1.0 + RAND_MAX);
     c.y = a.y + (c.x - a.x) * (a.y - b.y) / (a.x - b.x);
     return c;
