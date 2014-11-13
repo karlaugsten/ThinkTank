@@ -33,7 +33,8 @@ Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTa
     // Distances are given as a percentage of direction likelihood
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    return randPointInRange(Forward, Backward);
+    //return randPointInRange(Forward, Backward);
+    return Forward;
 }
 /*
 * returns true if a ray intersects a circle
@@ -255,6 +256,7 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
         bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
         double angle = state.player.TankSlow.turret;
         angle = thisTank.position.GetAngle(closestEnemy) - angle;
+        cout << "DAT ANGLE DOE: " << angle<< endl;
         moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
         if(canShoot
                 && closestEnemy == state.opponent.TankSlow.position
