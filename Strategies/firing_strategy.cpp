@@ -32,8 +32,8 @@ Position getPointOnLineWithDistanceFromCurrent(Position current, Position previo
 Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTankPosition){
     //if the tank hasn't moved return current position
     if(enemyTank.position.x == previousTankPosition.x && enemyTank.position.y == previousTankPosition.y) return enemyTank.position;
-    double ratioForGoingForward=0.8;
-    double ratioForGoingBackward=0.2;
+    double ratioForGoingForward=1.0;
+    double ratioForGoingBackward=0.0;
     double distanceFromTanks = ourTank.position.Distance(enemyTank.position);
     double timeBetweenMissileCollision = distanceFromTanks/30.0; //constant missile speed
     double distanceTravelableByEnemy=enemyTank.speed*timeBetweenMissileCollision;
@@ -235,16 +235,12 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
         angle = thisTank.position.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
         if(canShoot
-                && closestEnemy == state.opponent.TankSlow.position
-                && aiming(state.player.TankFast, state.opponent.TankSlow)
                 && !aiming(state.player.TankFast, state.player.TankSlow)
                 ){
 
             moves.push(new FireCommand(state.player.TankFast.id));
 
         } else if (canShoot
-                && closestEnemy == state.opponent.TankFast.position
-                && aiming(state.player.TankFast, state.opponent.TankFast)
                 && !aiming(state.player.TankFast, state.player.TankSlow)
                 ) {
 
