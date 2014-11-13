@@ -19,6 +19,7 @@ public:
     double tracks;
     double turret;
     double speed;
+    bool newFire = false;
 
     Position position;
 

@@ -11,7 +11,6 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
     if(argc != 4) {
-
         cout << "Program must be run with arguments: ./ThinkTank server_ip match_token password" << endl;
         return -1;
     }
