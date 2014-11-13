@@ -2,7 +2,6 @@
 #include <cmath>
 #include <string>
 #include <iostream>
-#include <AppKit/AppKit.h>
 
 using namespace std;
 
@@ -33,8 +32,7 @@ Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTa
     // Distances are given as a percentage of direction likelihood
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    //return randPointInRange(Forward, Backward);
-    return Forward;
+    return randPointInRange(Forward, Backward);
 }
 /*
 * returns true if a ray intersects a circle
