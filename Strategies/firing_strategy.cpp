@@ -30,8 +30,10 @@ Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTa
     double distanceFromTanks = ourTank.position.Distance(enemyTank.position);
     double timeBetweenMissileCollision = distanceFromTanks/30.0; //constant missile speed
     double distanceTravelableByEnemy=enemyTank.speed*timeBetweenMissileCollision;
+    cout<< "Distance Travelable: "<<distanceTravelableByEnemy <<endl;
     // Distances are given as a percentage of direction likelihood
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
+    cout<< "Forward x : " << Forward.x << endl;
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
     return randPointInRange(Forward, Backward);
 }
