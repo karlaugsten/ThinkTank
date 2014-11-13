@@ -260,7 +260,6 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
         moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
         if(canShoot
                 && closestEnemy == state.opponent.TankSlow.position
-                && aiming(state.player.TankSlow, state.opponent.TankSlow)
                 && !aiming(state.player.TankSlow, state.player.TankFast)
                 ){
 
@@ -268,7 +267,6 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
 
         } else if (canShoot
                 && closestEnemy == state.opponent.TankFast.position
-                && aiming(state.player.TankSlow, state.opponent.TankFast)
                 && !aiming(state.player.TankSlow, state.player.TankFast)
                 ) {
 
