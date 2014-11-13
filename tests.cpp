@@ -27,7 +27,7 @@ void plot_test(GameState &state) {
         for(int j = 1; j < 1000; j++){
             double x = double(i)*state.map.width/1000.0;
             double y = double(j)*state.map.height/1000.0;
-            double goodness = strategy.CalculateGoodness(state, state.player.TankSlow, x, y);
+            double goodness = strategy.CalculateGoodness(state, state, state.player.TankFast, state.player.TankSlow, x, y);
             if(goodness < -1E29) goodness = 10.0;
             myfile << x << "\t" << y << "\t" << goodness << endl;
         }

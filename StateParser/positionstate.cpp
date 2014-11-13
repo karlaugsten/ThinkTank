@@ -57,3 +57,10 @@ double Position::Norm2(){
 double Position::Distance(const Position& other){
     return hypot(this->x-other.x, this->y-other.y);
 }
+
+/**
+* Returns the length of this vector
+*/
+double Position::Length(){
+    return hypot(this->x, this->y);
+}

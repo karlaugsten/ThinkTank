@@ -25,6 +25,7 @@ public:
     double GetAngle();
     double Distance(const Position& other);
     double Norm2();
+    double Length();
 
     friend Position operator-(const Position &p1, const Position &p2);
     bool operator==(const Position &other) const;

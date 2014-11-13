@@ -31,6 +31,8 @@ public:
 
     void Run();
 
+    void DetermineTimeLastFired();
+
     std::thread Start();
 };
 
