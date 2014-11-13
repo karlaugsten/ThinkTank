@@ -5,6 +5,43 @@
 
 using namespace std;
 
+
+Position randPointInRange(Position a, Position b){
+    Position c;
+    if(a == b){
+        return a;
+    }
+    if(a.x == b.x){
+        c.x = a.x;
+        c.y = a.y + (b.y - a.y) * double(rand() / (1.0 + RAND_MAX));
+        return c;
+    }
+    c.x = a.x + (b.x - a.x) * rand() / (1.0 + RAND_MAX);
+    c.y = a.y + (c.x - a.x) * (a.y - b.y) / (a.x - b.x);
+    return c;
+}
+
+Position getPointOnLineWithDistanceFromCurrent(Position current, Position previous, double distance){
+    //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
+    Position v= Position(current.x-previous.x,current.y-previous.y);
+    double vMagnitude = sqrt(v.x*v.x+v.y*v.y);
+    Position unitVector = Position(v.x/vMagnitude,v.y/vMagnitude);
+    return Position(current.x+(unitVector.x*distance), current.y+(unitVector.y*distance));
+}
+
+Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTankPosition){
+    //if the tank hasn't moved return current position
+    if(enemyTank.position.x == previousTankPosition.x && enemyTank.position.y == previousTankPosition.y) return enemyTank.position;
+    double ratioForGoingForward=1.0;
+    double ratioForGoingBackward=0.0;
+    double distanceFromTanks = ourTank.position.Distance(enemyTank.position);
+    double timeBetweenMissileCollision = distanceFromTanks/30.0; //constant missile speed
+    double distanceTravelableByEnemy=enemyTank.speed*timeBetweenMissileCollision;
+    // Distances are given as a percentage of direction likelihood
+    Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
+    Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
+    return randPointInRange(Forward, Backward);
+}
 /*
 * returns true if a ray intersects a circle
 * direction is in radians from the (1,0) vector.
@@ -47,49 +84,6 @@ bool aiming(Tank &tank, Tank &target){
     return intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
 }
 
-/*
-bool isIntercepted(Position tankPosition,double angle,Position a, Position b){
-    // ref:http://rootllama.wordpress.com/2014/06/20/ray-line-segment-intersection-test-in-2d/
-    // direction vector: http://math.stackexchange.com/questions/180874/convert-angle-radians-to-a-heading-vector
-    double t1;
-    double t2;
-    Position v1 = Position(tankPosition.x-a.x, tankPosition.y-a.y);
-    Position v2 = Position(b.x-a.x,b.y-a.y);
-    Position v3 = Position(-sin(angle), cos(angle));
-    t1 = abs(v2.x*v1.y-v2.y*v1.x)/(v2.x*v3.x+v2.y*v3.y);
-    t2 = (v1.x*v3.x+v1.y*v3.y)/(v2.x*v3.x+v2.y*v3.y);
-    if(t1 >= 0 && t2 >= 0 && t2 <= 1) {
-        return true;
-    }else{
-        return false;
-    }
-}
-
-
-bool isTargetInSight(vector<Terrain> vecTerrain,Position tankPosition,double angle) {
-    bool isTargetable = true;
-
-    for(int i=0;i<vecTerrain.size();i++) {
-        if (isTargetable == false) break;
-        Terrain terrain = vecTerrain.at(i);
-        Position upperLeft = Position(terrain.position.x, terrain.position.y+terrain.size.y);
-        Position upperRight = Position(terrain.position.x+terrain.size.x, terrain.position.y+terrain.size.y);
-        Position lowerRight = Position(terrain.position.x+terrain.size.x, terrain.position.y);
-        Position lowerLeft = terrain.position;
-        if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solid
-            if(angle>0 && angle<=1.571){
-                isTargetable =(isIntercepted(tankPosition,angle,lowerLeft,upperLeft) || isIntercepted(tankPosition,angle,upperLeft,upperRight));
-            }else if(angle>1.571 && angle <= 3.142){
-                isTargetable =(isIntercepted(tankPosition,angle,upperLeft,upperRight) || isIntercepted(tankPosition,angle,upperRight,lowerRight));
-            }else if(angle>3.142 && angle <= 4.712){
-             isTargetable =(isIntercepted(tankPosition,angle,lowerLeft,lowerRight) || isIntercepted(tankPosition,angle,lowerRight,upperRight));
-            }else {
-             isTargetable =(isIntercepted(tankPosition,angle,lowerLeft,upperLeft) || isIntercepted(tankPosition,angle,lowerLeft,lowerRight));
-        }
-    }
-
-    return isTargetable;
-} */
 
 // http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 bool onSegment(Position &p, Position &q, Position &r)
@@ -145,7 +139,7 @@ bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enem
     return true;
 }
 
-bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Position& target){
+bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tank& thisTank, Position& target){
     double distanceBetweenTanksFast = 100000;
     double distanceBetweenTanksSlow = 100000;
     bool FastIsAlive = true;
@@ -155,45 +149,57 @@ bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Posi
 
     if(state.opponent.TankFast.alive) {//Check if fast tank is alive and calculate its relative distance
         Position enemy1 = state.opponent.TankFast.position;
-        distanceBetweenTanksFast=thisTank.Distance(enemy1);
-        if(!inSight(state.map.terrain, thisTank, enemy1)) FastInSight = false;// Alive but hiding
+        distanceBetweenTanksFast=thisTank.position.Distance(enemy1);
+        if(!inSight(state.map.terrain, thisTank.position, enemy1)) FastInSight = false;// Alive but hiding
     } else {
         FastIsAlive = false; //dead
     }
     if(state.opponent.TankSlow.alive) {//Check if fast tank is alive and calculate its relative distance
         Position enemy2 = state.opponent.TankSlow.position;
-        distanceBetweenTanksSlow=thisTank.Distance(enemy2);
-        if(!inSight(state.map.terrain, thisTank, enemy2)) SlowInSight = false;// Alive but hiding
+        distanceBetweenTanksSlow=thisTank.position.Distance(enemy2);
+        if(!inSight(state.map.terrain, thisTank.position, enemy2)) SlowInSight = false;// Alive but hiding
     } else {
         SlowIsAlive = false; //dead
     }
 
     if(!SlowInSight && !FastInSight){ // Both are alive and not in sight
         if(distanceBetweenTanksFast>distanceBetweenTanksSlow){ // Aim at the nearest but hold your fire
-            target.x = state.opponent.TankSlow.position.x;
-            target.y = state.opponent.TankSlow.position.y;
+            //target.x = state.opponent.TankSlow.position.x;
+            //target.y = state.opponent.TankSlow.position.y;
+            target.x = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).x;
+            target.y = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).y;
         }else{
-            target.x = state.opponent.TankFast.position.x;
-            target.y = state.opponent.TankFast.position.y;
+            //target.x = state.opponent.TankFast.position.x;
+            //target.y = state.opponent.TankFast.position.y;
+            target.x = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).x;
+            target.y = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).y;
         }
         return false; // Hold your fire captain!!!
     }
 
     if(!FastInSight&&!SlowIsAlive){ //Check if there is only fast tank alive but not in sight
-        target.x = state.opponent.TankFast.position.x;
-        target.y = state.opponent.TankFast.position.y;
+        //target.x = state.opponent.TankFast.position.x;
+        //target.y = state.opponent.TankFast.position.y;
+        target.x = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).x;
+        target.y = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).y;
         return false;
     }else if(!SlowInSight&&!FastIsAlive){ //Check if there is only fast tank alive but not in sight
-        target.x = state.opponent.TankSlow.position.x;
-        target.y = state.opponent.TankSlow.position.y;
+        //target.x = state.opponent.TankSlow.position.x;
+        //target.y = state.opponent.TankSlow.position.y;
+        target.x = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).x;
+        target.y = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).y;
         return false;
     }else if(!FastInSight&&SlowIsAlive){ //Only slow in sight
-        target.x = state.opponent.TankSlow.position.x;
-        target.y = state.opponent.TankSlow.position.y;
+        //target.x = state.opponent.TankSlow.position.x;
+        //target.y = state.opponent.TankSlow.position.y;
+        target.x = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).x;
+        target.y = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).y;
         return true;
     }else if(!SlowInSight&&FastIsAlive) { //Only fast in sight
-        target.x = state.opponent.TankFast.position.x;
-        target.y = state.opponent.TankFast.position.y;
+        //target.x = state.opponent.TankFast.position.x;
+        //target.y = state.opponent.TankFast.position.y;
+        target.x = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).x;
+        target.y = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).y;
         return true;
 
     }else if(!SlowIsAlive&&!FastIsAlive){// If both are dead, target is irrelevant, just don't shoot
@@ -201,11 +207,15 @@ bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Posi
     }
     else{// If both are alive and in sight
         if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-            target.x = state.opponent.TankSlow.position.x;
-            target.y = state.opponent.TankSlow.position.y;
+            //target.x = state.opponent.TankSlow.position.x;
+            //target.y = state.opponent.TankSlow.position.y;
+            target.x = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).x;
+            target.y = getTargetWithVariance(thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position).y;
         }else{
-            target.x = state.opponent.TankFast.position.x;
-            target.y = state.opponent.TankFast.position.y;
+            //target.x = state.opponent.TankFast.position.x;
+            //target.y = state.opponent.TankFast.position.y;
+            target.x = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).x;
+            target.y = getTargetWithVariance(thisTank, state.opponent.TankFast, previous.opponent.TankFast.position).y;
         }
         return true;
     }
@@ -216,25 +226,21 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
-        Position thisTank = state.player.TankFast.position;
+        Tank thisTank = state.player.TankFast;
         Position closestEnemy;
-        bool canShoot = getClosestTarget(state, thisTank, closestEnemy);
+        bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
 
 
         double angle = state.player.TankFast.turret;
-        angle = thisTank.GetAngle(closestEnemy) - angle;
+        angle = thisTank.position.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
         if(canShoot
-                && closestEnemy == state.opponent.TankSlow.position
-                && aiming(state.player.TankFast, state.opponent.TankSlow)
                 && !aiming(state.player.TankFast, state.player.TankSlow)
                 ){
 
             moves.push(new FireCommand(state.player.TankFast.id));
 
         } else if (canShoot
-                && closestEnemy == state.opponent.TankFast.position
-                && aiming(state.player.TankFast, state.opponent.TankFast)
                 && !aiming(state.player.TankFast, state.player.TankSlow)
                 ) {
 
@@ -247,23 +253,21 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
     }
     if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
-        Position thisTank = state.player.TankSlow.position;
+        Tank thisTank = state.player.TankSlow;
         Position closestEnemy;
-        bool canShoot = getClosestTarget(state, thisTank, closestEnemy);
+        bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
+        cout<< "slightly backward X: "<< closestEnemy.x << " -- Y :" << closestEnemy.y<<endl;
         double angle = state.player.TankSlow.turret;
-        angle = thisTank.GetAngle(closestEnemy) - angle;
+        angle = thisTank.position.GetAngle(closestEnemy) - angle;
+        cout << "DAT ANGLE DOE: " << angle<< endl;
         moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
         if(canShoot
-                && closestEnemy == state.opponent.TankSlow.position
-                && aiming(state.player.TankSlow, state.opponent.TankSlow)
                 && !aiming(state.player.TankSlow, state.player.TankFast)
                 ){
 
             moves.push(new FireCommand(state.player.TankSlow.id));
 
         } else if (canShoot
-                && closestEnemy == state.opponent.TankFast.position
-                && aiming(state.player.TankSlow, state.opponent.TankFast)
                 && !aiming(state.player.TankSlow, state.player.TankFast)
                 ) {
 
