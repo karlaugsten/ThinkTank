@@ -11,6 +11,7 @@ Position randPointInRange(Position a, Position b){
     Position c;
     c.x = a.x + (b.x - a.x) * rand() / (1. + RAND_MAX);
     c.y = a.y + (c.x - a.x) * (a.y - b.y) / (a.x - b.x);
+    cout<<"expected Position.x: " <<c.x<< "Position.y:"<< c.y<<endl;
     return c;
 }
 
@@ -23,6 +24,8 @@ Position getPointOnLineWithDistanceFromCurrent(Position current, Position previo
 }
 
 Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTankPosition){
+    //if the tank hasn't moved return current position
+    if(enemyTank.position.x == previousTankPosition.x && enemyTank.position.y == previousTankPosition.y) return enemyTank.position;
     double ratioForGoingForward=0.8;
     double ratioForGoingBackward=0.2;
     double distanceFromTanks = ourTank.position.Distance(enemyTank.position);
@@ -84,7 +87,7 @@ bool onSegment(Position &p, Position &q, Position &r)
     return false;
 }
 
-long orientation(Position &p, Position &q, Position &r)
+int orientation(Position &p, Position &q, Position &r)
 {
     int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
     if (fabs(val) < 1E-7) return 0;
