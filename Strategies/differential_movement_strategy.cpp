@@ -2,6 +2,11 @@
 #include "../StateParser/gamestate.h"
 #include <iostream>
 
+double optimalDistance(Position from, Position to, double dist, double amplitude){
+    return amplitude*cos(acos(-1)*from.Distance(to)/dist) * exp(-(from.Distance(to)*from.Distance(to))/(dist*dist));
+
+}
+
 double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameState& previousState, Tank &tank, Tank &otherTank, double x, double y){
     double goodness = 0.0;
     Position current = Position(x,y);
@@ -55,7 +60,8 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
     // Try to stay away from other tank!
     if(otherTank.alive){
         double dist = 50.0;
-        goodness -= 10.0*cos(acos(-1)*dist*otherTank.position.Distance(Position(x,y))) * exp(-(otherTank.position.Distance(Position(x,y))*otherTank.position.Distance(Position(x,y)))/dist);
+        // TODO: make it really bad if you are super close to them
+        goodness -= optimalDistance(otherTank.position, Position(x,y), dist, 10.0);
     }
 
     if(state.opponent.alive) {
@@ -67,7 +73,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
             } else {
                 dist = 60.0;
             }
-            goodness -= 10.0*cos(acos(-1)*dist*state.opponent.TankSlow.position.Distance(Position(x,y)))*exp(-(state.opponent.TankSlow.position.Distance(Position(x,y))*state.opponent.TankSlow.position.Distance(Position(x,y)))/dist);
+            goodness -= optimalDistance(state.opponent.TankSlow.position, Position(x,y), dist, 10.0);
 
             // determine if position is in front of tank turrent
 
@@ -95,8 +101,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
             } else {
                 dist = 60.0;
             }
-            goodness -= 10.0*cos(acos(-1)*dist*state.opponent.TankFast.position.Distance(Position(x,y)))*exp(-(state.opponent.TankFast.position.Distance(Position(x,y))*state.opponent.TankFast.position.Distance(Position(x,y)))/dist);
-
+            goodness -= optimalDistance(state.opponent.TankFast.position, Position(x,y), dist, 10.0);
 
             // determine if position is in front of tank turrent
 
