@@ -52,6 +52,7 @@ void StateParser::ParseState(std::string stateMsg){
         lastGame = game;
         game = GameState(dom);
         game.paused = false;
+        DetermineTimeLastFired();
         //StateParser::SetState(tmp);
     } else if (comm_type == "GAME_START") {
         // TODO: implement this somehow
@@ -67,6 +68,34 @@ void StateParser::ParseState(std::string stateMsg){
         game.over = true;
     }
     allocator->Clear();
+}
+
+void StateParser::DetermineTimeLastFired() {
+    if(game.player.TankFast.minDistanceProjectile < lastGame.player.TankFast.minDistanceProjectile){
+        game.player.TankFast.lastTimeFired = (lastGame.timeRemaining - game.timeRemaining) + (game.player.TankFast.minDistanceProjectile-game.player.TankFast.hitRadius)/30.0;
+    } else {
+        game.player.TankFast.lastTimeFired = lastGame.player.TankFast.lastTimeFired;
+    }
+
+    if(game.player.TankSlow.minDistanceProjectile < lastGame.player.TankSlow.minDistanceProjectile){
+        game.player.TankSlow.lastTimeFired = (lastGame.timeRemaining - game.timeRemaining) + (game.player.TankSlow.minDistanceProjectile-game.player.TankSlow.hitRadius)/30.0;
+    } else {
+        game.player.TankSlow.lastTimeFired = lastGame.player.TankSlow.lastTimeFired;
+    }
+
+    if(game.opponent.TankFast.minDistanceProjectile < lastGame.opponent.TankFast.minDistanceProjectile){
+        game.opponent.TankFast.lastTimeFired = (lastGame.timeRemaining - game.timeRemaining) + (game.opponent.TankFast.minDistanceProjectile-game.opponent.TankFast.hitRadius)/30.0;
+    } else {
+        game.opponent.TankFast.lastTimeFired = lastGame.opponent.TankFast.lastTimeFired;
+    }
+
+    if(game.opponent.TankSlow.minDistanceProjectile < lastGame.opponent.TankSlow.minDistanceProjectile){
+        game.opponent.TankSlow.lastTimeFired = (lastGame.timeRemaining - game.timeRemaining) + (game.opponent.TankSlow.minDistanceProjectile-game.opponent.TankSlow.hitRadius)/30.0;
+    } else {
+        game.opponent.TankSlow.lastTimeFired = lastGame.opponent.TankSlow.lastTimeFired;
+    }
+
+    std::cout << "Fast Tank player last time: " << game.player.TankFast.lastTimeFired << std::endl;
 }
 
 /*

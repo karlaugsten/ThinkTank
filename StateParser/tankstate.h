@@ -19,7 +19,11 @@ public:
     double tracks;
     double turret;
     double speed;
-    bool newFire = false;
+    /*
+    * Variable to store the distance to the closest projectile.
+     */
+    double minDistanceProjectile = 1E30;
+    double lastTimeFired = 1E30;
 
     Position position;
 

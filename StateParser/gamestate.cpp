@@ -48,7 +48,6 @@ GameState::GameState(rapidjson::Document &dom)
         projectiles.insert(projectiles.end(), opponent.TankFast.projectiles.begin(), opponent.TankFast.projectiles.end());
         projectiles.insert(projectiles.end(), opponent.TankSlow.projectiles.begin(), opponent.TankSlow.projectiles.end());
     }
-
 }
 
 GameState::~GameState(){

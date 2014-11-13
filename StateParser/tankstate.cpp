@@ -58,9 +58,8 @@ Tank::Tank(const rapidjson::Value &dom)
     for(int i = 0; i < d_projectiles.Size(); i++){
         Projectile projectile = Projectile(d_projectiles[i]);
         Position dPos = projectile.position - position;
-        if(dPos.Length() <= hitRadius + 0.1){
-            newFire = true;
-            std::cout << "Tank just fired projectile!!!" << std::endl;
+        if(dPos.Length() < minDistanceProjectile){
+            minDistanceProjectile = dPos.Length();
         }
         projectiles.push_back(projectile);
     }
