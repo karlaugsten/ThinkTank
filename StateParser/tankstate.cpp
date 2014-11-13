@@ -51,21 +51,20 @@ Tank::Tank(const rapidjson::Value &dom)
     assert(d_alive.IsBool());
     alive = d_alive.GetBool();
 
+    position = Position(dom["position"]);
 
     const rapidjson::Value& d_projectiles = dom["projectiles"];
     assert(d_projectiles.IsArray());
     for(int i = 0; i < d_projectiles.Size(); i++){
         Projectile projectile = Projectile(d_projectiles[i]);
         Position dPos = projectile.position - position;
-        if(dPos.Length() < hitRadius){
+        if(dPos.Length() <= hitRadius + 0.1){
             newFire = true;
             std::cout << "Tank just fired projectile!!!" << std::endl;
         }
         projectiles.push_back(projectile);
     }
 
-    // TODO: Finish implementing this
-    position = Position(dom["position"]);
 }
 
 Tank::~Tank(){
