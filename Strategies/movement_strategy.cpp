@@ -2,7 +2,7 @@
 #include "../StateParser/gamestate.h"
 
 
-std::queue<Command*> MovementStrategy::DetermineActions(GameState &state) {
+std::queue<Command*> MovementStrategy::DetermineActions(GameState &state, GameState& previousState) {
     // For now simply move in a circle!
     // TODO: Check for terrain we cant move through
     std::queue<Command* > moves;

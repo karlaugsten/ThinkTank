@@ -22,6 +22,7 @@ public:
     //static GameState* GetState();
     //static void SetState(GameState* state);
     GameState game;
+    GameState lastGame;
     StateParser(zmq::socket_t *s); // Constructor that parses the game state response message
     StateParser(){}
     ~StateParser();

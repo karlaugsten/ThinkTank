@@ -13,7 +13,7 @@ public:
     MovementStrategy(){
     }
 
-    std::queue<Command*> DetermineActions(GameState &state);
+    std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);
 };
 
 

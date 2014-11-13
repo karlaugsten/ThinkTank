@@ -48,6 +48,8 @@ void StateParser::ParseState(std::string stateMsg){
     assert(d_comm_type.IsString());
     std::string comm_type = d_comm_type.GetString();
     if (comm_type == "GAMESTATE") {
+        // update last game;
+        lastGame = game;
         game = GameState(dom);
         game.paused = false;
         //StateParser::SetState(tmp);

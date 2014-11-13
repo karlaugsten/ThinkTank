@@ -110,7 +110,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, Tank &o
     return CalculateGoodness(state, otherTank, position.x, position.y);
 }
 
-std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &state) {
+std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &state, GameState &previousState) {
     // For now simply move in a circle!
 
     std::queue<Command* > moves;

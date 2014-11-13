@@ -22,7 +22,7 @@ public:
     DifferentialMovementStrategy(){
     }
     double CalculateGoodness(GameState &state, Tank &otherTank, double x, double y);
-    std::queue<Command*> DetermineActions(GameState &state);
+    std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);
 };
 
 

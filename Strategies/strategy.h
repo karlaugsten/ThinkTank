@@ -17,7 +17,7 @@ public:
     Strategy(){
     }
 
-    virtual std::queue<Command*> DetermineActions(GameState& state)=0;
+    virtual std::queue<Command*> DetermineActions(GameState& state, GameState& previousState)=0;
 };
 
 #endif

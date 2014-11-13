@@ -212,7 +212,7 @@ bool FiringStrategy::getClosestTarget(GameState& state, Position& thisTank, Posi
 }
 
 
-std::queue<Command*> FiringStrategy::DetermineActions(GameState &state) {
+std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameState &previousState) {
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
