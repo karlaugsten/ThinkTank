@@ -138,7 +138,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
 
         if (fabs(dAngle - cAngle) < acos(-1)/2.0){
             // add goodness to try and go the current direction over switching.
-            goodness += 0.1;
+            goodness += 0.001;
         }
     }
 
