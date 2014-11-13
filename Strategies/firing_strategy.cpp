@@ -11,6 +11,11 @@ Position randPointInRange(Position a, Position b){
     if(a == b){
         return a;
     }
+    if(a.x == b.x){
+        c.x = a.x;
+        c.y = a.y + (b.y - a.y) * double(rand() / (1.0 + RAND_MAX));
+        return c;
+    }
     c.x = a.x + (b.x - a.x) * rand() / (1.0 + RAND_MAX);
     c.y = a.y + (c.x - a.x) * (a.y - b.y) / (a.x - b.x);
     return c;
