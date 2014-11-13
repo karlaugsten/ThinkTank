@@ -18,7 +18,7 @@ Position getPointOnLineWithDistanceFromCurrent(Position current, Position previo
     //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
     Position v= Position(current.x-previous.x,current.y-previous.y);
     double vMagnitude = sqrt(v.x*v.x+v.y*v.y);
-    Position unitVector = Position(distance*v.x/vMagnitude,distance*v.y/vMagnitude);
+    Position unitVector = Position(v.x/vMagnitude,v.y/vMagnitude);
     return Position(current.x+(unitVector.x*distance), current.y+(unitVector.y*distance));
 }
 
