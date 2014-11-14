@@ -16,7 +16,7 @@ std::thread Control::Start() {
 void Control::Run() {
     GameState state;
     GameState previousState;
-    movementStrategy = new DifferentialMovementStrategy();
+    movementStrategy = new DifferentialMovementStrategy(true);
     firingStrategy = new FiringStrategy();
     // Algorithm does stuff here!
     try {

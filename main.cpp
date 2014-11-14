@@ -38,9 +38,10 @@ int main(int argc, char* argv[]) {
 
     std::thread parserThread = parser->Start();
     std::thread controlThread = control->Start();
-    // constantly wait for output
+    // constantly wait for input
     string command;
     while(cin >> command){
+        // dynamically change strategies based on command line input!
         if(command == "exit" || command == "quit"){
             exit(0);
         }
@@ -49,7 +50,18 @@ int main(int argc, char* argv[]) {
             control->movementStrategy = circleMovement;
         }
         if(command == "-d" || command == "differential"){
-            Strategy* diffMovement = new DifferentialMovementStrategy();
+            // defaults to ternary search
+            Strategy* diffMovement = new DifferentialMovementStrategy(true);
+            control->movementStrategy = diffMovement;
+        }
+        if(command == "-dl" || command == "differential-linear"){
+            // do a linear search instead of ternary
+            Strategy* diffMovement = new DifferentialMovementStrategy(false);
+            control->movementStrategy = diffMovement;
+        }
+        if(command == "-dt" || command == "differential-ternary"){
+            // do a ternary search
+            Strategy* diffMovement = new DifferentialMovementStrategy(true);
             control->movementStrategy = diffMovement;
         }
     }

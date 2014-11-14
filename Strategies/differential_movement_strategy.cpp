@@ -177,7 +177,11 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
         Position curPos = state.player.TankSlow.position;
         double r = 0.2;
-        Position bestPos = ternarySearch(state, previousState, state.player.TankSlow, state.player.TankFast, 1000, r);
+        Position bestPos;
+        if(ternary)
+            bestPos = ternarySearch(state, previousState, state.player.TankSlow, state.player.TankFast, 1000, r);
+        else
+            bestPos = linearSearch(state, previousState, state.player.TankSlow, state.player.TankFast, 1000, r);
         double angle = state.player.TankSlow.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
 
@@ -194,7 +198,11 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
     if(state.player.TankFast.alive) {
         Position curPos = state.player.TankFast.position;
         double r = 0.2;
-        Position bestPos = ternarySearch(state, previousState, state.player.TankFast, state.player.TankSlow, 1000, r);
+        Position bestPos;
+        if(ternary)
+            bestPos = ternarySearch(state, previousState, state.player.TankFast, state.player.TankSlow, 1000, r);
+        else
+            bestPos = linearSearch(state, previousState, state.player.TankFast, state.player.TankSlow, 1000, r);
         double angle = state.player.TankFast.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
 
