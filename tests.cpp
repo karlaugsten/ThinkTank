@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
             "{\n"
             "\"id\" : \"blahblah\",\n"
             "\"position\" : [50, 50],\n"
-            "\"direction\" : 4.7123,\n"
+            "\"direction\" : 0.7,\n"
             "\"speed\" : 30,\n"
             "\"damage\" : 100\n"
             "}\n"
