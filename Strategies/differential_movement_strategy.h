@@ -18,6 +18,8 @@ private:
      */
     double CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const Position& position);
     Position linearSearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int iterations, const double r);
+    Position ternarySearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int maxIterations, const double r);
+
 public:
     DifferentialMovementStrategy(){
     }
