@@ -134,6 +134,40 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
                 my = dy;
             }
         }
+
+        // try to do a ternary search on the goodness function
+        double max = 1E30;
+        double left = 0.00000001;
+        double right = 2*acos(-1);
+        int it = 0;
+        while(it++ < 10000){
+            if(fabs(right - left) < 1E-3){
+                max = (right + left) / 2.0;
+                break;
+            }
+            double leftThird = left + (right - left)/3.0;
+            double rightThird = right - (right - left)/3.0;
+            double dx = r*cos(leftThird);
+            double dy = r*sin(leftThird);
+            double leftThirdGoodness = CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos.x+dx, curPos.y+dy);
+            dx = r*cos(rightThird);
+            dy = r*sin(rightThird);
+            double rightThirdGoodness = CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos.x+dx, curPos.y+dy);
+            if(leftThirdGoodness < rightThirdGoodness){
+                left = leftThird;
+            } else {
+                right = rightThird;
+            }
+        }
+
+        double dx = r*cos(max);
+        double dy = r*sin(max);
+        double ternGoodness =  CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos.x+dx, curPos.y+dy);
+
+        if(fabs(ternGoodness - maxgoodness) > 1E-3){
+            std::cout << "wtf: " << it << " " << ternGoodness << " " << maxgoodness << std::endl;
+        }
+
         // best position is now in mx, my;
         Position bestPos = Position(curPos.x + mx, curPos.y + my);
         double angle = state.player.TankSlow.tracks;
