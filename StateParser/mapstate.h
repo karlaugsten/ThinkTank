@@ -8,19 +8,16 @@
 class MapState
 {
 private:
-    int width;
-    int height;
-    std::vector<Terrain*> terrain;
-    MapState(){ } //private constructor
-public:
 
+
+public:
+    MapState(){ } //private constructor
     MapState(const rapidjson::Value &dom); // Constructor that parses the map state message
     ~MapState();
-    MapState* Clone();
 
-    int GetWidth() { return width; }
-    int GetHeight() { return height; }
-    std::vector<Terrain*> GetTerrain() { return terrain; }
+    double width;
+    double height;
+    std::vector<Terrain> terrain;
 
 };
 

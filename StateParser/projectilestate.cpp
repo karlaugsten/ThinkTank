@@ -17,20 +17,9 @@ Projectile::Projectile(const rapidjson::Value &dom){
     assert(d_damage.IsNumber());
     damage = d_damage.GetDouble();
 
-    position = new Position(dom["position"]);
+    position = Position(dom["position"]);
 }
 
 Projectile::~Projectile() {
     // Do nothing for now;
-    delete position;
-}
-
-Projectile* Projectile::Clone(){
-    Projectile* clone = new Projectile();
-    clone->speed = this->speed;
-    clone->position = this->position->Clone();
-    clone->damage = this->damage;
-    clone->direction = this->direction;
-    clone->id = this->id;
-    return clone;
 }

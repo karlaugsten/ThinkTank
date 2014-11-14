@@ -8,19 +8,17 @@
 class Projectile
 {
 private:
+public:
     std::string id;
     double direction;
     double speed;
     double damage;
 
-    Position* position;
+    Position position;
 
     Projectile() { } // private default constructor
-public:
-
     Projectile(const rapidjson::Value &dom); // Constructor that parses the game state response message
     ~Projectile();
-    Projectile* Clone();
 };
 
 #endif
