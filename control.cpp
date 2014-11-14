@@ -16,15 +16,15 @@ std::thread Control::Start() {
 void Control::Run() {
     GameState state;
     GameState previousState;
-    Strategy* movementStrategy = new DifferentialMovementStrategy();
-    Strategy* firingStrategy = new FiringStrategy();
+    movementStrategy = new DifferentialMovementStrategy();
+    firingStrategy = new FiringStrategy();
     // Algorithm does stuff here!
     try {
         while (!state.over) {
             // TODO: not thread safe
             state = parser->game;
             previousState = parser->lastGame;
-            if(state.over) break;
+            if(state.over) return;
             while(state.paused){
                 state = parser->game;
             }
@@ -32,6 +32,6 @@ void Control::Run() {
             cmdChannel->SendCommands(movementStrategy->DetermineActions(state, previousState));
         }
     } catch(const std::exception e){
-        std::cout << "ERROR: Recieved exception: " << e.what() << std::endl;
+        std::cerr << "ERROR: Recieved exception: " << e.what() << std::endl;
     }
 }
