@@ -6,6 +6,14 @@
 
 using namespace std;
 
+/*
+* returns true if tank is aiming at target tank
+ */
+bool aiming(Tank &tank, Tank &target){
+    Position intersect;
+    return Util::intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
+}
+
 Position getPointOnLineWithDistanceFromCurrent(Position current, Position previous, double distance){
     //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
     Position v= Position(current.x-previous.x,current.y-previous.y);
@@ -47,21 +55,13 @@ Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, P
     double distanceTravelableByEnemy=enemyTank.speed*timeBetweenMissileCollision;
     // Distances are given as a percentage of direction likelihood
 
-    if(distanceFromTanks<=20) return enemyTank.position;
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(state, ourTank.turret));
+    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(state, ourTank.turret)) || aiming(ourTank, enemyTank);
+    if(distanceFromTanks<=20) return enemyTank.position;
     return Util::randPointInRange(Forward, Backward);
 }
 
-
-/*
-* returns true if tank is aiming at target tank
- */
-bool aiming(Tank &tank, Tank &target){
-    Position intersect;
-    return Util::intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
-}
 
 bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
     for(int i=0;i<vecTerrain.size();i++) {
