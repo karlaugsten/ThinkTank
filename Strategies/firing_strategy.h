@@ -14,7 +14,7 @@ class FiringStrategy : public Strategy
 protected:
 
 private:
-    bool getClosestTarget(GameState& state, GameState& previous, Tank& thisTank, Position& target);
+    bool getClosestTarget(GameState& state, GameState& previous, Tank& thisTank, Position& target, bool &isInPredictionRange);
 public:
     FiringStrategy(){
     }
