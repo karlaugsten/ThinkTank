@@ -256,10 +256,8 @@ std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameStat
         Tank thisTank = state.player.TankSlow;
         Position closestEnemy;
         bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
-        cout<< "slightly backward X: "<< closestEnemy.x << " -- Y :" << closestEnemy.y<<endl;
         double angle = state.player.TankSlow.turret;
         angle = thisTank.position.GetAngle(closestEnemy) - angle;
-        cout << "DAT ANGLE DOE: " << angle<< endl;
         moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
         if(canShoot
                 && !aiming(state.player.TankSlow, state.player.TankFast)

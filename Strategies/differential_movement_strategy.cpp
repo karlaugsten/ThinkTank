@@ -131,7 +131,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
     }
     // it has actually moved some amount
 
-    if(dPos.Norm2() > 0.1) {
+    /*if(dPos.Norm2() > 0.1) {
         Position cPos = tank.position - Position(x,y);
         double dAngle = dPos.GetAngle();
         double cAngle = cPos.GetAngle();
@@ -140,7 +140,7 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
             // add goodness to try and go the current direction over switching.
             goodness += 0.001;
         }
-    }
+    }*/
 
     return goodness;
 
