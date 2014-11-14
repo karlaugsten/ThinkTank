@@ -60,6 +60,9 @@ private:
     std::string cmd_tankRotation_cw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE\",\"direction\":\"CW\",\"rads\":%lf,\"client_token\":\"%s\"}";
 public:
     RotateCommand(double r, std::string t){
+        if(r > 2*acos(-1)) r = r-2*acos(-1);
+        if(r < -(2*acos(-1))) r = r+2*acos(-1);
+
         // Dont rotate the long way around!
         if(r > acos(-1)){
             r -= 2*acos(-1);
