@@ -5,7 +5,6 @@
 #include "../util.h"
 #include <iostream>
 #include <string>
-#include <Python/Python.h>
 
 GameState::GameState(rapidjson::Document &dom)
 {
