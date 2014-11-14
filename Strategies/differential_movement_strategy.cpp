@@ -1,10 +1,11 @@
 #include "differential_movement_strategy.h"
 #include "../StateParser/gamestate.h"
 #include <iostream>
+#include <cmath>
+#include "../util.h"
 
 double optimalDistance(Position from, Position to, double dist, double amplitude){
     return amplitude*cos(acos(-1)*from.Distance(to)/dist) * exp(-(from.Distance(to)*from.Distance(to))/(dist*dist));
-
 }
 
 double degradingGaussian(Position inFrontOf, double angle, double x, double y, double amplitude, double degredation){
@@ -99,6 +100,55 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
             // reduce according to gaussian infront of turret
             goodness += degradingGaussian(state.opponent.TankFast.position, state.opponent.TankFast.turret, x, y, 8.0, 8.0/std::max(state.map.height, state.map.width));
 
+        }
+    }
+
+    // For every line of sight, subtract some function
+    // find the minimum distance to the line of sight polygon.
+    Position cur(x,y);
+    double minDist = 1E30;
+    for(int i = 0; i < state.fastLineOfSight.size(); i++){
+
+
+        Position p = state.fastLineOfSight[i];
+        Position q = state.fastLineOfSight[(i+1)%state.fastLineOfSight.size()];
+        Position c;
+        minDist = std::min(Util::distToLineSegment(cur, p, q, c), fabs(minDist));
+        /*
+        // point lies on some line of sight
+        if(curLine.dir.x*(x-curLine.from.x) + curLine.dir.y*(y-curLine.from.y) > 0.0 && curLine.dir.x*(x-curLine.to.x) + curLine.dir.y*(y-curLine.to.y) < 0.0){
+            double c = crossProduct(curLine.from - curLine.onSide, curLine.from - curLine.to);
+            Position curPos = Position(x,y);
+            double b = crossProduct(curLine.from - curPos, curLine.from - curLine.to);
+            // they are on the same side
+            // we should do checking if our guy has fired recently or not.
+            if(c < 0.0){
+                goodness -= 8.0/(1.0 + exp(-0.1*(-curLine.dir.y*(x-curLine.from.x) + curLine.dir.x*(y-curLine.from.y))));
+            }
+            else {
+                // we should do checking for
+                goodness -= (8.0 - (8.0/(1.0 + exp(-0.1*(-curLine.dir.y*(x-curLine.from.x) + curLine.dir.x*(y-curLine.from.y))))));
+            }
+
+        }*/
+    }
+    double time = 3.0;
+    if(tank.Type == TankType::FAST){
+        time = 5.0;
+    }
+    if(tank.lastTimeFired - state.timeRemaining > time) {
+        if (Util::insidePolygon(cur, state.fastLineOfSight)) {
+            goodness += 0.1 * minDist;
+
+        } else {
+            goodness -= 0.1 * minDist;
+        }
+    } else {
+        if (Util::insidePolygon(cur, state.fastLineOfSight)) {
+            goodness -= 0.1 * minDist;
+
+        } else {
+            goodness += 0.1 * minDist;
         }
     }
 

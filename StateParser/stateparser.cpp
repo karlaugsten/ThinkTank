@@ -98,6 +98,8 @@ void StateParser::DetermineTimeLastFired() {
     std::cout << "Fast Tank player last time: " << game.player.TankFast.lastTimeFired << std::endl;
 }
 
+
+
 /*
 
 // Returns a copy of the game state

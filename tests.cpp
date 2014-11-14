@@ -19,6 +19,20 @@ using namespace std;
 
 // Plots the gamestate using the goodness calculator for testing.
 void plot_test(GameState &state) {
+    /*Position a(20, 20);
+    Position b(50, 20);
+    Position c(50, 50);
+    Position x(35, 60);
+    Position d(20, 50);
+
+    state.fastLineOfSight.push_back(a);
+    state.fastLineOfSight.push_back(b);
+    state.fastLineOfSight.push_back(c);
+    state.fastLineOfSight.push_back(x);
+    state.fastLineOfSight.push_back(d);*/
+    for(int i = 0; i < state.fastLineOfSight.size(); i++){
+        cout << "Pos x: " << state.fastLineOfSight[i].x << " y: " << state.fastLineOfSight[i].y << endl;
+    }
     DifferentialMovementStrategy strategy = DifferentialMovementStrategy();
     ofstream myfile;
     cout << state.map.width << " " << state.map.height << endl;
@@ -52,7 +66,7 @@ int main(int argc, char* argv[]) {
             "}\n"
             "},\n"
             "{\n"
-            "\"type\" : \"IMPASSABLE\",\n"
+            "\"type\" : \"SOLID\",\n"
             "\"boundingBox\" : {\n"
             "\"corner\" : [80, 80],\n"
             "\"size\" : [50, 80]\n"
@@ -71,19 +85,19 @@ int main(int argc, char* argv[]) {
             "\"hitRadius\" : 2.0,\n"
             "\"collisionRadius\" : 1.0,\n"
             "\"type\" : \"TankSlow\",\n"
-            "\"alive\" : true,\n"
+            "\"alive\" : false,\n"
             "\"position\" : [63, 33.2],\n"
             "\"tracks\" : 3.14,\n"
             "\"turret\": 0.0,\n"
             "\"speed\" : 5,\n"
             "\"projectiles\" : [\n"
-            "{\n"
-            "\"id\" : \"blahblah\",\n"
-            "\"position\" : [50, 50],\n"
-            "\"direction\" : 0.7,\n"
-            "\"speed\" : 30,\n"
-            "\"damage\" : 100\n"
-            "}\n"
+//            "{\n"
+//            "\"id\" : \"blahblah\",\n"
+//            "\"position\" : [50, 50],\n"
+//            "\"direction\" : 0.7,\n"
+//            "\"speed\" : 30,\n"
+//            "\"damage\" : 100\n"
+//            "}\n"
             "]\n"
             "},\n"
             "{\n"
@@ -111,7 +125,7 @@ int main(int argc, char* argv[]) {
             "\"hitRadius\" : 2.0,\n"
             "\"collisionRadius\" : 1.0,\n"
             "\"type\" : \"TankSlow\",\n"
-            "\"alive\" : true,\n"
+            "\"alive\" : false,\n"
             "\"position\" : [43, 33.2],\n"
             "\"tracks\" : 3.14,\n"
             "\"turret\": 0.0,\n"
@@ -124,7 +138,7 @@ int main(int argc, char* argv[]) {
             "\"hitRadius\" : 1.5,\n"
             "\"collisionRadius\" : 0.75,\n"
             "\"type\" : \"TankFast\",\n"
-            "\"alive\" : true,\n"
+            "\"alive\" : false,\n"
             "\"position\" : [23, 33.2],\n"
             "\"tracks\" : 3.14,\n"
             "\"turret\" : 0.0,\n"
