@@ -23,9 +23,10 @@ public:
 
     double GetAngle(const Position& other);
     double GetAngle();
-    double Distance(const Position& other);
+    double Distance(const Position& other) const;
     double Norm2();
     double Length();
+    Position Normalize();
 
     friend Position operator-(const Position &p1, const Position &p2);
     bool operator==(const Position &other) const;

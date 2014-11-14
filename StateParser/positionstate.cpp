@@ -54,7 +54,7 @@ double Position::Norm2(){
 /**
 * Returns the distance to the other point
 */
-double Position::Distance(const Position& other){
+double Position::Distance(const Position& other) const{
     return hypot(this->x-other.x, this->y-other.y);
 }
 
@@ -63,4 +63,12 @@ double Position::Distance(const Position& other){
 */
 double Position::Length(){
     return hypot(this->x, this->y);
+}
+
+/**
+* Returns the length of this vector
+*/
+Position Position::Normalize(){
+    double l = this->Length();
+    return Position(this->x/l, this->y/l);
 }

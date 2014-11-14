@@ -2,8 +2,10 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "../util.h"
 #include <iostream>
 #include <string>
+#include <Python/Python.h>
 
 GameState::GameState(rapidjson::Document &dom)
 {
@@ -48,8 +50,8 @@ GameState::GameState(rapidjson::Document &dom)
         projectiles.insert(projectiles.end(), opponent.TankFast.projectiles.begin(), opponent.TankFast.projectiles.end());
         projectiles.insert(projectiles.end(), opponent.TankSlow.projectiles.begin(), opponent.TankSlow.projectiles.end());
     }
+
 }
 
 GameState::~GameState(){
 }
-

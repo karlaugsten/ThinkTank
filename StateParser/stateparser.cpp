@@ -32,7 +32,7 @@ void StateParser::Run() {
         std::string json = std::string(static_cast<char *>(msg.data()), msg.size());
         //std::cout << "Received: " << json << std::endl;
         ParseState(json);
-        if(this->game.over) break;
+        if(this->game.over) return;
     }
 
 }
@@ -41,7 +41,7 @@ void StateParser::ParseState(std::string stateMsg){
     rapidjson::Document dom(allocator);
     dom.Parse(stateMsg.c_str());
     if (dom.HasParseError()) {
-        std::cout << "ERROR: Parsing json. " << stateMsg << std::endl;
+        std::cerr << "ERROR: Parsing json. " << stateMsg << std::endl;
         return;
     }
     const rapidjson::Value &d_comm_type = dom["comm_type"];
@@ -94,9 +94,9 @@ void StateParser::DetermineTimeLastFired() {
     } else {
         game.opponent.TankSlow.lastTimeFired = lastGame.opponent.TankSlow.lastTimeFired;
     }
-
-    std::cout << "Fast Tank player last time: " << game.player.TankFast.lastTimeFired << std::endl;
 }
+
+
 
 /*
 

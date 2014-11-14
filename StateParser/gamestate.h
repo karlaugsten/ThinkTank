@@ -27,8 +27,7 @@ public:
     GameState(rapidjson::Document &dom); // Constructor that parses the game state response message
     ~GameState();
 
-    long GetTimeRemaining() { return timeRemaining; }
-    long GetTimestamp() { return timestamp; }
+    void CalculateLineOfSight();
 
 };
 

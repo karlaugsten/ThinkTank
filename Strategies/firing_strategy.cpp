@@ -2,24 +2,9 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include "../util.h"
 
 using namespace std;
-
-
-Position randPointInRange(Position a, Position b){
-    Position c;
-    if(a == b){
-        return a;
-    }
-    if(a.x == b.x){
-        c.x = a.x;
-        c.y = a.y + (b.y - a.y) * double(rand() / (1.0 + RAND_MAX));
-        return c;
-    }
-    c.x = a.x + (b.x - a.x) * rand() / (1.0 + RAND_MAX);
-    c.y = a.y + (c.x - a.x) * (a.y - b.y) / (a.x - b.x);
-    return c;
-}
 
 Position getPointOnLineWithDistanceFromCurrent(Position current, Position previous, double distance){
     //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
@@ -40,80 +25,16 @@ Position getTargetWithVariance(Tank ourTank, Tank enemyTank, Position previousTa
     // Distances are given as a percentage of direction likelihood
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    return randPointInRange(Forward, Backward);
+    return Util::randPointInRange(Forward, Backward);
 }
-/*
-* returns true if a ray intersects a circle
-* direction is in radians from the (1,0) vector.
-* start is the start of the ray.
-* outIntersection will have the closest intersection point.
- */
-bool intersectLineCircle(Position &circle, double radius, Position &start, double direction, Position &outIntersection){
 
-    Position rayDir = Position(cos(direction), sin(direction));
-    Position originNew = circle - start;
-
-    double b = 2.0*((originNew.x*rayDir.x) + (rayDir.y*originNew.y));
-    double c = (originNew.Norm2()) - radius*radius;
-    double a = rayDir.Norm2();
-
-    double delta = b * b - (4.0 * a * c);
-
-    // Negative doesnt have square root
-    if( delta <= 0.0 ) return false;
-    // if delta is 0.0 it is tangent to circle
-    // TODO: handle when delta is zero
-
-
-    double intersect1 = (-b-sqrt(delta))/(2.0*a);
-    double intersect2 = (-b + sqrt(delta))/(2.0*a);
-
-    double intersect = min(intersect1, intersect2);
-
-    outIntersection.x = rayDir.x*intersect + start.x;
-    outIntersection.y = rayDir.y*intersect + start.y;
-
-    return true;
-}
 
 /*
 * returns true if tank is aiming at target tank
  */
 bool aiming(Tank &tank, Tank &target){
     Position intersect;
-    return intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
-}
-
-
-// http://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
-bool onSegment(Position &p, Position &q, Position &r)
-{
-    if (q.x <= max(p.x, r.x) && q.x >= min(p.x, r.x) && q.y <= max(p.y, r.y) && q.y >= min(p.y, r.y))
-        return true;
-    return false;
-}
-
-int orientation(Position &p, Position &q, Position &r)
-{
-    int val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
-    if (fabs(val) < 1E-7) return 0;
-    return (val > 0)? 1: 2;
-}
-
-bool doIntersect(Position &p1, Position &q1, Position &p2, Position &q2)
-{
-    int o1 = orientation(p1, q1, p2);
-    int o2 = orientation(p1, q1, q2);
-    int o3 = orientation(p2, q2, p1);
-    int o4 = orientation(p2, q2, q1);
-    if (o1 != o2 && o3 != o4)
-        return true;
-    if (fabs(o1) < 1E-7 && onSegment(p1, p2, q1)) return true;
-    if (fabs(o2) < 1E-7 && onSegment(p1, q2, q1)) return true;
-    if (fabs(o3) < 1E-7 && onSegment(p2, p1, q2)) return true;
-    if (fabs(o4) < 1E-7 && onSegment(p2, q1, q2)) return true;
-
-    return false;
+    return Util::intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
 }
 
 bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
@@ -125,13 +46,13 @@ bool inSight(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enem
         Position lowerRight = Position(terrain.position.x+terrain.size.x, terrain.position.y);
         Position lowerLeft = terrain.position;
 
-        if(doIntersect(tankPosition,enemyPosition,upperLeft,upperRight)){
+        if(Util::doIntersect(tankPosition,enemyPosition,upperLeft,upperRight)){
             return false;
-        }else if(doIntersect(tankPosition,enemyPosition,upperRight,lowerRight)){
+        }else if(Util::doIntersect(tankPosition,enemyPosition,upperRight,lowerRight)){
             return false;
-        }else if(doIntersect(tankPosition,enemyPosition,lowerRight,lowerLeft)){
+        }else if(Util::doIntersect(tankPosition,enemyPosition,lowerRight,lowerLeft)){
             return false;
-        }else if(doIntersect(tankPosition,enemyPosition,lowerLeft,upperLeft)){
+        }else if(Util::doIntersect(tankPosition,enemyPosition,lowerLeft,upperLeft)){
             return false;
         }
     }

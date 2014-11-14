@@ -1,10 +1,11 @@
 #include "differential_movement_strategy.h"
 #include "../StateParser/gamestate.h"
 #include <iostream>
+#include <cmath>
+#include "../util.h"
 
 double optimalDistance(Position from, Position to, double dist, double amplitude){
     return amplitude*cos(acos(-1)*from.Distance(to)/dist) * exp(-(from.Distance(to)*from.Distance(to))/(dist*dist));
-
 }
 
 double degradingGaussian(Position inFrontOf, double angle, double x, double y, double amplitude, double degredation){
@@ -101,26 +102,6 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
 
         }
     }
-
-    // if the new position is in the current direction of travel, give it some kind of boost.
-    /*Position dPos;
-    if(tank.Type == TankType::SLOW){
-        dPos = previousState.player.TankSlow.position - tank.position;
-    } else {
-        dPos = previousState.player.TankFast.position - tank.position;
-    }*/
-    // it has actually moved some amount
-
-    /*if(dPos.Norm2() > 0.1) {
-        Position cPos = tank.position - Position(x,y);
-        double dAngle = dPos.GetAngle();
-        double cAngle = cPos.GetAngle();
-
-        if (fabs(dAngle - cAngle) < acos(-1)/2.0){
-            // add goodness to try and go the current direction over switching.
-            goodness += 0.001;
-        }
-    }*/
 
     return goodness;
 
