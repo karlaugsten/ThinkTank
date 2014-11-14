@@ -26,7 +26,7 @@ double degradingGaussian(Position inFrontOf, double angle, double x, double y, d
     return goodness;
 }
 
-double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameState& previousState, Tank &tank, Tank &otherTank, double x, double y){
+double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, const GameState& previousState, const Tank &tank, const Tank &otherTank, const double x, const double y){
     double goodness = 0.0;
     Position current = Position(x,y);
     // Add subtract 1/r^2 for the outer walls
@@ -107,8 +107,65 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
 
 }
 
-double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameState &previousState, Tank &tank, Tank &otherTank, Position &position){
+double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const Position &position){
     return CalculateGoodness(state, previousState, tank, otherTank, position.x, position.y);
+}
+
+/*
+ * Searches linearly around the tank for the best goodness
+  */
+Position DifferentialMovementStrategy::linearSearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int iterations, const double r){
+    Position curPos = tank.position;
+    double mx = 1E30;
+    double my = 1E30;
+    double maxgoodness = -1E30;
+    double currentgoodness = CalculateGoodness(state, previousState, tank, otherTank, curPos);
+    for(int t = 0; t < 1000; t++){
+        double dx = r*cos(double(t)*2*acos(-1)/1000.0);
+        double dy = r*sin(double(t)*2*acos(-1)/1000.0);
+        double goodness = CalculateGoodness(state, previousState, tank, otherTank, curPos.x+dx, curPos.y+dy);
+        if(goodness - currentgoodness > maxgoodness){
+            maxgoodness = goodness - currentgoodness;
+            mx = dx;
+            my = dy;
+        }
+    }
+    return Position(curPos.x + mx, curPos.y + my);
+}
+
+/*
+ * Does a ternary search on the goodness function to find the max goodness
+  */
+Position DifferentialMovementStrategy::ternarySearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int maxIterations, const double r){
+    Position curPos = tank.position;
+    double max = 1E30;
+    double left = 1E-30;
+    double right = 2*acos(-1);
+    int it = 0;
+    while(it++ < maxIterations){
+        if(fabs(right - left) < 1E-3){
+            max = (right + left) / 2.0;
+            break;
+        }
+        double leftThird = left + (right - left)/3.0;
+        double rightThird = right - (right - left)/3.0;
+        double dx = r*cos(leftThird);
+        double dy = r*sin(leftThird);
+        double leftThirdGoodness = CalculateGoodness(state, previousState, tank, otherTank, curPos.x+dx, curPos.y+dy);
+        dx = r*cos(rightThird);
+        dy = r*sin(rightThird);
+        double rightThirdGoodness = CalculateGoodness(state, previousState, tank, otherTank, curPos.x+dx, curPos.y+dy);
+        if(leftThirdGoodness < rightThirdGoodness){
+            left = leftThird;
+        } else {
+            right = rightThird;
+        }
+    }
+
+    double dx = r*cos(max);
+    double dy = r*sin(max);
+
+    return Position(curPos.x + dx, curPos.y + dy);
 }
 
 std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &state, GameState &previousState) {
@@ -117,30 +174,16 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
     if(state.player.TankSlow.alive) {
-        // for now do a linear search for where the goodness is increasing with radius 1.
-        double r = 0.5;
+
         Position curPos = state.player.TankSlow.position;
-        double mx = 1E30;
-        double my = 1E30;
-        double maxgoodness = -1E30;
-        double currentgoodness = CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos);
-        for(int t = 0; t < 1000; t++){
-            double dx = r*cos(double(t)*2*acos(-1)/1000.0);
-            double dy = r*sin(double(t)*2*acos(-1)/1000.0);
-            double goodness = CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos.x+dx, curPos.y+dy);
-            if(goodness - currentgoodness > maxgoodness){
-                maxgoodness = goodness - currentgoodness;
-                mx = dx;
-                my = dy;
-            }
-        }
-        // best position is now in mx, my;
-        Position bestPos = Position(curPos.x + mx, curPos.y + my);
+        double r = 0.2;
+        Position bestPos;
+        if(ternary)
+            bestPos = ternarySearch(state, previousState, state.player.TankSlow, state.player.TankFast, 1000, r);
+        else
+            bestPos = linearSearch(state, previousState, state.player.TankSlow, state.player.TankFast, 1000, r);
         double angle = state.player.TankSlow.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
-
-        // check if tracks are pointing in proper direction
-        Position dir = Position(state.player.TankSlow.position.x + r*cos(angle), state.player.TankSlow.position.y + r*sin(angle));
 
         // it might be better to go backwards instead of forwards!
         if(fabs(angle) > acos(-1)/2.0){
@@ -153,25 +196,13 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
     }
     if(state.player.TankFast.alive) {
-        // for now do a linear search for where the goodness is increasing with radius 1.
-        double r = 0.5;
         Position curPos = state.player.TankFast.position;
-        double mx = 1E30;
-        double my = 1E30;
-        double maxgoodness = -1E30;
-        double currentgoodness = CalculateGoodness(state, previousState, state.player.TankFast, state.player.TankSlow, curPos);
-        for(int t = 0; t < 1000; t++){
-            double dx = r*cos(double(t)*2*acos(-1)/1000.0);
-            double dy = r*sin(double(t)*2*acos(-1)/1000.0);
-            double goodness = CalculateGoodness(state, previousState, state.player.TankFast, state.player.TankSlow, curPos.x+dx, curPos.y+dy);
-            if(goodness - currentgoodness > maxgoodness){
-                maxgoodness = goodness - currentgoodness;
-                mx = dx;
-                my = dy;
-            }
-        }
-        // best position is now in mx, my;
-        Position bestPos = Position(curPos.x + mx, curPos.y + my);
+        double r = 0.2;
+        Position bestPos;
+        if(ternary)
+            bestPos = ternarySearch(state, previousState, state.player.TankFast, state.player.TankSlow, 1000, r);
+        else
+            bestPos = linearSearch(state, previousState, state.player.TankFast, state.player.TankSlow, 1000, r);
         double angle = state.player.TankFast.tracks;
         angle = curPos.GetAngle(bestPos) - angle;
 

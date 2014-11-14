@@ -13,15 +13,23 @@ class DifferentialMovementStrategy : public Strategy
 protected:
 
 private:
+    bool ternary = true;
     /*
     * Calculates the goodness at the given position
      */
-    double CalculateGoodness(GameState &state, GameState &previousState, Tank &tank, Tank &otherTank, Position& position);
+    double CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const Position& position);
+    Position linearSearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int iterations, const double r);
+    Position ternarySearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int maxIterations, const double r);
 
 public:
     DifferentialMovementStrategy(){
+        ternary = true;
     }
-    double CalculateGoodness(GameState &state, GameState &previousState, Tank &tank, Tank &otherTank, double x, double y);
+
+    DifferentialMovementStrategy(bool t){
+        ternary = t;
+    }
+    double CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const double x, const double y);
     std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);
 };
 

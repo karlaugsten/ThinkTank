@@ -18,6 +18,8 @@ private:
     CommandChannel* cmdChannel;
 
 public:
+    Strategy* movementStrategy;
+    Strategy* firingStrategy;
     Control(StateParser *parser, CommandChannel *cmdChannel); // Constructor that parses the game state response message
     ~Control(){
         delete parser;
