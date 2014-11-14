@@ -19,20 +19,7 @@ using namespace std;
 
 // Plots the gamestate using the goodness calculator for testing.
 void plot_test(GameState &state) {
-    /*Position a(20, 20);
-    Position b(50, 20);
-    Position c(50, 50);
-    Position x(35, 60);
-    Position d(20, 50);
 
-    state.fastLineOfSight.push_back(a);
-    state.fastLineOfSight.push_back(b);
-    state.fastLineOfSight.push_back(c);
-    state.fastLineOfSight.push_back(x);
-    state.fastLineOfSight.push_back(d);*/
-    for(int i = 0; i < state.fastLineOfSight.size(); i++){
-        cout << "Pos x: " << state.fastLineOfSight[i].x << " y: " << state.fastLineOfSight[i].y << endl;
-    }
     DifferentialMovementStrategy strategy = DifferentialMovementStrategy();
     ofstream myfile;
     cout << state.map.width << " " << state.map.height << endl;
