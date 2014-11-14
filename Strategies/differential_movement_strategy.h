@@ -16,12 +16,12 @@ private:
     /*
     * Calculates the goodness at the given position
      */
-    double CalculateGoodness(GameState &state, GameState &previousState, Tank &tank, Tank &otherTank, Position& position);
-
+    double CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const Position& position);
+    Position linearSearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int iterations, const double r);
 public:
     DifferentialMovementStrategy(){
     }
-    double CalculateGoodness(GameState &state, GameState &previousState, Tank &tank, Tank &otherTank, double x, double y);
+    double CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const double x, const double y);
     std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);
 };
 

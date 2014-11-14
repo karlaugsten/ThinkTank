@@ -26,7 +26,7 @@ double degradingGaussian(Position inFrontOf, double angle, double x, double y, d
     return goodness;
 }
 
-double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameState& previousState, Tank &tank, Tank &otherTank, double x, double y){
+double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, const GameState& previousState, const Tank &tank, const Tank &otherTank, const double x, const double y){
     double goodness = 0.0;
     Position current = Position(x,y);
     // Add subtract 1/r^2 for the outer walls
@@ -107,8 +107,30 @@ double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameSta
 
 }
 
-double DifferentialMovementStrategy::CalculateGoodness(GameState &state, GameState &previousState, Tank &tank, Tank &otherTank, Position &position){
+double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const Position &position){
     return CalculateGoodness(state, previousState, tank, otherTank, position.x, position.y);
+}
+
+/*
+ * Searches linearly around the tank for the best goodness
+  */
+Position DifferentialMovementStrategy::linearSearch(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const int iterations, const double r){
+    Position curPos = tank.position;
+    double mx = 1E30;
+    double my = 1E30;
+    double maxgoodness = -1E30;
+    double currentgoodness = CalculateGoodness(state, previousState, tank, otherTank, curPos);
+    for(int t = 0; t < 1000; t++){
+        double dx = r*cos(double(t)*2*acos(-1)/1000.0);
+        double dy = r*sin(double(t)*2*acos(-1)/1000.0);
+        double goodness = CalculateGoodness(state, previousState, tank, otherTank, curPos.x+dx, curPos.y+dy);
+        if(goodness - currentgoodness > maxgoodness){
+            maxgoodness = goodness - currentgoodness;
+            mx = dx;
+            my = dy;
+        }
+    }
+    return Position(curPos.x + mx, curPos.y + my);
 }
 
 std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &state, GameState &previousState) {
@@ -162,7 +184,7 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
 
         double dx = r*cos(max);
         double dy = r*sin(max);
-        double ternGoodness =  CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos.x+dx, curPos.y+dy);
+        double ternGoodness =  CalculateGoodness(state, previousState, state.player.TankSlow, state.player.TankFast, curPos.x+dx, curPos.y+dy) - currentgoodness;
 
         if(fabs(ternGoodness - maxgoodness) > 1E-3){
             std::cout << "wtf: " << it << " " << ternGoodness << " " << maxgoodness << std::endl;
