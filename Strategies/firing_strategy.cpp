@@ -129,7 +129,7 @@ bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tan
     }
 }
 
-void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &state, GameState &previousState, Tank thisTank){
+void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &state, GameState &previousState, Tank &thisTank){
     Tank ally;
     Tank closestEnemy;
     Position closesEnemyWithPrediction;
@@ -138,7 +138,7 @@ void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &st
     bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
     if(closestEnemy.position == state.opponent.TankFast.position){
         closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankFast.position,isInPredictionRange);
-    } else if(closestEnemy.position == state.opponent.TankSlow.position){
+    } else{
         closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankSlow.position,isInPredictionRange);
     }
     if(thisTank.position == state.player.TankFast.position){ // Ensure not firing at friendly tank
@@ -150,10 +150,10 @@ void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &st
     angle = thisTank.position.GetAngle(closesEnemyWithPrediction) - angle;
     moves.push(new RotateTurretCommand(angle, thisTank.id)); // Send move commands
     if(canShoot && isInPredictionRange && !shootingAtAlly){
-        moves.push(new FireCommand(state.player.TankSlow.id));
+        moves.push(new FireCommand(thisTank.id));
 
     }else {
-        moves.push(new StopFireCommand(state.player.TankSlow.id));
+        moves.push(new StopFireCommand(thisTank.id));
     }
 }
 
@@ -161,7 +161,7 @@ void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &st
 std::queue<Command*> FiringStrategy::DetermineActions(GameState &state, GameState &previousState) {
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
-    if(state.player.TankFast.alive) {// Do slow tank firing strategy
+    if(state.player.TankFast.alive) {
         sendTankCommands(moves, state, previousState, state.player.TankFast);
     }
     if(state.player.TankSlow.alive) {
