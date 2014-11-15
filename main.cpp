@@ -76,6 +76,16 @@ int main(int argc, char* argv[]) {
             Strategy* predictiveFiring = new PredictiveFiringStrategy();
             control->firingStrategy = predictiveFiring;
         }
+        if(command == "-fr" || command == "firing-random"){
+            // do a ternary search
+            Strategy* randomFiring = new RandomFiringStrategy();
+            control->firingStrategy = randomFiring;
+        }
+        if(command == "-fn" || command == "firing-none"){
+            // do a ternary search
+            Strategy* firing = new FiringStrategy();
+            control->firingStrategy = firing;
+        }
     }
     // Join and wait for threads to finish
     parserThread.join();

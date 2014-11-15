@@ -7,6 +7,7 @@
 #include "commandchannel.h"
 #include "Strategies/differential_movement_strategy.h"
 #include "Strategies/firing_strategy.h"
+#include "Strategies/random_firing_strategy.h"
 #include <mutex>
 #include <thread>
 

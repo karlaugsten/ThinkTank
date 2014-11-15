@@ -17,7 +17,7 @@ void Control::Run() {
     GameState state;
     GameState previousState;
     movementStrategy = new DifferentialMovementStrategy(true);
-    firingStrategy = new FiringStrategy();
+    firingStrategy = new RandomFiringStrategy();
     // Algorithm does stuff here!
     try {
         while (!state.over) {
