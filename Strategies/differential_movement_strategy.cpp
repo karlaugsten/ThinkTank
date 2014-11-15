@@ -158,7 +158,7 @@ Position DifferentialMovementStrategy::ternarySearch(const GameState &state, con
     double right = 2*Util::PI;
     int it = 0;
     while(it++ < maxIterations){
-        if(fabs(right - left) < 1E-3){
+        if(fabs(right - left) < 1E-7){
             max = (right + left) / 2.0;
             break;
         }
