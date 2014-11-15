@@ -14,6 +14,7 @@ protected:
 
 private:
     bool ternary = true;
+    double enemyDistance = 40.0;
     /*
     * Calculates the goodness at the given position
      */
@@ -24,10 +25,23 @@ private:
 public:
     DifferentialMovementStrategy(){
         ternary = true;
+        enemyDistance = 40.0;
     }
+
+    DifferentialMovementStrategy(double dist){
+        ternary = true;
+        enemyDistance = dist;
+    }
+
 
     DifferentialMovementStrategy(bool t){
         ternary = t;
+        enemyDistance = 40.0;
+    }
+
+    DifferentialMovementStrategy(bool t, double dist){
+        ternary = t;
+        enemyDistance = dist;
     }
     double CalculateGoodness(const GameState &state, const GameState &previousState, const Tank &tank, const Tank &otherTank, const double x, const double y);
     std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);

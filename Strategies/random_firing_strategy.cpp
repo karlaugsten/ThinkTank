@@ -7,7 +7,7 @@
 
 Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, Position previousTankPosition, bool &isInPredictionRange){
     //if the tank hasn't moved return current position
-    if(enemyTank.position.x == previousTankPosition.x && enemyTank.position.y == previousTankPosition.y) return enemyTank.position;
+    if(fabs(enemyTank.position.x - previousTankPosition.x) < 1E-7 && fabs(enemyTank.position.y - previousTankPosition.y) < 1E-7) return enemyTank.position;
     double ratioForGoingForward=1.0;
     double ratioForGoingBackward=0.0;
     double distanceFromTanks = ourTank.position.Distance(enemyTank.position);

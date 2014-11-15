@@ -37,32 +37,32 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
     goodness -= (20.0/((y - state.map.height)*(y - state.map.height)));
 
     if(state.timeRemaining < 5.0){
-        goodness -= ((100 - state.timeRemaining*state.timeRemaining*state.timeRemaining)/(y*y));
-        goodness -= ((100 - state.timeRemaining*state.timeRemaining*state.timeRemaining)/((y - state.map.height)*(y - state.map.height)));
+        goodness -= ((100 - 10*state.timeRemaining*state.timeRemaining*state.timeRemaining)/(y*y));
+        goodness -= ((100 - 10*state.timeRemaining*state.timeRemaining*state.timeRemaining)/((y - state.map.height)*(y - state.map.height)));
     }
 
     // subtract 1/d^2 for distance to terrain objects.
     for(int i = 0; i < state.map.terrain.size(); i++){
         Terrain t = state.map.terrain[i];
         if(x > t.position.x && x < t.position.x + t.size.x){
-            goodness -= (10.0/((y - t.position.y)*(y - t.position.y)));
-            goodness -= (10.0/((y - (t.position.y + t.size.y))*(y - (t.position.y + t.size.y))));
+            goodness -= (13.0/((y - t.position.y)*(y - t.position.y)));
+            goodness -= (13.0/((y - (t.position.y + t.size.y))*(y - (t.position.y + t.size.y))));
         }
 
         if(y > t.position.y && y < t.position.y + t.size.y){
-            goodness -= (10.0/((x - t.position.x)*(x - t.position.x)));
-            goodness -= (10.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x))));
+            goodness -= (13.0/((x - t.position.x)*(x - t.position.x)));
+            goodness -= (13.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x))));
         }
         if(y > t.position.y && y < t.position.y + t.size.y && x > t.position.x && x < t.position.x + t.size.x) return -1E30;
 
         if(x < t.position.x && y < t.position.y){
-            goodness -= (10.0/(current.Distance(t.position)*current.Distance(t.position)));
+            goodness -= (13.0/(current.Distance(t.position)*current.Distance(t.position)));
         } else if( y > t.position.y + t.size.y && x < t.position.x) {
-            goodness -= 10.0 / (current.Distance(Position(t.position.x, t.position.y + t.size.y)) * current.Distance(Position(t.position.x, t.position.y + t.size.y)));
+            goodness -= 13.0 / (current.Distance(Position(t.position.x, t.position.y + t.size.y)) * current.Distance(Position(t.position.x, t.position.y + t.size.y)));
         } else if(x > t.position.x + t.size.x && y < t.position.y) {
-            goodness -= 10.0 / (current.Distance(Position(t.position.x + t.size.x, t.position.y)) * current.Distance(Position(t.position.x + t.size.x, t.position.y)));
+            goodness -= 13.0 / (current.Distance(Position(t.position.x + t.size.x, t.position.y)) * current.Distance(Position(t.position.x + t.size.x, t.position.y)));
         } else if(x > t.position.x + t.size.x && y > t.position.y + t.size.y) {
-            goodness -= 10.0 / (current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)) * current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)));
+            goodness -= 13.0 / (current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)) * current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)));
         }
     }
 
@@ -86,9 +86,9 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
             // if tank is fast, we can get closer to enemy
             double dist;
             if(tank.Type == TankType::FAST){
-                dist = 40.0;
+                dist = enemyDistance;
             } else {
-                dist = 80.0;
+                dist = enemyDistance + 30;
             }
 
             goodness -= 3.0*exp(-(tank.position.Distance(state.opponent.TankSlow.position)*tank.position.Distance(state.opponent.TankSlow.position))/(8.0*8.0));
@@ -104,9 +104,9 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
             // if tank is fast, we can get closer to enemy
             double dist;
             if(tank.Type == TankType::FAST){
-                dist = 50.0;
+                dist = enemyDistance + 10;
             } else {
-                dist = 80.0;
+                dist = enemyDistance + 40;
             }
 
             goodness -= 3.0*exp(-(tank.position.Distance(state.opponent.TankFast.position)*tank.position.Distance(state.opponent.TankFast.position))/(8.0*8.0));

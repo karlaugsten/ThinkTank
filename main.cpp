@@ -56,6 +56,16 @@ int main(int argc, char* argv[]) {
             Strategy* diffMovement = new DifferentialMovementStrategy(true);
             control->movementStrategy = diffMovement;
         }
+
+        if(command == "-dd" || command == "differential-distance"){
+            // defaults to ternary search
+            double num;
+            cin >> num;
+            Strategy* diffMovement = new DifferentialMovementStrategy(true, num);
+            control->movementStrategy = diffMovement;
+            cout << "Changing diff movement distance to " << num << endl;
+        }
+
         if(command == "-dl" || command == "differential-linear"){
             // do a linear search instead of ternary
             Strategy* diffMovement = new DifferentialMovementStrategy(false);
