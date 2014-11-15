@@ -7,7 +7,7 @@
 #include <iostream>
 #include "StateParser/tankstate.h"
 #include "StateParser/terrain.h"
-
+#include "StateParser/gamestate.h"
 
 class Util {
 
@@ -32,7 +32,65 @@ public:
         return toReturn;
     }
 
-    static bool inSight(std::vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
+    static bool getClosestTarget(const GameState& state, const GameState& previous, const Tank& thisTank, Tank& target){
+        double distanceBetweenTanksFast = 100000;
+        double distanceBetweenTanksSlow = 100000;
+        bool FastIsAlive = true;
+        bool SlowIsAlive = true;
+        bool FastInSight = true;
+        bool SlowInSight = true;
+
+        if(state.opponent.TankFast.alive) {//Check if fast tank is alive and calculate its relative distance
+            Position enemy1 = state.opponent.TankFast.position;
+            distanceBetweenTanksFast=thisTank.position.Distance(enemy1);
+            if(!Util::inSight(state.map.terrain, thisTank.position, enemy1)) FastInSight = false;// Alive but hiding
+        } else {
+            FastIsAlive = false; //dead
+        }
+        if(state.opponent.TankSlow.alive) {//Check if fast tank is alive and calculate its relative distance
+            Position enemy2 = state.opponent.TankSlow.position;
+            distanceBetweenTanksSlow=thisTank.position.Distance(enemy2);
+            if(!Util::inSight(state.map.terrain, thisTank.position, enemy2)) SlowInSight = false;// Alive but hiding
+        } else {
+            SlowIsAlive = false; //dead
+        }
+
+        if(!SlowInSight && !FastInSight){ // Both are alive and not in sight
+            if(distanceBetweenTanksFast>distanceBetweenTanksSlow){ // Aim at the nearest but hold your fire
+                target = state.opponent.TankSlow;
+            }else{
+                target = state.opponent.TankFast;
+            }
+            return false; // Hold your fire captain!!!
+        }
+        if(!FastInSight&&!SlowIsAlive){ //Check if there is only fast tank alive but not in sight
+            target = state.opponent.TankFast;
+            return false;
+        }else if(!SlowInSight&&!FastIsAlive){ //Check if there is only fast tank alive but not in sight
+            target = state.opponent.TankSlow;
+            return false;
+        }else if(!FastInSight&&SlowIsAlive){ //Only slow in sight
+            target = state.opponent.TankSlow;
+            return true;
+        }else if(!SlowInSight&&FastIsAlive) { //Only fast in sight
+            target = previous.opponent.TankFast;
+            return true;
+
+        }else if(!SlowIsAlive&&!FastIsAlive){// If both are dead, target is irrelevant, just don't shoot
+            target.position = Position(state.map.width/2.0, state.map.height/2.0);
+            return false;
+        }
+        else{// If both are alive and in sight
+            if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
+                target = state.opponent.TankSlow;
+            }else{
+                target = state.opponent.TankFast;
+            }
+            return true;
+        }
+    }
+
+    static bool inSight(const std::vector<Terrain> &vecTerrain, const Position &tankPosition, const Position &enemyPosition) {
         for(int i=0;i<vecTerrain.size();i++) {
             Terrain terrain = vecTerrain[i];
             if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solids

@@ -14,7 +14,6 @@ class RandomFiringStrategy : public Strategy
 protected:
 
 private:
-    bool getClosestTarget(GameState& state, GameState& previous, Tank& thisTank, Tank& target);
     void sendTankCommands(std::queue<Command*> &moves, GameState &state, GameState &previousState, Tank &thisTank);
 public:
     RandomFiringStrategy(){

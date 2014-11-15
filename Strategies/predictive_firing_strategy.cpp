@@ -4,74 +4,6 @@
 #include <iostream>
 #include "../util.h"
 
-using namespace std;
-
-
-bool PredictiveFiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tank& thisTank, Position& target){
-    double distanceBetweenTanksFast = 100000;
-    double distanceBetweenTanksSlow = 100000;
-    bool FastIsAlive = true;
-    bool SlowIsAlive = true;
-    bool FastInSight = true;
-    bool SlowInSight = true;
-
-    if(state.opponent.TankFast.alive) {//Check if fast tank is alive and calculate its relative distance
-        Position enemy1 = state.opponent.TankFast.position;
-        distanceBetweenTanksFast=thisTank.position.Distance(enemy1);
-        if(!Util::inSight(state.map.terrain, thisTank.position, enemy1)) FastInSight = false;// Alive but hiding
-    } else {
-        FastIsAlive = false; //dead
-    }
-    if(state.opponent.TankSlow.alive) {//Check if fast tank is alive and calculate its relative distance
-        Position enemy2 = state.opponent.TankSlow.position;
-        distanceBetweenTanksSlow=thisTank.position.Distance(enemy2);
-        if(!Util::inSight(state.map.terrain, thisTank.position, enemy2)) SlowInSight = false;// Alive but hiding
-    } else {
-        SlowIsAlive = false; //dead
-    }
-
-    if(!SlowInSight && !FastInSight){ // Both are alive and not in sight
-        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){ // Aim at the nearest but hold your fire
-            target.x = state.opponent.TankSlow.position.x;
-            target.y = state.opponent.TankSlow.position.y;
-        }else{
-            target.x = state.opponent.TankFast.position.x;
-            target.y = state.opponent.TankFast.position.y;
-        }
-        return false; // Hold your fire captain!!!
-    }
-
-    if(!FastInSight&&!SlowIsAlive){ //Check if there is only fast tank alive but not in sight
-        target.x = state.opponent.TankFast.position.x;
-        target.y = state.opponent.TankFast.position.y;
-        return false;
-    }else if(!SlowInSight&&!FastIsAlive){ //Check if there is only fast tank alive but not in sight
-        target.x = state.opponent.TankSlow.position.x;
-        target.y = state.opponent.TankSlow.position.y;
-        return false;
-    }else if(!FastInSight&&SlowIsAlive){ //Only slow in sight
-        target.x = state.opponent.TankSlow.position.x;
-        target.y = state.opponent.TankSlow.position.y;
-        return true;
-    }else if(!SlowInSight&&FastIsAlive) { //Only fast in sight
-        target.x = state.opponent.TankFast.position.x;
-        target.y = state.opponent.TankFast.position.y;
-        return true;
-
-    }else if(!SlowIsAlive&&!FastIsAlive){// If both are dead, target is irrelevant, just don't shoot
-        return false;
-    }
-    else{// If both are alive and in sight
-        if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-            target.x = state.opponent.TankSlow.position.x;
-            target.y = state.opponent.TankSlow.position.y;
-        }else{
-            target.x = state.opponent.TankFast.position.x;
-            target.y = state.opponent.TankFast.position.y;
-        }
-        return true;
-    }
-}
 
 Position getPredictedPosition(const Tank &tank, const Tank &enemy, const Tank &previousEnemy, double diffTime){
     // determine point to shoot from velocity tank is travelling at.
@@ -98,13 +30,13 @@ std::queue<Command*> PredictiveFiringStrategy::DetermineActions(GameState &state
     }
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
         Tank thisTank = state.player.TankFast;
-        Position closestEnemy;
-        bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
+        Tank closestEnemy;
+        bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
         Position target;
 
-        if(closestEnemy == state.opponent.TankSlow.position){
+        if(closestEnemy.position == state.opponent.TankSlow.position){
             target = getPredictedPosition(state.player.TankFast, state.opponent.TankSlow, previousState.opponent.TankSlow, previousState.timeRemaining - state.timeRemaining);
-        } else if (closestEnemy == state.opponent.TankFast.position){
+        } else if (closestEnemy.position == state.opponent.TankFast.position){
             target = getPredictedPosition(state.player.TankFast, state.opponent.TankFast, previousState.opponent.TankFast, previousState.timeRemaining - state.timeRemaining);
         }
 
@@ -127,13 +59,13 @@ std::queue<Command*> PredictiveFiringStrategy::DetermineActions(GameState &state
     if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
         Tank thisTank = state.player.TankSlow;
-        Position closestEnemy;
-        bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
+        Tank closestEnemy;
+        bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
 
         Position target;
-        if(closestEnemy == state.opponent.TankSlow.position){
+        if(closestEnemy.position == state.opponent.TankSlow.position){
             target = getPredictedPosition(state.player.TankSlow, state.opponent.TankSlow, previousState.opponent.TankSlow, previousState.timeRemaining - state.timeRemaining);
-        } else if (closestEnemy == state.opponent.TankFast.position){
+        } else if (closestEnemy.position == state.opponent.TankFast.position){
             target = getPredictedPosition(state.player.TankSlow, state.opponent.TankFast, previousState.opponent.TankFast, previousState.timeRemaining - state.timeRemaining);
         }
 
