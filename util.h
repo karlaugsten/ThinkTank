@@ -5,10 +5,44 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include "StateParser/tankstate.h"
+#include "StateParser/terrain.h"
+
 
 class Util {
 
 public:
+
+    static bool inSight(std::vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
+        for(int i=0;i<vecTerrain.size();i++) {
+            Terrain terrain = vecTerrain[i];
+            if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solids
+            Position upperLeft = Position(terrain.position.x, terrain.position.y+terrain.size.y);
+            Position upperRight = Position(terrain.position.x+terrain.size.x, terrain.position.y+terrain.size.y);
+            Position lowerRight = Position(terrain.position.x+terrain.size.x, terrain.position.y);
+            Position lowerLeft = terrain.position;
+
+            if(Util::doIntersect(tankPosition,enemyPosition,upperLeft,upperRight)){
+                return false;
+            }else if(Util::doIntersect(tankPosition,enemyPosition,upperRight,lowerRight)){
+                return false;
+            }else if(Util::doIntersect(tankPosition,enemyPosition,lowerRight,lowerLeft)){
+                return false;
+            }else if(Util::doIntersect(tankPosition,enemyPosition,lowerLeft,upperLeft)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /*
+    * returns true if tank is aiming at target tank
+     */
+    static bool aiming(Tank &tank, Tank &target){
+        Position intersect;
+        return Util::intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
+    }
 
     static Position pivot;
 
