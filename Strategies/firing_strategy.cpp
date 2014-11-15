@@ -41,7 +41,6 @@ Position getCurrentTargetFromTankAngle(GameState &state, double angle){
     }
     toReturn.x=x;
     toReturn.y=y;
-    cout<< "Current Tank Target Point: ( " <<x<<", "<<y<<")"<<endl;
     return toReturn;
 }
 
@@ -57,7 +56,7 @@ Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, P
 
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(state, ourTank.turret)) || aiming(ourTank, enemyTank);
+    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(state, ourTank.turret)); //|| aiming(ourTank, enemyTank);
     if(distanceFromTanks<=20) return enemyTank.position;
     return Util::randPointInRange(Forward, Backward);
 }
