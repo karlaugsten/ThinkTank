@@ -84,7 +84,7 @@ Position getPredictedPosition(const Tank &tank, const Tank &enemy, const Tank &p
     double timeToHit = distance/30.0;
     // distance is now distance enemy will travel.
     distance = speed*timeToHit;
-    Position dir(cos(enemy.turret), sin(enemy.turret));
+    Position dir(cos(enemy.tracks), sin(enemy.tracks));
     Position prediction = Position(enemy.position.x + dir.x*distance, enemy.position.y + dir.y*distance);
     return prediction;
 }
