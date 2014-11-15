@@ -22,25 +22,12 @@ Position getPointOnLineWithDistanceFromCurrent(Position current, Position previo
     return Position(current.x+(unitVector.x*distance), current.y+(unitVector.y*distance));
 }
 
-Position getCurrentTargetFromTankAngle(GameState &state, double angle){
+Position getCurrentTargetFromTankAngle(Tank &ourTank, double angle){
     Position toReturn;
-    double x;
-    double y;
-    if(angle<=0.5*acos(-1)){ // left border of the map
-        x=0;
-        y=angle/(0.5*acos(-1))*state.map.height;
-    }else if (angle<=acos(-1)){ // upper border of the map
-        x=angle/(acos(-1))*state.map.width;
-        y=state.map.height;
-    }else if (angle<=1.5*acos(-1)){ // right border of the map
-        x=state.map.width;
-        y=state.map.height - angle/(1.5*acos(-1))*state.map.height; // lower border of the map
-    }else{
-        x=state.map.width-angle/(2*acos(-1))*state.map.width;
-        y=0;
-    }
-    toReturn.x=x;
-    toReturn.y=y;
+    double x= cos(angle);
+    double y= sin(angle);
+    toReturn.x=ourTank.position.x+x*10000;
+    toReturn.y=ourTank.position.y+y*10000;
     return toReturn;
 }
 
@@ -56,7 +43,7 @@ Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, P
 
     Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
     Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(state, ourTank.turret)); //|| aiming(ourTank, enemyTank);
+    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(ourTank, ourTank.turret)) || aiming(ourTank, enemyTank);
     if(distanceFromTanks<=20) return enemyTank.position;
     return Util::randPointInRange(Forward, Backward);
 }
@@ -130,20 +117,14 @@ bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tan
         target.y = getTargetWithVariance(state, thisTank, state.opponent.TankFast, previous.opponent.TankFast.position,isInPredictionRange).y;
         return false;
     }else if(!SlowInSight&&!FastIsAlive){ //Check if there is only fast tank alive but not in sight
-        //target.x = state.opponent.TankSlow.position.x;
-        //target.y = state.opponent.TankSlow.position.y;
         target.x = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position,isInPredictionRange).x;
         target.y = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position,isInPredictionRange).y;
         return false;
     }else if(!FastInSight&&SlowIsAlive){ //Only slow in sight
-        //target.x = state.opponent.TankSlow.position.x;
-        //target.y = state.opponent.TankSlow.position.y;
         target.x = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position,isInPredictionRange).x;
         target.y = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position,isInPredictionRange).y;
         return true;
     }else if(!SlowInSight&&FastIsAlive) { //Only fast in sight
-        //target.x = state.opponent.TankFast.position.x;
-        //target.y = state.opponent.TankFast.position.y;
         target.x = getTargetWithVariance(state, thisTank, state.opponent.TankFast, previous.opponent.TankFast.position,isInPredictionRange).x;
         target.y = getTargetWithVariance(state, thisTank, state.opponent.TankFast, previous.opponent.TankFast.position,isInPredictionRange).y;
         return true;
@@ -153,13 +134,9 @@ bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tan
     }
     else{// If both are alive and in sight
         if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-            //target.x = state.opponent.TankSlow.position.x;
-            //target.y = state.opponent.TankSlow.position.y;
             target.x = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position,isInPredictionRange).x;
             target.y = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previous.opponent.TankSlow.position,isInPredictionRange).y;
         }else{
-            //target.x = state.opponent.TankFast.position.x;
-            //target.y = state.opponent.TankFast.position.y;
             target.x = getTargetWithVariance(state, thisTank, state.opponent.TankFast, previous.opponent.TankFast.position,isInPredictionRange).x;
             target.y = getTargetWithVariance(state, thisTank, state.opponent.TankFast, previous.opponent.TankFast.position,isInPredictionRange).y;
         }
