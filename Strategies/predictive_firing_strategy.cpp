@@ -30,13 +30,13 @@ std::queue<Command*> PredictiveFiringStrategy::DetermineActions(GameState &state
     }
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
         Tank thisTank = state.player.TankFast;
-        Tank closestEnemy;
+        Position closestEnemy;
         bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
         Position target;
 
-        if(closestEnemy.position == state.opponent.TankSlow.position){
+        if(closestEnemy == state.opponent.TankSlow.position){
             target = getPredictedPosition(state.player.TankFast, state.opponent.TankSlow, previousState.opponent.TankSlow, previousState.timeRemaining - state.timeRemaining);
-        } else if (closestEnemy.position == state.opponent.TankFast.position){
+        } else if (closestEnemy == state.opponent.TankFast.position){
             target = getPredictedPosition(state.player.TankFast, state.opponent.TankFast, previousState.opponent.TankFast, previousState.timeRemaining - state.timeRemaining);
         }
 
@@ -59,13 +59,13 @@ std::queue<Command*> PredictiveFiringStrategy::DetermineActions(GameState &state
     if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
         Tank thisTank = state.player.TankSlow;
-        Tank closestEnemy;
+        Position closestEnemy;
         bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
 
         Position target;
-        if(closestEnemy.position == state.opponent.TankSlow.position){
+        if(closestEnemy == state.opponent.TankSlow.position){
             target = getPredictedPosition(state.player.TankSlow, state.opponent.TankSlow, previousState.opponent.TankSlow, previousState.timeRemaining - state.timeRemaining);
-        } else if (closestEnemy.position == state.opponent.TankFast.position){
+        } else if (closestEnemy == state.opponent.TankFast.position){
             target = getPredictedPosition(state.player.TankSlow, state.opponent.TankFast, previousState.opponent.TankFast, previousState.timeRemaining - state.timeRemaining);
         }
 

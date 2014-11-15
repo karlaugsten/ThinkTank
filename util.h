@@ -32,7 +32,7 @@ public:
         return toReturn;
     }
 
-    static bool getClosestTarget(const GameState& state, const GameState& previous, const Tank& thisTank, Tank& target){
+    static bool getClosestTarget(const GameState& state, const GameState& previous, const Tank& thisTank, Position& target){
         double distanceBetweenTanksFast = 100000;
         double distanceBetweenTanksSlow = 100000;
         bool FastIsAlive = true;
@@ -57,34 +57,34 @@ public:
 
         if(!SlowInSight && !FastInSight){ // Both are alive and not in sight
             if(distanceBetweenTanksFast>distanceBetweenTanksSlow){ // Aim at the nearest but hold your fire
-                target = state.opponent.TankSlow;
+                target = state.opponent.TankSlow.position;
             }else{
-                target = state.opponent.TankFast;
+                target = state.opponent.TankFast.position;
             }
             return false; // Hold your fire captain!!!
         }
         if(!FastInSight&&!SlowIsAlive){ //Check if there is only fast tank alive but not in sight
-            target = state.opponent.TankFast;
+            target = state.opponent.TankFast.position;
             return false;
         }else if(!SlowInSight&&!FastIsAlive){ //Check if there is only fast tank alive but not in sight
-            target = state.opponent.TankSlow;
+            target = state.opponent.TankSlow.position;
             return false;
         }else if(!FastInSight&&SlowIsAlive){ //Only slow in sight
-            target = state.opponent.TankSlow;
+            target = state.opponent.TankSlow.position;
             return true;
         }else if(!SlowInSight&&FastIsAlive) { //Only fast in sight
-            target = previous.opponent.TankFast;
+            target = previous.opponent.TankFast.position;
             return true;
 
         }else if(!SlowIsAlive&&!FastIsAlive){// If both are dead, target is irrelevant, just don't shoot
-            target.position = Position(state.map.width/2.0, state.map.height/2.0);
+            target = Position(state.map.width/2.0, state.map.height/2.0);
             return false;
         }
         else{// If both are alive and in sight
             if(distanceBetweenTanksFast>distanceBetweenTanksSlow){
-                target = state.opponent.TankSlow;
+                target = state.opponent.TankSlow.position;
             }else{
-                target = state.opponent.TankFast;
+                target = state.opponent.TankFast.position;
             }
             return true;
         }

@@ -25,15 +25,18 @@ Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, P
 
 void RandomFiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &state, GameState &previousState, Tank &thisTank){
     Tank ally;
-    Tank closestEnemy;
+    Position closestEnemy;
     Position closesEnemyWithPrediction;
     bool isInPredictionRange;
     bool shootingAtAlly;
     bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
-    if(closestEnemy.position == state.opponent.TankFast.position){
-        closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankFast.position,isInPredictionRange);
-    } else{
-        closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankSlow.position,isInPredictionRange);
+    if(closestEnemy == state.opponent.TankFast.position){
+        closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, state.opponent.TankFast, previousState.opponent.TankFast.position,isInPredictionRange);
+    } else if(closestEnemy == state.opponent.TankSlow.position){
+        closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, state.opponent.TankSlow, previousState.opponent.TankSlow.position,isInPredictionRange);
+    } else {
+        // both are probably dead, just aim at the origin.
+        closesEnemyWithPrediction = closestEnemy;
     }
     if(thisTank.position == state.player.TankFast.position){ // Ensure not firing at friendly tank
         shootingAtAlly = Util::aiming(thisTank, state.player.TankSlow);

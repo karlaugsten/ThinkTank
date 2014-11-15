@@ -10,15 +10,15 @@ std::queue<Command*> DirectFiringStrategy::DetermineActions(GameState &state, Ga
     if(!state.player.alive) return moves;
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
         Tank thisTank = state.player.TankFast;
-        Tank closestEnemy;
+        Position closestEnemy;
         bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
 
 
         double angle = state.player.TankFast.turret;
-        angle = thisTank.position.GetAngle(closestEnemy.position) - angle;
+        angle = thisTank.position.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
         if(canShoot
-                && closestEnemy.position == state.opponent.TankSlow.position
+                && closestEnemy == state.opponent.TankSlow.position
                 && Util::aiming(state.player.TankFast, state.opponent.TankSlow)
                 && !Util::aiming(state.player.TankFast, state.player.TankSlow)
                 ){
@@ -26,7 +26,7 @@ std::queue<Command*> DirectFiringStrategy::DetermineActions(GameState &state, Ga
             moves.push(new FireCommand(state.player.TankFast.id));
 
         } else if (canShoot
-                && closestEnemy.position == state.opponent.TankFast.position
+                && closestEnemy == state.opponent.TankFast.position
                 && Util::aiming(state.player.TankFast, state.opponent.TankFast)
                 && !Util::aiming(state.player.TankFast, state.player.TankSlow)
                 ) {
@@ -41,13 +41,13 @@ std::queue<Command*> DirectFiringStrategy::DetermineActions(GameState &state, Ga
     if(state.player.TankSlow.alive) {
         // Do fast tank firing strategy
         Tank thisTank = state.player.TankSlow;
-        Tank closestEnemy;
+        Position closestEnemy;
         bool canShoot = Util::getClosestTarget(state, previousState, thisTank, closestEnemy);
         double angle = state.player.TankSlow.turret;
-        angle = thisTank.position.GetAngle(closestEnemy.position) - angle;
+        angle = thisTank.position.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
         if(canShoot
-                && closestEnemy.position == state.opponent.TankSlow.position
+                && closestEnemy == state.opponent.TankSlow.position
                 && Util::aiming(state.player.TankSlow, state.opponent.TankSlow)
                 && !Util::aiming(state.player.TankSlow, state.player.TankFast)
                 ){
@@ -55,7 +55,7 @@ std::queue<Command*> DirectFiringStrategy::DetermineActions(GameState &state, Ga
             moves.push(new FireCommand(state.player.TankSlow.id));
 
         } else if (canShoot
-                && closestEnemy.position == state.opponent.TankFast.position
+                && closestEnemy == state.opponent.TankFast.position
                 && Util::aiming(state.player.TankSlow, state.opponent.TankFast)
                 && !Util::aiming(state.player.TankSlow, state.player.TankFast)
                 ) {
