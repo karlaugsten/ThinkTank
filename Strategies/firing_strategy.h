@@ -18,6 +18,7 @@ private:
     void sendTankCommands(std::queue<Command*> &moves, GameState &state, GameState &previousState, Tank &thisTank);
 public:
     FiringStrategy(){
+
     }
 
     std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);

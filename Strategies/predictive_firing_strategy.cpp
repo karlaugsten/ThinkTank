@@ -93,14 +93,15 @@ Position getPredictedPosition(const Tank &tank, const Tank &enemy, const Tank &p
 std::queue<Command*> PredictiveFiringStrategy::DetermineActions(GameState &state, GameState &previousState) {
     std::queue<Command* > moves;
     if(!state.player.alive) return moves;
+    if(fabs(previousState.timeRemaining - state.timeRemaining) < 1E-7){
+        return moves;
+    }
     if(state.player.TankFast.alive) {// Do slow tank firing strategy
         Tank thisTank = state.player.TankFast;
         Position closestEnemy;
         bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
         Position target;
-        if(fabs(previousState.timeRemaining - state.timeRemaining) < 1E-7){
-            std::cout << "WTF times are the same!!1 " << std::endl;
-        }
+
         if(closestEnemy == state.opponent.TankSlow.position){
             target = getPredictedPosition(state.player.TankFast, state.opponent.TankSlow, previousState.opponent.TankSlow, previousState.timeRemaining - state.timeRemaining);
         } else if (closestEnemy == state.opponent.TankFast.position){

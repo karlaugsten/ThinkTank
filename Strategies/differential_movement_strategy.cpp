@@ -36,6 +36,11 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
     goodness -= (20.0/((x - state.map.width)*(x - state.map.width)));
     goodness -= (20.0/((y - state.map.height)*(y - state.map.height)));
 
+    if(state.timeRemaining < 5.0){
+        goodness -= ((100 - state.timeRemaining*state.timeRemaining*state.timeRemaining)/(y*y));
+        goodness -= ((100 - state.timeRemaining*state.timeRemaining*state.timeRemaining)/((y - state.map.height)*(y - state.map.height)));
+    }
+
     // subtract 1/d^2 for distance to terrain objects.
     for(int i = 0; i < state.map.terrain.size(); i++){
         Terrain t = state.map.terrain[i];
@@ -110,7 +115,6 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
 
             // reduce according to gaussian infront of turret
             goodness += degradingGaussian(state.opponent.TankFast.position, state.opponent.TankFast.turret, x, y, 8.0, 8.0/std::max(state.map.height, state.map.width));
-
         }
     }
 
