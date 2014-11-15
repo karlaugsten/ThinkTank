@@ -49,11 +49,16 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
             goodness -= (10.0/((x - (t.position.x + t.size.x))*(x - (t.position.x + t.size.x))));
         }
         if(y > t.position.y && y < t.position.y + t.size.y && x > t.position.x && x < t.position.x + t.size.x) return -1E30;
-        goodness -= (10.0/(current.Distance(t.position)*current.Distance(t.position)));
-        goodness -= 10.0/(current.Distance(Position(t.position.x, t.position.y + t.size.y))* current.Distance(Position(t.position.x, t.position.y + t.size.y)));
-        goodness -= 10.0/(current.Distance(Position(t.position.x + t.size.x, t.position.y))* current.Distance(Position(t.position.x + t.size.x, t.position.y)));
-        goodness -= 10.0/(current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y))* current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)));
 
+        if(x < t.position.x && y < t.position.y){
+            goodness -= (10.0/(current.Distance(t.position)*current.Distance(t.position)));
+        } else if( y > t.position.y + t.size.y && x < t.position.x) {
+            goodness -= 10.0 / (current.Distance(Position(t.position.x, t.position.y + t.size.y)) * current.Distance(Position(t.position.x, t.position.y + t.size.y)));
+        } else if(x > t.position.x + t.size.x && y < t.position.y) {
+            goodness -= 10.0 / (current.Distance(Position(t.position.x + t.size.x, t.position.y)) * current.Distance(Position(t.position.x + t.size.x, t.position.y)));
+        } else if(x > t.position.x + t.size.x && y > t.position.y + t.size.y) {
+            goodness -= 10.0 / (current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)) * current.Distance(Position(t.position.x + t.size.x, t.position.y + t.size.y)));
+        }
     }
 
     // subtract -Aexp(-(a*(x-b) + c*(y-d))^2/B) function if tank is in front of projectile
@@ -67,7 +72,7 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
     // Try to stay away from other tank!
     if(otherTank.alive){
         double dist = 70.0;
-        // TODO: make it really bad if you are super close to them
+        goodness -= 3.0*exp(-(tank.position.Distance(otherTank.position)*tank.position.Distance(otherTank.position))/(8.0*8.0));
         goodness -= optimalDistance(otherTank.position, Position(x,y), dist, 10.0);
     }
 
@@ -76,10 +81,13 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
             // if tank is fast, we can get closer to enemy
             double dist;
             if(tank.Type == TankType::FAST){
-                dist = 25.0;
+                dist = 40.0;
             } else {
-                dist = 60.0;
+                dist = 80.0;
             }
+
+            goodness -= 3.0*exp(-(tank.position.Distance(state.opponent.TankSlow.position)*tank.position.Distance(state.opponent.TankSlow.position))/(8.0*8.0));
+
             goodness -= optimalDistance(state.opponent.TankSlow.position, Position(x,y), dist, 5.0);
 
             // reduce according to gaussian infront of turret
@@ -91,10 +99,13 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
             // if tank is fast, we can get closer to enemy
             double dist;
             if(tank.Type == TankType::FAST){
-                dist = 25.0;
+                dist = 50.0;
             } else {
-                dist = 60.0;
+                dist = 80.0;
             }
+
+            goodness -= 3.0*exp(-(tank.position.Distance(state.opponent.TankFast.position)*tank.position.Distance(state.opponent.TankFast.position))/(8.0*8.0));
+
             goodness -= optimalDistance(state.opponent.TankFast.position, Position(x,y), dist, 5.0);
 
             // reduce according to gaussian infront of turret
@@ -214,8 +225,6 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
             moves.push(new RotateCommand(angle, state.player.TankFast.id));
             moves.push(new MoveCommand(10.0, state.player.TankFast.id));
         }
-
-
     }
 
     return moves;
