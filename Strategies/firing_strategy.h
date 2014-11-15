@@ -16,6 +16,7 @@ protected:
 private:
 public:
     FiringStrategy(){
+
     }
 
     std::queue<Command*> DetermineActions(GameState &state, GameState &previousState);
