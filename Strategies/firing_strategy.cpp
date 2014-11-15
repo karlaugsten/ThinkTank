@@ -131,23 +131,26 @@ bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tan
 }
 
 void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &state, GameState &previousState, Tank thisTank){
+    Tank ally;
     Tank closestEnemy;
     Position closesEnemyWithPrediction;
     bool isInPredictionRange;
+    bool shootingAtAlly;
     bool canShoot = getClosestTarget(state, previousState, thisTank, closestEnemy);
     if(closestEnemy.position == state.opponent.TankFast.position){
         closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankFast.position,isInPredictionRange);
     } else if(closestEnemy.position == state.opponent.TankSlow.position){
         closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankSlow.position,isInPredictionRange);
     }
-    double angle = state.player.TankSlow.turret;
+    if(thisTank.position == state.player.TankFast.position){ // Ensure not firing at friendly tank
+        shootingAtAlly = aiming(thisTank, state.player.TankSlow);
+    }else{
+        shootingAtAlly = aiming(thisTank, state.player.TankFast);
+    }
+    double angle = thisTank.turret;
     angle = thisTank.position.GetAngle(closesEnemyWithPrediction) - angle;
-    moves.push(new RotateTurretCommand(angle, state.player.TankSlow.id));
-    if(canShoot
-            && isInPredictionRange
-            && !aiming(state.player.TankSlow, state.player.TankFast)
-            ){
-
+    moves.push(new RotateTurretCommand(angle, thisTank.id)); // Send move commands
+    if(canShoot && isInPredictionRange && !shootingAtAlly){
         moves.push(new FireCommand(state.player.TankSlow.id));
 
     }else {
