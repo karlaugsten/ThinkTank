@@ -13,6 +13,8 @@ class Util {
 
 public:
 
+    static double PI;
+
     static Position getPointOnLineWithDistanceFromCurrent(Position current, Position previous, double distance){
         //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
         Position v= Position(current.x-previous.x,current.y-previous.y);
@@ -126,7 +128,7 @@ public:
             }
         }
 
-        return (fabs(sum - 2 * acos(-1)) < 1E-7 || fabs(sum + 2 * acos(-1)) < 1E-7);
+        return (fabs(sum - 2 * Util::PI) < 1E-7 || fabs(sum + 2 * Util::PI) < 1E-7);
     }
 
     static Position randPointInRange(Position a, Position b) {
@@ -175,8 +177,6 @@ public:
         // Negative doesnt have square root
         if (delta <= 0.0) return false;
         // if delta is 0.0 it is tangent to circle
-        // TODO: handle when delta is zero
-
 
         double intersect1 = (-b - sqrt(delta)) / (2.0 * a);
         double intersect2 = (-b + sqrt(delta)) / (2.0 * a);

@@ -12,13 +12,13 @@ CommandChannel::CommandChannel(zmq::context_t &ctx, std::string server_ip, std::
 
     std::string resp = SendMessage();
     if(resp.rfind("error") != std::string::npos){
-        std::cout << "Received error response:\n" << resp << "\nFrom command:\n" << buffer << "\n";
+        std::cerr << "Received error response:\n" << resp << "\nFrom command:\n" << buffer << "\n";
         exit(-1);
     }
     rapidjson::Document dom;
     dom.Parse(resp.c_str());
     if(dom.HasParseError()){
-        std::cout << "Error parsing match connect resp: " << resp << std::endl;
+        std::cerr << "Error parsing match connect resp: " << resp << std::endl;
     } else{
         const rapidjson::Value& d_client_token = dom["client_token"];
         assert(d_client_token.IsString());
@@ -40,7 +40,7 @@ std::string CommandChannel::SendMessage(){
         return data;
     } else {
         // TODO: return something useful
-        std::cout << "Failed to send message." << std::endl;
+        std::cerr << "Failed to send message." << std::endl;
         return "";
     }
 }
@@ -50,7 +50,7 @@ void CommandChannel::SendCommand(Command& command){
     std::string resp = SendMessage();
     // TODO: check for error resp
     if(resp.rfind("error") != std::string::npos){
-        std::cout << "Received error response:\n" << resp << "\nFrom command:\n" << buffer << "\n";
+        std::cerr << "Received error response:\n" << resp << "\nFrom command:\n" << buffer << "\n";
     }
 }
 

@@ -21,7 +21,6 @@ Terrain::Terrain(const rapidjson::Value &dom)
     }
     position = Position(dom["boundingBox"]["corner"]);
     size = Position(dom["boundingBox"]["size"]);
-    // TODO: Finish implementing this
 }
 
 Terrain::~Terrain(){

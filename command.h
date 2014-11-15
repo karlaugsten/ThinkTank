@@ -4,6 +4,7 @@
 #include <string>
 #include <zmq.hpp>
 #include <cmath>
+#include "util.h"
 
 /**
 * Base class that all commands inherit from.
@@ -15,6 +16,8 @@ protected:
 public:
     Command() {
     }
+
+    virtual ~Command(){}
 
     virtual std::string GetCommandMessage(std::string client_token, char* buffer)=0;
 };
@@ -60,14 +63,14 @@ private:
     std::string cmd_tankRotation_cw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE\",\"direction\":\"CW\",\"rads\":%lf,\"client_token\":\"%s\"}";
 public:
     RotateCommand(double r, std::string t){
-        if(r > 2*acos(-1)) r = r-2*acos(-1);
-        if(r < -(2*acos(-1))) r = r+2*acos(-1);
+        if(r > 2*Util::PI) r = r-2*Util::PI;
+        if(r < -(2*Util::PI)) r = r+2*Util::PI;
 
         // Dont rotate the long way around!
-        if(r > acos(-1)){
-            r -= 2*acos(-1);
-        } else if(r < -acos(-1)){
-            r += 2*acos(-1);
+        if(r > Util::PI){
+            r -= 2*Util::PI;
+        } else if(r < -1.0*Util::PI){
+            r += 2*Util::PI;
         }
         rads = r;
         tank_id = t;
@@ -78,14 +81,14 @@ public:
     std::string GetCommandMessage(std::string client_token, char* buffer){
         if(rads > 0.0) {
             // TODO: This acos is slow...
-            if(rads > 2*acos(-1)) {
-                rads -= 2*acos(-1);
+            if(rads > 2*Util::PI) {
+                rads -= 2*Util::PI;
             }
             std::sprintf(buffer, cmd_tankRotation_ccw.c_str(), tank_id.c_str(), rads, client_token.c_str());
         } else {
             rads = -rads;
-            if(rads > 2*acos(-1)) {
-                rads -= 2*acos(-1);
+            if(rads > 2*Util::PI) {
+                rads -= 2*Util::PI;
             }
             std::sprintf(buffer, cmd_tankRotation_cw.c_str(), tank_id.c_str(), rads, client_token.c_str());
         }
@@ -122,13 +125,13 @@ private:
     std::string cmd_turretRotation_ccw = "{\"tank_id\":\"%s\",\"comm_type\":\"ROTATE_TURRET\",\"direction\":\"CCW\",\"rads\":\"%lf\",\"client_token\":\"%s\"}";
 public:
     RotateTurretCommand(double r, std::string t){
-        if(r > 2*acos(-1)) r = r-2*acos(-1);
-        if(r < -(2*acos(-1))) r = r+2*acos(-1);
+        if(r > 2*Util::PI) r = r-2*Util::PI;
+        if(r < -(2*Util::PI)) r = r+2*Util::PI;
 
-        if(r > acos(-1)){
-            r -= 2*acos(-1);
-        } else if(r < -acos(-1)){
-            r += 2*acos(-1);
+        if(r > Util::PI){
+            r -= 2*Util::PI;
+        } else if(r < -1.0*Util::PI){
+            r += 2*Util::PI;
         }
         tank_id = t;
         rads = r;
@@ -139,15 +142,14 @@ public:
     std::string GetCommandMessage(std::string client_token, char* buffer){
 
         if(rads > 0.0) {
-            // TODO: This acos is slow...
-            if(rads > 2*acos(-1)) {
-                rads -= 2*acos(-1);
+            if(rads > 2*Util::PI) {
+                rads -= 2*Util::PI;
             }
             std::sprintf(buffer, cmd_turretRotation_ccw.c_str(), tank_id.c_str(), rads, client_token.c_str());
         } else {
             rads = -rads;
-            if(rads > 2*acos(-1)) {
-                rads -= 2*acos(-1);
+            if(rads > 2*Util::PI) {
+                rads -= 2*Util::PI;
             }
             std::sprintf(buffer, cmd_turretRotation_cw.c_str(), tank_id.c_str(), rads, client_token.c_str());
         }

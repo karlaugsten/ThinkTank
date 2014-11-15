@@ -5,12 +5,12 @@
 #include "../util.h"
 
 double optimalDistance(Position from, Position to, double dist, double amplitude){
-    return amplitude*cos(acos(-1)*from.Distance(to)/dist) * exp(-(from.Distance(to)*from.Distance(to))/(dist*dist));
+    return amplitude*cos(Util::PI*from.Distance(to)/dist) * exp(-(from.Distance(to)*from.Distance(to))/(dist*dist));
 }
 
 double degradingGaussian(Position inFrontOf, double angle, double x, double y, double amplitude, double degredation){
     double goodness = 0.0;
-    double theta1 = angle - acos(-1)/2.0;
+    double theta1 = angle - Util::PI/2.0;
     Position A = Position(inFrontOf.x + cos(theta1), inFrontOf.y + sin(theta1));
     Position B = Position(inFrontOf.x - cos(theta1), inFrontOf.y - sin(theta1));
     // Determine cross product for direction
@@ -136,8 +136,8 @@ Position DifferentialMovementStrategy::linearSearch(const GameState &state, cons
     double maxgoodness = -1E30;
     double currentgoodness = CalculateGoodness(state, previousState, tank, otherTank, curPos);
     for(int t = 0; t < 1000; t++){
-        double dx = r*cos(double(t)*2*acos(-1)/1000.0);
-        double dy = r*sin(double(t)*2*acos(-1)/1000.0);
+        double dx = r*cos(double(t)*2*Util::PI/1000.0);
+        double dy = r*sin(double(t)*2*Util::PI/1000.0);
         double goodness = CalculateGoodness(state, previousState, tank, otherTank, curPos.x+dx, curPos.y+dy);
         if(goodness - currentgoodness > maxgoodness){
             maxgoodness = goodness - currentgoodness;
@@ -155,7 +155,7 @@ Position DifferentialMovementStrategy::ternarySearch(const GameState &state, con
     Position curPos = tank.position;
     double max = 1E30;
     double left = 1E-30;
-    double right = 2*acos(-1);
+    double right = 2*Util::PI;
     int it = 0;
     while(it++ < maxIterations){
         if(fabs(right - left) < 1E-3){
@@ -201,8 +201,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         angle = curPos.GetAngle(bestPos) - angle;
 
         // it might be better to go backwards instead of forwards!
-        if(fabs(angle) > acos(-1)/2.0){
-            moves.push(new RotateCommand(angle - acos(-1), state.player.TankSlow.id));
+        if(fabs(angle) > Util::PI/2.0){
+            moves.push(new RotateCommand(angle - Util::PI, state.player.TankSlow.id));
             moves.push(new MoveCommand(10.0, state.player.TankSlow.id, true));
         } else {
             moves.push(new RotateCommand(angle, state.player.TankSlow.id));
@@ -222,8 +222,8 @@ std::queue<Command*> DifferentialMovementStrategy::DetermineActions(GameState &s
         angle = curPos.GetAngle(bestPos) - angle;
 
         // it might be better to go backwards instead of forwards!
-        if(fabs(angle) > acos(-1)/2.0){
-            moves.push(new RotateCommand(angle - acos(-1), state.player.TankFast.id));
+        if(fabs(angle) > Util::PI/2.0){
+            moves.push(new RotateCommand(angle - Util::PI, state.player.TankFast.id));
             moves.push(new MoveCommand(10.0, state.player.TankFast.id, true));
         } else {
             moves.push(new RotateCommand(angle, state.player.TankFast.id));
