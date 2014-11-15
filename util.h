@@ -13,6 +13,23 @@ class Util {
 
 public:
 
+    static Position getPointOnLineWithDistanceFromCurrent(Position current, Position previous, double distance){
+        //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
+        Position v= Position(current.x-previous.x,current.y-previous.y);
+        double vMagnitude = sqrt(v.x*v.x+v.y*v.y);
+        Position unitVector = Position(v.x/vMagnitude,v.y/vMagnitude);
+        return Position(current.x+(unitVector.x*distance), current.y+(unitVector.y*distance));
+    }
+
+    static Position getCurrentTargetFromTankAngle(Tank &ourTank, double angle){
+        Position toReturn;
+        double x= cos(angle);
+        double y= sin(angle);
+        toReturn.x=ourTank.position.x+x*10000;
+        toReturn.y=ourTank.position.y+y*10000;
+        return toReturn;
+    }
+
     static bool inSight(std::vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
         for(int i=0;i<vecTerrain.size();i++) {
             Terrain terrain = vecTerrain[i];

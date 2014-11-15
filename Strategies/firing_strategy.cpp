@@ -6,31 +6,6 @@
 
 using namespace std;
 
-/*
-* returns true if tank is aiming at target tank
- */
-bool aiming(Tank &tank, Tank &target){
-    Position intersect;
-    return Util::intersectLineCircle(target.position, target.hitRadius, tank.position, tank.turret, intersect);
-}
-
-Position getPointOnLineWithDistanceFromCurrent(Position current, Position previous, double distance){
-    //http://math.stackexchange.com/questions/175896/finding-a-point-along-a-line-a-certain-distance-away-from-another-point
-    Position v= Position(current.x-previous.x,current.y-previous.y);
-    double vMagnitude = sqrt(v.x*v.x+v.y*v.y);
-    Position unitVector = Position(v.x/vMagnitude,v.y/vMagnitude);
-    return Position(current.x+(unitVector.x*distance), current.y+(unitVector.y*distance));
-}
-
-Position getCurrentTargetFromTankAngle(Tank &ourTank, double angle){
-    Position toReturn;
-    double x= cos(angle);
-    double y= sin(angle);
-    toReturn.x=ourTank.position.x+x*10000;
-    toReturn.y=ourTank.position.y+y*10000;
-    return toReturn;
-}
-
 Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, Position previousTankPosition, bool &isInPredictionRange){
     //if the tank hasn't moved return current position
     if(enemyTank.position.x == previousTankPosition.x && enemyTank.position.y == previousTankPosition.y) return enemyTank.position;
@@ -41,35 +16,11 @@ Position getTargetWithVariance(GameState& state, Tank ourTank, Tank enemyTank, P
     double distanceTravelableByEnemy=enemyTank.speed*timeBetweenMissileCollision;
     // Distances are given as a percentage of direction likelihood
 
-    Position Forward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
-    Position Backward = getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
-    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, getCurrentTargetFromTankAngle(ourTank, ourTank.turret)) || aiming(ourTank, enemyTank);
+    Position Forward = Util::getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, ratioForGoingForward*distanceTravelableByEnemy);
+    Position Backward = Util::getPointOnLineWithDistanceFromCurrent(enemyTank.position, previousTankPosition, -(ratioForGoingBackward*distanceTravelableByEnemy));
+    isInPredictionRange = Util::doIntersect(Forward, Backward, ourTank.position, Util::getCurrentTargetFromTankAngle(ourTank, ourTank.turret)) || Util::aiming(ourTank, enemyTank);
     if(distanceFromTanks<=20) return enemyTank.position;
     return Util::randPointInRange(Forward, Backward);
-}
-
-
-bool isNotBlockedByTerrain(vector<Terrain> &vecTerrain, Position &tankPosition, Position &enemyPosition) {
-    for(int i=0;i<vecTerrain.size();i++) {
-        Terrain terrain = vecTerrain[i];
-        if(terrain.Type==TerrainType::IMPASSABLE) continue; // If the current terrain type is impassible, look for solids
-        Position upperLeft = Position(terrain.position.x, terrain.position.y+terrain.size.y);
-        Position upperRight = Position(terrain.position.x+terrain.size.x, terrain.position.y+terrain.size.y);
-        Position lowerRight = Position(terrain.position.x+terrain.size.x, terrain.position.y);
-        Position lowerLeft = terrain.position;
-
-        if(Util::doIntersect(tankPosition,enemyPosition,upperLeft,upperRight)){
-            return false;
-        }else if(Util::doIntersect(tankPosition,enemyPosition,upperRight,lowerRight)){
-            return false;
-        }else if(Util::doIntersect(tankPosition,enemyPosition,lowerRight,lowerLeft)){
-            return false;
-        }else if(Util::doIntersect(tankPosition,enemyPosition,lowerLeft,upperLeft)){
-            return false;
-        }
-    }
-
-    return true;
 }
 
 bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tank& thisTank, Tank& target){
@@ -83,14 +34,14 @@ bool FiringStrategy::getClosestTarget(GameState& state, GameState& previous, Tan
     if(state.opponent.TankFast.alive) {//Check if fast tank is alive and calculate its relative distance
         Position enemy1 = state.opponent.TankFast.position;
         distanceBetweenTanksFast=thisTank.position.Distance(enemy1);
-        if(!isNotBlockedByTerrain(state.map.terrain, thisTank.position, enemy1)) FastInSight = false;// Alive but hiding
+        if(!Util::inSight(state.map.terrain, thisTank.position, enemy1)) FastInSight = false;// Alive but hiding
     } else {
         FastIsAlive = false; //dead
     }
     if(state.opponent.TankSlow.alive) {//Check if fast tank is alive and calculate its relative distance
         Position enemy2 = state.opponent.TankSlow.position;
         distanceBetweenTanksSlow=thisTank.position.Distance(enemy2);
-        if(!isNotBlockedByTerrain(state.map.terrain, thisTank.position, enemy2)) SlowInSight = false;// Alive but hiding
+        if(!Util::inSight(state.map.terrain, thisTank.position, enemy2)) SlowInSight = false;// Alive but hiding
     } else {
         SlowIsAlive = false; //dead
     }
@@ -142,9 +93,9 @@ void FiringStrategy::sendTankCommands(std::queue<Command*> &moves, GameState &st
         closesEnemyWithPrediction = getTargetWithVariance(state, thisTank, closestEnemy, previousState.opponent.TankSlow.position,isInPredictionRange);
     }
     if(thisTank.position == state.player.TankFast.position){ // Ensure not firing at friendly tank
-        shootingAtAlly = aiming(thisTank, state.player.TankSlow);
+        shootingAtAlly = Util::aiming(thisTank, state.player.TankSlow);
     }else{
-        shootingAtAlly = aiming(thisTank, state.player.TankFast);
+        shootingAtAlly = Util::aiming(thisTank, state.player.TankFast);
     }
     double angle = thisTank.turret;
     angle = thisTank.position.GetAngle(closesEnemyWithPrediction) - angle;
