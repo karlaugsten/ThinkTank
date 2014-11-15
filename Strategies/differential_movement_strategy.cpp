@@ -36,7 +36,8 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
     goodness -= (20.0/((x - state.map.width)*(x - state.map.width)));
     goodness -= (20.0/((y - state.map.height)*(y - state.map.height)));
 
-    if(state.timeRemaining < 5.0){
+    if(state.timeRemaining < 3.0){
+        goodness -= ((100 - 10*state.timeRemaining*state.timeRemaining*state.timeRemaining)/(x*x));
         goodness -= ((100 - 10*state.timeRemaining*state.timeRemaining*state.timeRemaining)/(y*y));
         goodness -= ((100 - 10*state.timeRemaining*state.timeRemaining*state.timeRemaining)/((y - state.map.height)*(y - state.map.height)));
     }
