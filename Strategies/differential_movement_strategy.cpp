@@ -77,7 +77,7 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
 
     // Try to stay away from other tank!
     if(otherTank.alive){
-        double dist = 70.0;
+        double dist = enemyDistance + 5.0;
         goodness -= 3.0*exp(-(tank.position.Distance(otherTank.position)*tank.position.Distance(otherTank.position))/(8.0*8.0));
         goodness -= optimalDistance(otherTank.position, Position(x,y), dist, 5.5);
     }
