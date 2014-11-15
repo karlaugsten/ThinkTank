@@ -6,7 +6,6 @@
 
 MapState::MapState(const rapidjson::Value &dom)
 {
-    // TODO: Implement this
     const rapidjson::Value& size = dom["size"];
     assert(size.IsArray());
     width = size[0].GetDouble();

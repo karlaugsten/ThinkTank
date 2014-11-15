@@ -15,7 +15,6 @@ Player::Player(const rapidjson::Value &dom)
 
     const rapidjson::Value& tanks = dom["tanks"];
     assert(tanks.IsArray());
-    // TODO: If tank is not there handle this better (i.e if its dead)
     Tank firstTank;
     Tank secondTank;
     if(tanks.Size() == 2) {
@@ -44,9 +43,6 @@ Player::Player(const rapidjson::Value &dom)
         TankSlow = firstTank;
         TankFast = secondTank;
     }
-
-
-    // TODO: Finish implementing this
 }
 
 Player::~Player(){

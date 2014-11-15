@@ -21,9 +21,13 @@ GameState::GameState(rapidjson::Document &dom)
     Player secondPlayer;
     if(players.Size() == 1){
         firstPlayer = Player(players[0]);
-    }else{
+        secondPlayer.alive = false;
+    }else if(players.Size() == 2){
         firstPlayer = Player(players[0]);
         secondPlayer = Player(players[1]);
+    } else {
+        firstPlayer.alive = false;
+        secondPlayer.alive = false;
     }
 
     if(firstPlayer.name == "Think Tank"){
@@ -35,16 +39,16 @@ GameState::GameState(rapidjson::Document &dom)
         opponent = firstPlayer;
     }
     else {
-        // Could not find our team in the map state!
-        assert(false);
+        player = firstPlayer;
+        opponent = secondPlayer;
     }
 
     // make additional array of projectiles for easy access to all projectiles.
     if(player.alive) {
         projectiles.insert(projectiles.end(), player.TankFast.projectiles.begin(), player.TankFast.projectiles.end());
         projectiles.insert(projectiles.end(), player.TankSlow.projectiles.begin(), player.TankSlow.projectiles.end());
-
     }
+
     if(opponent.alive) {
         projectiles.insert(projectiles.end(), opponent.TankFast.projectiles.begin(), opponent.TankFast.projectiles.end());
         projectiles.insert(projectiles.end(), opponent.TankSlow.projectiles.begin(), opponent.TankSlow.projectiles.end());
