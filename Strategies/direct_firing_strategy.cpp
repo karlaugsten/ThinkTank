@@ -88,12 +88,16 @@ std::queue<Command*> DirectFiringStrategy::DetermineActions(GameState &state, Ga
         angle = thisTank.position.GetAngle(closestEnemy) - angle;
         moves.push(new RotateTurretCommand(angle, state.player.TankFast.id));
         if(canShoot
+                && closestEnemy == state.opponent.TankSlow.position
+                && Util::aiming(state.player.TankFast, state.opponent.TankSlow)
                 && !Util::aiming(state.player.TankFast, state.player.TankSlow)
                 ){
 
             moves.push(new FireCommand(state.player.TankFast.id));
 
         } else if (canShoot
+                && closestEnemy == state.opponent.TankFast.position
+                && Util::aiming(state.player.TankFast, state.opponent.TankFast)
                 && !Util::aiming(state.player.TankFast, state.player.TankSlow)
                 ) {
 
