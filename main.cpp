@@ -6,6 +6,7 @@
 #include "control.h"
 #include "Strategies/movement_strategy.h"
 #include "Strategies/differential_movement_strategy.h"
+#include "Strategies/direct_firing_strategy.h"
 
 
 using namespace std;
@@ -63,6 +64,11 @@ int main(int argc, char* argv[]) {
             // do a ternary search
             Strategy* diffMovement = new DifferentialMovementStrategy(true);
             control->movementStrategy = diffMovement;
+        }
+        if(command == "-fd" || command == "firing-direct"){
+            // do a ternary search
+            Strategy* directFiring = new DirectFiringStrategy();
+            control->firingStrategy = directFiring;
         }
     }
     // Join and wait for threads to finish
