@@ -2,7 +2,6 @@
 #include <cmath>
 #include <string>
 #include <iostream>
-#include <AppKit/AppKit.h>
 #include "../util.h"
 
 using namespace std;
