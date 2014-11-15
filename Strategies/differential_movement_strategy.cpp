@@ -78,7 +78,7 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
     if(otherTank.alive){
         double dist = 70.0;
         goodness -= 3.0*exp(-(tank.position.Distance(otherTank.position)*tank.position.Distance(otherTank.position))/(8.0*8.0));
-        goodness -= optimalDistance(otherTank.position, Position(x,y), dist, 8.0);
+        goodness -= optimalDistance(otherTank.position, Position(x,y), dist, 5.5);
     }
 
     if(state.opponent.alive) {
@@ -93,7 +93,7 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
 
             goodness -= 3.0*exp(-(tank.position.Distance(state.opponent.TankSlow.position)*tank.position.Distance(state.opponent.TankSlow.position))/(8.0*8.0));
 
-            goodness -= optimalDistance(state.opponent.TankSlow.position, Position(x,y), dist, 6.0);
+            goodness -= optimalDistance(state.opponent.TankSlow.position, Position(x,y), dist, 7.0);
 
             // reduce according to gaussian infront of turret
             goodness += degradingGaussian(state.opponent.TankSlow.position, state.opponent.TankSlow.turret, x, y, 8.0, 8.0/std::max(state.map.height, state.map.width));
@@ -111,7 +111,7 @@ double DifferentialMovementStrategy::CalculateGoodness(const GameState &state, c
 
             goodness -= 3.0*exp(-(tank.position.Distance(state.opponent.TankFast.position)*tank.position.Distance(state.opponent.TankFast.position))/(8.0*8.0));
 
-            goodness -= optimalDistance(state.opponent.TankFast.position, Position(x,y), dist, 6.0);
+            goodness -= optimalDistance(state.opponent.TankFast.position, Position(x,y), dist, 7.0);
 
             // reduce according to gaussian infront of turret
             goodness += degradingGaussian(state.opponent.TankFast.position, state.opponent.TankFast.turret, x, y, 8.0, 8.0/std::max(state.map.height, state.map.width));
