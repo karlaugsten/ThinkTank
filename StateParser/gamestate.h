@@ -9,23 +9,25 @@
 class GameState
 {
 private:
-    long timeRemaining;
-    long timestamp;
-    MapState* mapState;
-    Player* opponent;
-    Player* us;
-    //GameState() { } // private default constructor
+
+
+
 public:
+    double timeRemaining;
+    double timestamp;
+    MapState map;
+    Player opponent;
+    Player player;
+    bool paused = true;
+    bool over = false;
+    // for easy access keep a list of all projectiles here
+    std::vector<Projectile> projectiles;
 
+    GameState() { } // private default constructor
     GameState(rapidjson::Document &dom); // Constructor that parses the game state response message
+    ~GameState();
 
-    MapState* GetMapState() { return mapState; }
-    Player* GetOpponent() { return opponent; }
-    Player* GetPlayer() { return us; }
-    long GetTimeRemaining() { return timeRemaining; }
-    long GetTimestamp() { return timestamp; }
-
-    static GameState* ParseState(std::string state);
+    void CalculateLineOfSight();
 
 };
 

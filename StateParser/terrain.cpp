@@ -7,10 +7,11 @@ Terrain::Terrain(const rapidjson::Value &dom)
 
     const rapidjson::Value& type = dom["type"];
     assert(type.IsString());
-    if(strcmp(type.GetString(), "SOLID"))
+    std::string t = type.GetString();
+    if(t == "SOLID")
     {
         Type = TerrainType::SOLID;
-    } else if(strcmp(type.GetString(), "IMPASSABLE"))
+    } else if(t == "IMPASSABLE")
     {
         Type = TerrainType::IMPASSABLE;
     } else
@@ -18,5 +19,9 @@ Terrain::Terrain(const rapidjson::Value &dom)
         // Should never get here!
         assert(false);
     }
-    // TODO: Finish implementing this
+    position = Position(dom["boundingBox"]["corner"]);
+    size = Position(dom["boundingBox"]["size"]);
+}
+
+Terrain::~Terrain(){
 }

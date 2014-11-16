@@ -2,43 +2,59 @@
 #include "rapidjson/document.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
+#include "../util.h"
 #include <iostream>
 #include <string>
 
 GameState::GameState(rapidjson::Document &dom)
 {
-    rapidjson::Value::MemberIterator tr = dom.FindMember("timeRemaining");
-    timeRemaining = tr->value.GetInt64();
-    tr = dom.FindMember("timestamp");
-    timestamp = tr->value.GetInt64();
-    mapState = new MapState(dom["map"]);
+    rapidjson::Value& tr = dom["timeRemaining"];
+    timeRemaining = tr.GetDouble();
+    tr = dom["timestamp"];
+    timestamp = tr.GetDouble();
+    map = MapState(dom["map"]);
 
     // Parse players array
     const rapidjson::Value& players = dom["players"];
     assert(players.IsArray());
+    Player firstPlayer;
+    Player secondPlayer;
+    if(players.Size() == 1){
+        firstPlayer = Player(players[0]);
+        secondPlayer.alive = false;
+    }else if(players.Size() == 2){
+        firstPlayer = Player(players[0]);
+        secondPlayer = Player(players[1]);
+    } else {
+        firstPlayer.alive = false;
+        secondPlayer.alive = false;
+    }
 
-    Player* firstPlayer = new Player(players[0]);
-    Player* secondPlayer = new Player(players[1]);
-    if(strcmp(firstPlayer->name.c_str(), "ThinkTank")){
+    if(firstPlayer.name == "Think Tank"){
 
-        us = firstPlayer;
+        player = firstPlayer;
         opponent = secondPlayer;
-    } else if(strcmp(secondPlayer->name.c_str(), "ThinkTank")){
-        us = secondPlayer;
+    } else if(secondPlayer.name == "Think Tank"){
+        player = secondPlayer;
         opponent = firstPlayer;
     }
     else {
-        // Could not find our team in the map state!
-        assert(false);
+        player = firstPlayer;
+        opponent = secondPlayer;
     }
+
+    // make additional array of projectiles for easy access to all projectiles.
+    if(player.alive) {
+        projectiles.insert(projectiles.end(), player.TankFast.projectiles.begin(), player.TankFast.projectiles.end());
+        projectiles.insert(projectiles.end(), player.TankSlow.projectiles.begin(), player.TankSlow.projectiles.end());
+    }
+
+    if(opponent.alive) {
+        projectiles.insert(projectiles.end(), opponent.TankFast.projectiles.begin(), opponent.TankFast.projectiles.end());
+        projectiles.insert(projectiles.end(), opponent.TankSlow.projectiles.begin(), opponent.TankSlow.projectiles.end());
+    }
+
 }
 
-GameState* GameState::ParseState(std::string json){
-    rapidjson::Document dom;
-    std::cout << "Now parsing:"  << std::endl << json << std::endl;
-    dom.Parse(json.c_str());
-    if(dom.HasParseError()){
-        return NULL;
-    }
-    return new GameState(dom);
+GameState::~GameState(){
 }

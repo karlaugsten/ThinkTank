@@ -6,13 +6,19 @@
 
 class Player
 {
+private:
+
 public:
+    Player(){ alive = false; }
     int score;
+    bool alive;
     std::string name;
-    Tank* TankSlow;
-    Tank* TankFast;
+    Tank TankSlow;
+    Tank TankFast;
 
     Player(const rapidjson::Value &dom); // Constructor that parses the map state message
+    ~Player();
+
 
 };
 

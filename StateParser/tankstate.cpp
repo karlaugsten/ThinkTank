@@ -8,14 +8,13 @@ Tank::Tank(const rapidjson::Value &dom)
     const rapidjson::Value& strId = dom["id"];
     assert(strId.IsString());
     id = strId.GetString();
-
     const rapidjson::Value& type = dom["type"];
     assert(type.IsString());
-
-    if(strcmp(type.GetString(), "TankSlow"))
+    std::string strType = type.GetString();
+    if(strType == "TankSlow")
     {
         Type = TankType::SLOW;
-    } else if(strcmp(type.GetString(), "TankFast"))
+    } else if(strType == "TankFast")
     {
         Type = TankType::FAST;
     } else
@@ -52,6 +51,20 @@ Tank::Tank(const rapidjson::Value &dom)
     assert(d_alive.IsBool());
     alive = d_alive.GetBool();
 
+    position = Position(dom["position"]);
 
-    // TODO: Finish implementing this
+    const rapidjson::Value& d_projectiles = dom["projectiles"];
+    assert(d_projectiles.IsArray());
+    for(int i = 0; i < d_projectiles.Size(); i++){
+        Projectile projectile = Projectile(d_projectiles[i]);
+        Position dPos = projectile.position - position;
+        if(dPos.Length() < minDistanceProjectile){
+            minDistanceProjectile = dPos.Length();
+        }
+        projectiles.push_back(projectile);
+    }
+
+}
+
+Tank::~Tank(){
 }

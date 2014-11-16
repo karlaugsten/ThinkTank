@@ -4,37 +4,47 @@
 
 Player::Player(const rapidjson::Value &dom)
 {
-
+    alive = true;
     const rapidjson::Value& sc = dom["score"];
     assert(sc.IsInt());
-    score = sc.GetInt();
+    score = sc.GetDouble();
 
     const rapidjson::Value& nm = dom["name"];
     assert(nm.IsString());
     name = nm.GetString();
 
-    std::cout << "Found player: " << name << std::endl;
-
     const rapidjson::Value& tanks = dom["tanks"];
     assert(tanks.IsArray());
-    Tank* firstTank = new Tank(tanks[0]);
-    Tank* secondTank = new Tank(tanks[1]);
-
-    if(firstTank->Type == TankType::FAST)
-    {
-
-        TankFast = firstTank;
-        TankSlow = secondTank;
-    } else if(firstTank->Type == TankType::SLOW)
-    {
-
-        TankFast = secondTank;
+    Tank firstTank;
+    Tank secondTank;
+    if(tanks.Size() == 2) {
+        firstTank = Tank(tanks[0]);
+        secondTank = Tank(tanks[1]);
+        if(firstTank.Type == TankType::FAST){
+            TankFast = firstTank;
+            TankSlow = secondTank;
+        } else {
+            TankFast = secondTank;
+            TankSlow = firstTank;
+        }
+    } else if(tanks.Size() == 1){
+        firstTank = Tank(tanks[0]);
+        secondTank.alive = false;
+        if(firstTank.Type == TankType::FAST){
+            TankFast = firstTank;
+            TankSlow = secondTank;
+        } else {
+            TankFast = secondTank;
+            TankSlow = firstTank;
+        }
+    }else{
+        firstTank.alive = false;
+        secondTank.alive = false;
         TankSlow = firstTank;
-    } else
-    {
-        // Could not find fast and slow tanks!
-        assert(false);
+        TankFast = secondTank;
     }
-
-    // TODO: Finish implementing this
 }
+
+Player::~Player(){
+}
+
